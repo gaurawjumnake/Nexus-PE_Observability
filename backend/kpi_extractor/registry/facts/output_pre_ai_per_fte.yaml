@@ -1,0 +1,40 @@
+fact_id: output_pre_ai_per_fte
+name: Output Pre-AI Per FTE
+category: operations
+description: Average output per full-time-equivalent employee measured before AI deployment.
+business_definition: The baseline productivity figure (output units per FTE) for an AI-enabled department
+  prior to AI deployment, used as the comparison baseline for the Productivity Gain KPI.
+data_type: float
+unit: units_per_fte
+fact_type: raw
+source_priority:
+- operations
+- hr
+document_sources:
+- operations
+- hr
+possible_aliases:
+- output pre-ai per fte
+- baseline productivity per fte
+- pre-ai output per employee
+extraction_patterns:
+- output pre-ai per fte
+- baseline output per fte before ai
+validation_rules:
+  min: 0
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: average
+related_facts:
+- output_post_ai_per_fte
+- productivity_gain
+used_by_kpis:
+- productivity_gain
+example_values:
+- 100
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: exclude_portco
+status: active

@@ -1,0 +1,45 @@
+name: AI ROI
+category: Value Creation
+tier: executive
+description: Measures the total financial return generated per dollar of AI investment
+  across the portfolio.
+business_value: Determines whether AI investments create measurable financial value
+  and guides capital allocation decisions.
+formula: (ai_revenue + cost_savings) / total_ai_spend
+unit: ratio
+aggregation: portfolio_weighted_average
+frequency: monthly
+required_facts:
+- ai_revenue
+- cost_savings
+- total_ai_spend
+derived_facts: []
+required_documents:
+- financial
+- project_portfolio
+dependencies:
+- ai_revenue
+- total_ai_spend
+- cost_savings
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: pe_benchmark_panel
+thresholds:
+  excellent: 5.0
+  good: 3.0
+  warning: 1.5
+  critical: 1.0
+data_quality:
+  minimum_coverage: 80
+  confidence_threshold: 0.85
+missing_data_strategy: insufficient_data
+owner_persona:
+- cxo
+- operating_partner
+dashboard_visibility:
+- executive_dashboard
+- benchmark_dashboard
+example_calculation: ai_revenue=5M, cost_savings=2M, total_ai_spend=1M => ROI = 7.0
+status: active
+kpi_id: ai_roi

@@ -1,0 +1,39 @@
+name: Direct AI Revenue
+category: Revenue Growth
+tier: operational
+description: Revenue from products or features where AI is the primary value driver.
+business_value: Isolates pure AI product revenue for product-level accountability.
+formula: sum(revenue_lines WHERE ai_attribution_type = 'direct')
+unit: USD
+aggregation: sum
+frequency: monthly
+required_facts:
+- revenue_line_amount
+- ai_attribution_type
+derived_facts: []
+required_documents:
+- financial
+- crm
+dependencies:
+- ai_attribution_type
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 5000000
+  good: 2000000
+  warning: 500000
+  critical: 0
+data_quality:
+  minimum_coverage: 85
+  confidence_threshold: 0.9
+missing_data_strategy: insufficient_data
+owner_persona:
+- business_lead
+- cxo
+dashboard_visibility:
+- revenue_dashboard
+example_calculation: direct AI product lines summed => $14.1M
+status: active
+kpi_id: direct_ai_revenue

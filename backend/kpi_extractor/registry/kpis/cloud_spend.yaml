@@ -1,0 +1,40 @@
+name: Cloud Compute Spend
+category: FinOps
+tier: operational
+description: Total cloud infrastructure costs for AI workloads including GPU instances
+  and storage.
+business_value: Largest cost driver for AI — requires dedicated visibility and optimization.
+formula: sum(cloud_invoices WHERE workload_tag = 'ai')
+unit: USD
+aggregation: sum
+frequency: monthly
+required_facts:
+- cloud_invoice_amount
+- workload_tag
+derived_facts: []
+required_documents:
+- financial
+- inventory
+dependencies:
+- workload_tag
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 3000000
+  good: 6000000
+  warning: 9000000
+  critical: 12000000
+data_quality:
+  minimum_coverage: 95
+  confidence_threshold: 0.95
+missing_data_strategy: use_last_known
+owner_persona:
+- cfo
+- technology_lead
+dashboard_visibility:
+- finops_dashboard
+example_calculation: GPU+infra cloud bills tagged AI => $6.4M
+status: active
+kpi_id: cloud_spend

@@ -1,0 +1,45 @@
+fact_id: storage_data_spend
+name: Storage & Data Spend
+category: cost
+description: Total spend on data storage and data pipeline infrastructure for AI workloads.
+business_definition: The portion of AI operating cost attributable to data storage, data lakes, and pipeline
+  infrastructure supporting AI systems.
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+- inventory
+document_sources:
+- financial
+- inventory
+possible_aliases:
+- storage and data spend
+- data infrastructure cost
+- data pipeline spend
+extraction_patterns:
+- storage and data spend
+- data infrastructure cost for ai
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: sum
+related_facts:
+- cloud_spend
+- total_ai_spend
+used_by_kpis:
+- total_ai_spend
+example_values:
+- 3500000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

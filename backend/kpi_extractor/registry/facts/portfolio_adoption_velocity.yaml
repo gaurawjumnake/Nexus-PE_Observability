@@ -1,0 +1,39 @@
+fact_id: portfolio_adoption_velocity
+name: Portfolio Adoption Velocity
+category: benchmark
+description: Measure of the portfolio's speed of AI adoption, used for percentile ranking against industry
+  peers.
+business_definition: A composite measure of how quickly the portfolio is adopting AI relative to its own
+  historical baseline, used as the numerator input for the Adoption Velocity Rank percentile calculation.
+data_type: float
+unit: score
+fact_type: raw
+source_priority:
+- benchmark
+document_sources:
+- benchmark
+possible_aliases:
+- portfolio adoption velocity
+- ai adoption speed score
+- portfolio adoption pace
+extraction_patterns:
+- portfolio adoption velocity
+- ai adoption speed score for portfolio
+validation_rules:
+  min: 0
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- adoption_velocity_rank
+- benchmark_adoption_velocity_distribution
+used_by_kpis:
+- adoption_velocity_rank
+example_values:
+- 92
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

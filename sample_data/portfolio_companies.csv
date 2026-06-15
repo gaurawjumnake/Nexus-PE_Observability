@@ -1,0 +1,11 @@
+portco_id,portco_name,sector,total_employees,annual_revenue_m,ebitda_m
+PC001,MediCore Health,Healthcare,1800,120,24
+PC002,FinAxis Solutions,Financial Services,1400,95,19
+PC003,RetailSphere,Retail,2200,150,22
+PC004,LogiFlow Logistics,Logistics,1700,110,18
+PC005,AutoParts Global,Manufacturing,2800,180,27
+PC006,CloudNova Technologies,SaaS,900,85,25
+PC007,AgriSmart Systems,Agriculture,1200,70,12
+PC008,EnergyGrid Solutions,Energy,2100,140,30
+PC009,EduNext Learning,Education,1300,75,15
+PC010,SecureNet Systems,Cybersecurity,1000,90,23

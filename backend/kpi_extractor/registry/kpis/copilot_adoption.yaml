@@ -1,0 +1,39 @@
+name: Copilot Adoption
+category: User Adoption
+tier: operational
+description: Count of employees actively using AI copilot tools (coding assistants,
+  writing assistants) at least weekly.
+business_value: Tracks adoption of productivity-enhancing AI assistants across portfolio
+  workforce.
+formula: count(employees WHERE copilot_tool_weekly_sessions >= 1)
+unit: count
+aggregation: sum
+frequency: weekly
+required_facts:
+- copilot_tool_weekly_sessions
+derived_facts: []
+required_documents:
+- telemetry
+- hr
+dependencies:
+- copilot_tool_weekly_sessions
+benchmarking:
+  enabled: true
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 1500
+  good: 1000
+  warning: 500
+  critical: 100
+data_quality:
+  minimum_coverage: 85
+  confidence_threshold: 0.85
+missing_data_strategy: use_last_known
+owner_persona:
+- technology_lead
+dashboard_visibility:
+- adoption_dashboard
+example_calculation: 1200 employees with weekly copilot sessions
+status: active
+kpi_id: copilot_adoption

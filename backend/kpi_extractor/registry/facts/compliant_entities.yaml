@@ -1,0 +1,42 @@
+fact_id: compliant_entities
+name: Compliant Entities
+category: governance
+description: Count of employees and vendors adhering to the Global AI Acceptable Use Policy.
+business_definition: The number of employees and vendors confirmed compliant with the Global AI Acceptable
+  Use Policy, used as the numerator for the Policy Compliance Rate KPI.
+data_type: integer
+unit: count
+fact_type: raw
+source_priority:
+- governance
+- audit
+- hr
+document_sources:
+- governance
+- hr
+- audit
+possible_aliases:
+- compliant entities
+- policy-compliant employees and vendors
+- ai policy compliant count
+extraction_patterns:
+- compliant entities count
+- employees and vendors compliant with ai policy
+validation_rules:
+  min: 0
+  required_type: integer
+normalization_rules: {}
+aggregation_strategy: sum
+related_facts:
+- policy_compliance_rate
+- total_entities
+used_by_kpis:
+- policy_compliance_rate
+example_values:
+- 9800
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_worst_case
+status: active

@@ -1,0 +1,38 @@
+name: Company Maturity Rank
+category: Benchmarking
+tier: executive
+description: Individual PortCo ranking by AI maturity score within the portfolio.
+business_value: Identifies leaders and laggards for targeted operating partner support.
+formula: rank(portco_ai_maturity_score) OVER (PARTITION BY portfolio ORDER BY portco_ai_maturity_score
+  DESC)
+unit: rank
+aggregation: latest_value
+frequency: quarterly
+required_facts:
+- portco_ai_maturity_score
+derived_facts: []
+required_documents:
+- project_portfolio
+- governance
+dependencies:
+- portco_ai_maturity_score
+benchmarking:
+  enabled: true
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 1
+  good: 3
+  warning: 5
+  critical: 8
+data_quality:
+  minimum_coverage: 80
+  confidence_threshold: 0.8
+missing_data_strategy: exclude_portco
+owner_persona:
+- operating_partner
+dashboard_visibility:
+- benchmark_dashboard
+example_calculation: '#1 Precision Tech maturity=4.8, #2 Nexus Industrial=4.6'
+status: active
+kpi_id: company_maturity_rank

@@ -1,0 +1,37 @@
+fact_id: benchmark_adoption_velocity_distribution
+name: Benchmark Adoption Velocity Distribution
+category: benchmark
+description: Distribution of AI adoption velocity scores across the PE benchmark panel.
+business_definition: A statistical distribution of AI adoption velocity scores from the PE benchmark panel,
+  used as the comparison set for computing the portfolio's adoption velocity percentile rank.
+data_type: string
+unit: distribution
+fact_type: raw
+source_priority:
+- benchmark
+document_sources:
+- benchmark
+possible_aliases:
+- benchmark adoption velocity distribution
+- peer adoption velocity distribution
+- industry adoption velocity benchmark
+extraction_patterns:
+- benchmark adoption velocity distribution
+- peer panel adoption velocity data
+validation_rules:
+  required_type: string
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- adoption_velocity_rank
+- portfolio_adoption_velocity
+used_by_kpis:
+- adoption_velocity_rank
+example_values:
+- benchmark_panel_2026_q2
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

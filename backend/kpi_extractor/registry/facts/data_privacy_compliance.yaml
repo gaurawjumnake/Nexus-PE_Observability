@@ -1,0 +1,43 @@
+fact_id: data_privacy_compliance
+name: Data Privacy Compliance
+category: governance
+description: Compliance score measuring adherence to data privacy regulations (GDPR, CCPA) in AI data
+  pipelines.
+business_definition: A 0-100 score representing the percentage of AI data pipelines that meet data privacy
+  regulatory requirements (e.g., GDPR, CCPA), used as input to the AI Governance Score.
+data_type: float
+unit: score_0_100
+fact_type: derived
+source_priority:
+- governance
+- audit
+document_sources:
+- governance
+- audit
+possible_aliases:
+- data privacy compliance score
+- gdpr/ccpa compliance score
+- privacy compliance rating
+extraction_patterns:
+- data privacy compliance score
+- gdpr ccpa compliance rate for ai pipelines
+validation_rules:
+  min: 0
+  max: 100
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: average
+related_facts:
+- ai_governance_score
+- compliant_data_pipelines
+- total_data_pipelines
+used_by_kpis:
+- ai_governance_score
+example_values:
+- 76
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_worst_case
+status: active

@@ -1,0 +1,41 @@
+name: Active AI Users
+category: User Adoption
+tier: operational
+description: Total employees with at least 5 meaningful AI tool interactions per week
+  across portfolio.
+business_value: Measures real workforce engagement with AI tools vs mere license allocation.
+formula: count(employees WHERE weekly_ai_interactions >= 5)
+unit: count
+aggregation: sum
+frequency: weekly
+required_facts:
+- employee_id
+- weekly_ai_interactions
+derived_facts: []
+required_documents:
+- telemetry
+- hr
+dependencies:
+- weekly_ai_interactions
+benchmarking:
+  enabled: true
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 3000
+  good: 2000
+  warning: 1000
+  critical: 500
+data_quality:
+  minimum_coverage: 90
+  confidence_threshold: 0.9
+missing_data_strategy: use_last_known
+owner_persona:
+- operating_partner
+- technology_lead
+dashboard_visibility:
+- adoption_dashboard
+- operations_dashboard
+example_calculation: 2772 employees with >=5 weekly interactions => active_ai_users=2772
+status: active
+kpi_id: active_ai_users

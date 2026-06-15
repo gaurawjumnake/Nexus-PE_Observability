@@ -1,0 +1,41 @@
+fact_id: api_response_time_ms
+name: API Response Time (ms)
+category: telemetry
+description: Response time in milliseconds for an individual AI API/LLM inference request.
+business_definition: The end-to-end latency, in milliseconds, for a consumer-facing LLM inference request,
+  used to compute the P95 Latency KPI.
+data_type: float
+unit: milliseconds
+fact_type: raw
+source_priority:
+- telemetry
+document_sources:
+- telemetry
+possible_aliases:
+- api response time
+- llm inference latency
+- response time milliseconds
+extraction_patterns:
+- api response time in milliseconds
+- llm inference latency ms
+validation_rules:
+  min: 0
+  required_type: float
+normalization_rules:
+  normalize_to: milliseconds
+  seconds_to_ms_multiplier: 1000
+aggregation_strategy: average
+related_facts:
+- p95_latency
+used_by_kpis:
+- p95_latency
+example_values:
+- 420
+- 1100
+- 2300
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_worst_case
+status: active

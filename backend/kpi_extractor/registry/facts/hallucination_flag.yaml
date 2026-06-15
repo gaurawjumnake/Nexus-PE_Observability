@@ -1,0 +1,41 @@
+fact_id: hallucination_flag
+name: Hallucination Flag
+category: governance
+description: Boolean indicator of whether an AI output was flagged as factually incorrect or fabricated.
+business_definition: A true/false flag indicating whether an AI model output was flagged by automated
+  detection systems as factually incorrect or fabricated, used to compute the Hallucination Rate KPI.
+data_type: boolean
+unit: boolean
+fact_type: raw
+source_priority:
+- audit
+- telemetry
+document_sources:
+- telemetry
+- audit
+possible_aliases:
+- hallucination flag
+- hallucination detected indicator
+- factual error flag
+extraction_patterns:
+- hallucination flag = true
+- output flagged as hallucination
+- factually incorrect output detected
+validation_rules:
+  required_type: boolean
+normalization_rules: {}
+aggregation_strategy: average
+related_facts:
+- evaluated_output_id
+- hallucination_rate
+used_by_kpis:
+- hallucination_rate
+example_values:
+- true
+- false
+confidence_rules:
+  minimum_confidence: 0.9
+  auto_approve: 0.97
+  manual_review_below: 0.9
+missing_value_strategy: use_worst_case
+status: active

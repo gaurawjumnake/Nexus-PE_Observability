@@ -1,0 +1,46 @@
+fact_id: vendor_invoice_amount
+name: Vendor Invoice Amount
+category: cost
+description: Individual vendor invoice amount, prior to spend category classification.
+business_definition: The raw dollar amount on a vendor invoice, used as the base unit for spend categorization
+  (e.g., api_licensing).
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+- inventory
+document_sources:
+- financial
+- inventory
+possible_aliases:
+- vendor invoice amount
+- vendor bill amount
+- invoice line amount
+extraction_patterns:
+- vendor invoice amount
+- vendor bill line item
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: sum
+related_facts:
+- api_licensing_spend
+- spend_category
+used_by_kpis:
+- api_licensing_spend
+example_values:
+- 180000
+- 95000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

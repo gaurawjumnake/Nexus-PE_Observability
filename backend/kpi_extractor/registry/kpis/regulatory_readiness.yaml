@@ -1,0 +1,40 @@
+name: Regulatory Readiness
+category: Governance
+tier: operational
+description: Assessment of preparedness for current and upcoming AI regulations (EU
+  AI Act, SEC AI disclosure).
+business_value: Proactively de-risks portfolio from emerging AI compliance obligations.
+formula: average(portco_regulatory_readiness_rating) WHERE portco_regulatory_readiness_rating
+  IN [0,100]
+unit: score_0_100
+aggregation: average
+frequency: quarterly
+required_facts:
+- portco_regulatory_readiness_rating
+derived_facts: []
+required_documents:
+- governance
+- audit
+dependencies:
+- portco_regulatory_readiness_rating
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: pe_benchmark_panel
+thresholds:
+  excellent: 90
+  good: 75
+  warning: 60
+  critical: 40
+data_quality:
+  minimum_coverage: 80
+  confidence_threshold: 0.8
+missing_data_strategy: use_worst_case
+owner_persona:
+- compliance_lead
+- cxo
+dashboard_visibility:
+- governance_dashboard
+example_calculation: portfolio avg regulatory readiness = 68/100
+status: active
+kpi_id: regulatory_readiness

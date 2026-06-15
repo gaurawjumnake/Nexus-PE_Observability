@@ -1,0 +1,45 @@
+name: AI Governance Score
+category: Governance
+tier: executive
+description: Composite risk metric evaluating policy adherence, audit readiness, and
+  model risk management.
+business_value: Provides PE-level governance assurance and regulatory risk visibility.
+formula: (data_privacy_compliance * 0.40 + model_bias_risk_score * 0.30 + regulatory_readiness
+  * 0.30)
+unit: score_0_100
+aggregation: weighted_average
+frequency: monthly
+required_facts:
+- data_privacy_compliance
+- model_bias_risk_score
+- regulatory_readiness
+derived_facts: []
+required_documents:
+- governance
+- audit
+dependencies:
+- data_privacy_compliance
+- model_bias_risk_score
+- regulatory_readiness
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: pe_benchmark_panel
+thresholds:
+  excellent: 90
+  good: 75
+  warning: 60
+  critical: 40
+data_quality:
+  minimum_coverage: 85
+  confidence_threshold: 0.85
+missing_data_strategy: use_worst_case
+owner_persona:
+- cxo
+- compliance_lead
+dashboard_visibility:
+- executive_dashboard
+- governance_dashboard
+example_calculation: privacy=76, bias=71, readiness=68 => score=72.1
+status: active
+kpi_id: ai_governance_score

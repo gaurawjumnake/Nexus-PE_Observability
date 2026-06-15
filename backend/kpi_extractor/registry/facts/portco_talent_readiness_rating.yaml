@@ -1,0 +1,43 @@
+fact_id: portco_talent_readiness_rating
+name: PortCo Talent Readiness Rating
+category: hr
+description: Individual PortCo's talent readiness rating on a 0-5 scale.
+business_definition: A 0-5 assessment rating of an individual PortCo's workforce AI skill levels, training
+  completion, and AI talent density, used to compute the portfolio talent readiness score.
+data_type: float
+unit: score_0_5
+fact_type: raw
+source_priority:
+- governance
+- hr
+document_sources:
+- governance
+- hr
+possible_aliases:
+- talent readiness rating
+- portco talent readiness score
+- ai talent maturity rating
+extraction_patterns:
+- talent readiness rating for portco
+- portco ai talent readiness assessment
+validation_rules:
+  min: 0
+  max: 5
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- ai_maturity_score
+- talent_readiness_score
+used_by_kpis:
+- talent_readiness_score
+example_values:
+- 3.3
+- 3.9
+- 2.2
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: exclude_portco
+status: active

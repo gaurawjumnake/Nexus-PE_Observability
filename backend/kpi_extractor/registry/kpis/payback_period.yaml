@@ -1,0 +1,43 @@
+name: AI Payback Period
+category: Value Creation
+tier: executive
+description: Number of months required to recoup total AI investment from cumulative
+  returns.
+business_value: Provides LP-ready measure of investment recovery timeline.
+formula: total_ai_spend / ((ai_revenue + cost_savings) / 12)
+unit: months
+aggregation: average
+frequency: quarterly
+required_facts:
+- total_ai_spend
+- ai_revenue
+- cost_savings
+derived_facts:
+- monthly_ai_return
+required_documents:
+- financial
+dependencies:
+- total_ai_spend
+- ai_revenue
+- cost_savings
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: pe_benchmark_panel
+thresholds:
+  excellent: 6
+  good: 12
+  warning: 24
+  critical: 36
+data_quality:
+  minimum_coverage: 80
+  confidence_threshold: 0.85
+missing_data_strategy: insufficient_data
+owner_persona:
+- cxo
+- operating_partner
+dashboard_visibility:
+- executive_dashboard
+example_calculation: spend=10M, monthly_return=1.17M => payback=8.5 months
+status: active
+kpi_id: payback_period

@@ -1,0 +1,43 @@
+fact_id: portco_governance_maturity_rating
+name: PortCo Governance Maturity Rating
+category: governance
+description: Individual PortCo's governance maturity rating on a 0-5 scale.
+business_definition: A 0-5 assessment rating of an individual PortCo's AI governance frameworks, policy
+  completeness, and audit trail quality, used to compute the portfolio governance maturity score.
+data_type: float
+unit: score_0_5
+fact_type: raw
+source_priority:
+- governance
+- audit
+document_sources:
+- governance
+- audit
+possible_aliases:
+- governance maturity rating
+- portco governance rating
+- ai governance maturity score per portco
+extraction_patterns:
+- governance maturity rating for portco
+- portco governance maturity assessment score
+validation_rules:
+  min: 0
+  max: 5
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- ai_maturity_score
+- governance_maturity_score
+used_by_kpis:
+- governance_maturity_score
+example_values:
+- 3.4
+- 4.0
+- 2.5
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: exclude_portco
+status: active

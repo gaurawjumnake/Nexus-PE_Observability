@@ -1,0 +1,47 @@
+fact_id: ebitda_delta
+name: EBITDA Delta
+category: financial
+description: Absolute dollar change in EBITDA between pre-AI and post-AI periods.
+business_definition: The computed difference between post-AI EBITDA and pre-AI EBITDA, serving as the
+  numerator for the EBITDA uplift percentage calculation.
+data_type: currency
+unit: USD
+fact_type: derived
+source_priority:
+- financial
+- board_deck
+document_sources:
+- financial
+- board_deck
+possible_aliases:
+- ebitda delta
+- ebitda change
+- ebitda difference
+extraction_patterns:
+- ebitda delta
+- change in ebitda
+- ebitda difference pre vs post ai
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: latest_value
+related_facts:
+- ebitda_post_ai
+- ebitda_pre_ai
+- ebitda_uplift
+used_by_kpis:
+- ebitda_uplift
+example_values:
+- 4000000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: insufficient_data
+status: active

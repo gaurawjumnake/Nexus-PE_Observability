@@ -1,0 +1,40 @@
+name: Production Ratio
+category: Project Portfolio
+tier: operational
+description: Ratio of production projects to total PoC/Pilot projects, measuring pipeline
+  conversion efficiency.
+business_value: Identifies portfolio velocity in converting experiments to production
+  value.
+formula: projects_in_production / projects_in_poc
+unit: ratio
+aggregation: average
+frequency: monthly
+required_facts:
+- projects_in_production
+- projects_in_poc
+derived_facts: []
+required_documents:
+- project_portfolio
+dependencies:
+- projects_in_production
+- projects_in_poc
+benchmarking:
+  enabled: true
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 4.0
+  good: 2.5
+  warning: 1.5
+  critical: 0.5
+data_quality:
+  minimum_coverage: 90
+  confidence_threshold: 0.9
+missing_data_strategy: exclude_portco
+owner_persona:
+- technology_lead
+dashboard_visibility:
+- operations_dashboard
+example_calculation: 53 production / 12 poc => ratio=4.4
+status: active
+kpi_id: production_ratio

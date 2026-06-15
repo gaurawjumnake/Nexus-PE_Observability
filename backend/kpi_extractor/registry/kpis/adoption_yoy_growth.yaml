@@ -1,0 +1,40 @@
+name: Adoption YoY Growth
+category: Adoption
+tier: operational
+description: Year-over-year percentage growth in portfolio-wide AI adoption score.
+business_value: Tracks momentum of AI adoption maturity over time.
+formula: (adoption_score_current_year - adoption_score_prior_year) / adoption_score_prior_year
+  * 100
+unit: percentage
+aggregation: average
+frequency: annual
+required_facts:
+- adoption_score_current_year
+- adoption_score_prior_year
+derived_facts: []
+required_documents:
+- project_portfolio
+- operations
+dependencies:
+- adoption_score_current_year
+- adoption_score_prior_year
+benchmarking:
+  enabled: true
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 30
+  good: 15
+  warning: 5
+  critical: 0
+data_quality:
+  minimum_coverage: 80
+  confidence_threshold: 0.85
+missing_data_strategy: insufficient_data
+owner_persona:
+- operating_partner
+dashboard_visibility:
+- adoption_dashboard
+example_calculation: score_prior=55, score_current=71 => YoY growth=29.1%
+status: active
+kpi_id: adoption_yoy_growth

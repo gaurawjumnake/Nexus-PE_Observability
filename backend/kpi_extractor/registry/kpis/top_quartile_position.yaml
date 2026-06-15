@@ -1,0 +1,39 @@
+name: Top Quartile Position
+category: Benchmarking
+tier: executive
+description: Percentage of portfolio PortCos ranking in the top quartile of AI maturity
+  within the industry benchmark.
+business_value: LP-facing headline metric demonstrating portfolio AI leadership concentration.
+formula: count(portcos WHERE industry_maturity_percentile >= 75) / count(portcos)
+  * 100
+unit: percentage
+aggregation: latest_value
+frequency: quarterly
+required_facts:
+- portco_industry_maturity_percentile
+derived_facts: []
+required_documents:
+- benchmark
+dependencies:
+- portco_industry_maturity_percentile
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: pe_benchmark_panel
+thresholds:
+  excellent: 50
+  good: 30
+  warning: 15
+  critical: 5
+data_quality:
+  minimum_coverage: 70
+  confidence_threshold: 0.8
+missing_data_strategy: exclude_portco
+owner_persona:
+- cxo
+dashboard_visibility:
+- executive_dashboard
+- benchmark_dashboard
+example_calculation: 28% of PortCos in top quartile globally
+status: active
+kpi_id: top_quartile_position

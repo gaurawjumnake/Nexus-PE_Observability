@@ -1,0 +1,42 @@
+name: Power User Ratio
+category: User Adoption
+tier: operational
+description: Percentage of active AI users who engage with AI tools more than 20 times
+  per week.
+business_value: Identifies depth of AI integration in daily workflows beyond surface
+  adoption.
+formula: count(users WHERE weekly_ai_interactions > 20) / active_ai_users * 100
+unit: percentage
+aggregation: average
+frequency: weekly
+required_facts:
+- weekly_ai_interactions
+- active_ai_users
+derived_facts: []
+required_documents:
+- telemetry
+- hr
+dependencies:
+- weekly_ai_interactions
+- active_ai_users
+benchmarking:
+  enabled: true
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 40
+  good: 25
+  warning: 15
+  critical: 5
+data_quality:
+  minimum_coverage: 85
+  confidence_threshold: 0.85
+missing_data_strategy: use_last_known
+owner_persona:
+- technology_lead
+- operating_partner
+dashboard_visibility:
+- adoption_dashboard
+example_calculation: 844 power users / 2772 active => 30.4%
+status: active
+kpi_id: power_user_ratio

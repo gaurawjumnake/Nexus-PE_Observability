@@ -1,0 +1,38 @@
+fact_id: custom_agent_weekly_sessions
+name: Custom Agent Weekly Sessions
+category: usage
+description: Count of an employee's weekly sessions using custom-built AI agents.
+business_definition: The number of weekly sessions an employee has with custom-built AI agents deployed
+  internally by the PortCo, used to measure adoption of bespoke automation.
+data_type: integer
+unit: count
+fact_type: raw
+source_priority:
+- telemetry
+document_sources:
+- telemetry
+possible_aliases:
+- custom agent weekly sessions
+- custom ai agent usage sessions
+extraction_patterns:
+- custom agent weekly sessions
+- weekly custom ai agent usage
+validation_rules:
+  min: 0
+  required_type: integer
+normalization_rules: {}
+aggregation_strategy: sum
+related_facts:
+- custom_agent_adoption
+used_by_kpis:
+- custom_agent_adoption
+example_values:
+- 0
+- 3
+- 9
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

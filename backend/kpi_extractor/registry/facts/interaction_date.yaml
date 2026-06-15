@@ -1,0 +1,39 @@
+fact_id: interaction_date
+name: Interaction Date
+category: usage
+description: Calendar date on which an AI interaction occurred.
+business_definition: The calendar date associated with a recorded AI tool interaction, used to filter
+  daily interaction counts to the current reporting date.
+data_type: date
+unit: date
+fact_type: raw
+source_priority:
+- telemetry
+document_sources:
+- telemetry
+possible_aliases:
+- interaction date
+- usage date
+- activity date
+extraction_patterns:
+- interaction date
+- date of ai usage
+validation_rules:
+  required_type: date
+normalization_rules:
+  date_format: YYYY-MM-DD
+aggregation_strategy: latest_value
+related_facts:
+- daily_ai_interactions
+- dau_mau_intensity
+used_by_kpis:
+- dau_mau_intensity
+example_values:
+- '2026-06-11'
+- '2026-06-12'
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: mark_unavailable
+status: active

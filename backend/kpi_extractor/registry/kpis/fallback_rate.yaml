@@ -1,0 +1,38 @@
+name: Fallback Rate
+category: Reliability
+tier: operational
+description: Percentage of AI requests that fall back to a secondary system or human
+  escalation due to primary model failure.
+business_value: Indicates primary model reliability and efficiency of fallback architecture.
+formula: count(requests WHERE fallback_triggered = true) / count(requests) * 100
+unit: percentage
+aggregation: average
+frequency: daily
+required_facts:
+- request_id
+- fallback_triggered
+derived_facts: []
+required_documents:
+- telemetry
+dependencies:
+- fallback_triggered
+benchmarking:
+  enabled: true
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 0.05
+  good: 0.5
+  warning: 1.5
+  critical: 5.0
+data_quality:
+  minimum_coverage: 95
+  confidence_threshold: 0.95
+missing_data_strategy: use_worst_case
+owner_persona:
+- technology_lead
+dashboard_visibility:
+- operations_dashboard
+example_calculation: 14 fallbacks / 10000 requests => 0.14%
+status: active
+kpi_id: fallback_rate

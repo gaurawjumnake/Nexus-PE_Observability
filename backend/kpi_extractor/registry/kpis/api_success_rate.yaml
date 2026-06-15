@@ -1,0 +1,38 @@
+name: API Success Rate
+category: Reliability
+tier: operational
+description: Percentage of AI API calls completing successfully without 5xx errors.
+business_value: Monitors AI endpoint reliability essential for user experience and
+  business continuity.
+formula: count(api_calls WHERE status_code < 500) / count(api_calls) * 100
+unit: percentage
+aggregation: average
+frequency: daily
+required_facts:
+- api_call_id
+- api_status_code
+derived_facts: []
+required_documents:
+- telemetry
+dependencies:
+- api_status_code
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: sre_standards
+thresholds:
+  excellent: 99.9
+  good: 99.5
+  warning: 98.0
+  critical: 95.0
+data_quality:
+  minimum_coverage: 99
+  confidence_threshold: 0.99
+missing_data_strategy: use_worst_case
+owner_persona:
+- technology_lead
+dashboard_visibility:
+- operations_dashboard
+example_calculation: 9998 success / 10000 calls => 99.98%
+status: active
+kpi_id: api_success_rate

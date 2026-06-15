@@ -1,0 +1,39 @@
+fact_id: projects_in_poc
+name: Projects in PoC / Pilot
+category: project
+description: Count of AI projects currently in proof-of-concept or pilot stage.
+business_definition: The number of AI projects whose project_stage is 'poc' or 'pilot', representing the
+  experimentation pipeline feeding future production deployments.
+data_type: integer
+unit: count
+fact_type: derived
+source_priority:
+- project_portfolio
+document_sources:
+- project_portfolio
+possible_aliases:
+- projects in poc
+- pilot stage ai projects
+- proof of concept ai projects
+extraction_patterns:
+- projects in poc or pilot stage
+- pilot-stage ai projects count
+validation_rules:
+  min: 0
+  required_type: integer
+normalization_rules: {}
+aggregation_strategy: sum
+related_facts:
+- production_ratio
+- project_id
+- project_stage
+used_by_kpis:
+- production_ratio
+example_values:
+- 12
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

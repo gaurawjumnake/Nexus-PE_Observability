@@ -1,0 +1,41 @@
+name: Cost Efficiency Rank
+category: Benchmarking
+tier: executive
+description: Portfolio percentile ranking on AI cost efficiency relative to PE benchmark
+  panel.
+business_value: Validates FinOps discipline relative to peers and informs cost optimization
+  targets.
+formula: percentile_rank(portfolio_cost_per_outcome, benchmark_cost_efficiency_distribution)
+unit: percentile
+aggregation: latest_value
+frequency: quarterly
+required_facts:
+- portfolio_cost_per_outcome
+- benchmark_cost_efficiency_distribution
+derived_facts: []
+required_documents:
+- benchmark
+- financial
+dependencies:
+- portfolio_cost_per_outcome
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: pe_benchmark_panel
+thresholds:
+  excellent: 90
+  good: 75
+  warning: 50
+  critical: 25
+data_quality:
+  minimum_coverage: 70
+  confidence_threshold: 0.8
+missing_data_strategy: use_last_known
+owner_persona:
+- cxo
+- cfo
+dashboard_visibility:
+- benchmark_dashboard
+example_calculation: portfolio cost efficiency ranks at 88th percentile
+status: active
+kpi_id: cost_efficiency_rank

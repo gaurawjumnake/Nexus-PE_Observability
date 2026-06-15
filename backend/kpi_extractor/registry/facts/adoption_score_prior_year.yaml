@@ -1,0 +1,41 @@
+fact_id: adoption_score_prior_year
+name: Adoption Score (Prior Year)
+category: adoption
+description: Portfolio-wide AI adoption score for the prior year.
+business_definition: The portfolio-wide composite AI adoption maturity score measured for the prior year,
+  used as the baseline denominator for the Adoption YoY Growth KPI.
+data_type: float
+unit: score_0_100
+fact_type: raw
+source_priority:
+- operations
+- project_portfolio
+document_sources:
+- project_portfolio
+- operations
+possible_aliases:
+- adoption score prior year
+- previous year ai adoption score
+- last year's adoption score
+extraction_patterns:
+- adoption score for prior year
+- previous year ai adoption maturity score
+validation_rules:
+  min: 0
+  max: 100
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- adoption_score_current_year
+- adoption_yoy_growth
+used_by_kpis:
+- adoption_yoy_growth
+example_values:
+- 55
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: insufficient_data
+status: active

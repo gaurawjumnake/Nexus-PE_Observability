@@ -1,0 +1,42 @@
+fact_id: remaining_months_in_year
+name: Remaining Months In Year
+category: cost
+description: Number of months remaining in the current fiscal year from the reporting period.
+business_definition: A calendar-derived count of months remaining until fiscal year end, used to extrapolate
+  run-rate spend into a full-year forecast.
+data_type: integer
+unit: count
+fact_type: raw
+source_priority:
+- financial
+- inventory
+document_sources:
+- financial
+- inventory
+possible_aliases:
+- remaining months in year
+- months left in fiscal year
+extraction_patterns:
+- remaining months in fiscal year
+- months left in year
+validation_rules:
+  min: 0
+  max: 12
+  required_type: integer
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- current_run_rate_spend
+- forecasted_ai_spend
+used_by_kpis:
+- forecasted_ai_spend
+example_values:
+- 1
+- 3
+- 6
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

@@ -1,0 +1,39 @@
+fact_id: ai_flag
+name: AI Flag
+category: project
+description: Boolean indicator of whether a project is classified as an AI initiative.
+business_definition: A true/false flag applied to project portfolio records indicating whether the initiative
+  is classified as an AI project, used to scope the total AI project count.
+data_type: boolean
+unit: boolean
+fact_type: raw
+source_priority:
+- project_portfolio
+document_sources:
+- project_portfolio
+possible_aliases:
+- ai flag
+- ai project indicator
+- is ai project
+extraction_patterns:
+- ai flag = true
+- classified as ai project
+- ai project indicator
+validation_rules:
+  required_type: boolean
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- project_id
+- total_ai_projects
+used_by_kpis:
+- total_ai_projects
+example_values:
+- true
+- false
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: mark_unavailable
+status: active

@@ -1,0 +1,41 @@
+name: Spend by Model Family
+category: FinOps
+tier: operational
+description: Percentage cost distribution of total AI spend across commercial and
+  open-source model families.
+business_value: Enables model vendor concentration risk management and cost optimization.
+formula: model_family_spend / total_ai_spend * 100
+unit: percentage
+aggregation: latest_value
+frequency: monthly
+required_facts:
+- model_family_spend
+- total_ai_spend
+derived_facts: []
+required_documents:
+- financial
+- inventory
+dependencies:
+- model_family_spend
+- total_ai_spend
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 40
+  good: 60
+  warning: 75
+  critical: 90
+data_quality:
+  minimum_coverage: 90
+  confidence_threshold: 0.9
+missing_data_strategy: use_last_known
+owner_persona:
+- technology_lead
+- cfo
+dashboard_visibility:
+- finops_dashboard
+example_calculation: OpenAI=62%, Anthropic=18%, Llama=14%, Other=6%
+status: active
+kpi_id: spend_by_model_family

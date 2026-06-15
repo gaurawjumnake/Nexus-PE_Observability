@@ -1,0 +1,48 @@
+fact_id: ebitda_post_ai
+name: EBITDA Post-AI
+category: financial
+description: EBITDA figure for the period following AI-driven initiatives.
+business_definition: The company's EBITDA for the current reporting period, reflecting the impact of AI-driven
+  cost reduction and process efficiency initiatives.
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+- board_deck
+document_sources:
+- financial
+- board_deck
+possible_aliases:
+- ebitda post ai
+- current ebitda
+- post-ai ebitda
+extraction_patterns:
+- ebitda post-ai
+- ebitda after ai initiatives
+- current period ebitda
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: latest_value
+related_facts:
+- ebitda_delta
+- ebitda_pre_ai
+- ebitda_uplift
+- revenue_base
+used_by_kpis:
+- ebitda_uplift
+example_values:
+- 25000000
+confidence_rules:
+  minimum_confidence: 0.9
+  auto_approve: 0.97
+  manual_review_below: 0.9
+missing_value_strategy: insufficient_data
+status: active

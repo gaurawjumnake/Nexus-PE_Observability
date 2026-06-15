@@ -1,0 +1,41 @@
+name: Stalled / Deprioritized Projects
+category: Project Portfolio
+tier: operational
+description: Count of AI projects with no activity for 30+ days or formally deprioritized.
+business_value: Surfaces resource waste and pipeline blockages requiring intervention.
+formula: count(projects WHERE project_stage IN ['stalled','deprioritized'] OR days_since_last_update
+  >= 30)
+unit: count
+aggregation: sum
+frequency: monthly
+required_facts:
+- project_id
+- project_stage
+- days_since_last_update
+derived_facts: []
+required_documents:
+- project_portfolio
+dependencies:
+- project_stage
+- days_since_last_update
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 2
+  good: 5
+  warning: 10
+  critical: 20
+data_quality:
+  minimum_coverage: 90
+  confidence_threshold: 0.9
+missing_data_strategy: use_worst_case
+owner_persona:
+- technology_lead
+- operating_partner
+dashboard_visibility:
+- operations_dashboard
+example_calculation: 3 stalled projects identified
+status: active
+kpi_id: stalled_projects

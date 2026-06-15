@@ -1,0 +1,42 @@
+fact_id: human_review_completed
+name: Human Review Completed
+category: governance
+description: Boolean indicator of whether a high-criticality AI output underwent human-in-the-loop review.
+business_definition: A true/false flag indicating whether a given AI output was subjected to human-in-the-loop
+  review, used to compute the Human Review Coverage KPI for high-criticality outputs.
+data_type: boolean
+unit: boolean
+fact_type: raw
+source_priority:
+- governance
+- audit
+document_sources:
+- governance
+- audit
+possible_aliases:
+- human review completed
+- reviewed by human flag
+- human-in-the-loop review status
+extraction_patterns:
+- human review completed = true
+- output reviewed by human
+- human-in-the-loop audit completed
+validation_rules:
+  required_type: boolean
+normalization_rules: {}
+aggregation_strategy: average
+related_facts:
+- human_review_coverage
+- output_criticality
+- output_id
+used_by_kpis:
+- human_review_coverage
+example_values:
+- true
+- false
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_worst_case
+status: active

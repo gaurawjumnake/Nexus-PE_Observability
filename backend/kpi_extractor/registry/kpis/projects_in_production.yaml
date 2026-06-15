@@ -1,0 +1,38 @@
+name: Projects in Production
+category: Project Portfolio
+tier: operational
+description: Count of AI projects currently live in production environments.
+business_value: Measures conversion from pilots to value-generating production deployments.
+formula: count(projects WHERE project_stage = 'production')
+unit: count
+aggregation: sum
+frequency: monthly
+required_facts:
+- project_id
+- project_stage
+derived_facts: []
+required_documents:
+- project_portfolio
+- telemetry
+dependencies:
+- project_stage
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 60
+  good: 40
+  warning: 20
+  critical: 5
+data_quality:
+  minimum_coverage: 95
+  confidence_threshold: 0.95
+missing_data_strategy: use_last_known
+owner_persona:
+- technology_lead
+dashboard_visibility:
+- operations_dashboard
+example_calculation: 53 projects in production state
+status: active
+kpi_id: projects_in_production

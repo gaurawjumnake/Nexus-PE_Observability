@@ -1,0 +1,43 @@
+fact_id: portco_technical_maturity_rating
+name: PortCo Technical Maturity Rating
+category: maturity
+description: Individual PortCo's technical maturity rating on a 0-5 scale.
+business_definition: A 0-5 assessment rating of an individual PortCo's MLOps rigor, data infrastructure
+  quality, and AI engineering practices, used to compute the portfolio technical maturity score.
+data_type: float
+unit: score_0_5
+fact_type: raw
+source_priority:
+- governance
+- project_portfolio
+document_sources:
+- governance
+- project_portfolio
+possible_aliases:
+- technical maturity rating
+- portco technical maturity score
+- mlops maturity rating
+extraction_patterns:
+- technical maturity rating for portco
+- portco mlops and engineering maturity assessment
+validation_rules:
+  min: 0
+  max: 5
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- ai_maturity_score
+- technical_maturity_score
+used_by_kpis:
+- technical_maturity_score
+example_values:
+- 2.8
+- 3.5
+- 4.0
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: exclude_portco
+status: active

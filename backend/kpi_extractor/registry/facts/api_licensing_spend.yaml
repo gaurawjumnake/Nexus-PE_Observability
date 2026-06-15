@@ -1,0 +1,48 @@
+fact_id: api_licensing_spend
+name: API Licensing Spend
+category: cost
+description: Total spend on AI API access and model licensing from commercial providers.
+business_definition: The sum of vendor invoices categorized as API licensing spend, covering commercial
+  LLM/API access fees (e.g., OpenAI, Anthropic).
+data_type: currency
+unit: USD
+fact_type: derived
+source_priority:
+- financial
+- inventory
+document_sources:
+- financial
+- inventory
+possible_aliases:
+- api licensing spend
+- model licensing cost
+- llm api cost
+- ai api spend
+extraction_patterns:
+- api licensing spend
+- model licensing fees
+- llm api subscription cost
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: sum
+related_facts:
+- spend_category
+- total_ai_spend
+- vendor_invoice_amount
+used_by_kpis:
+- total_ai_spend
+example_values:
+- 2900000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

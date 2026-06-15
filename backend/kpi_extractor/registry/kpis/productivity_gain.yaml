@@ -1,0 +1,41 @@
+name: Human Productivity Gains
+category: Adoption
+tier: operational
+description: Average percentage increase in output per FTE across AI-enabled departments.
+business_value: Demonstrates workforce efficiency gains from AI copilots and automation.
+formula: (output_post_ai_per_fte - output_pre_ai_per_fte) / output_pre_ai_per_fte
+  * 100
+unit: percentage
+aggregation: average
+frequency: quarterly
+required_facts:
+- output_post_ai_per_fte
+- output_pre_ai_per_fte
+derived_facts: []
+required_documents:
+- hr
+- operations
+dependencies:
+- output_post_ai_per_fte
+- output_pre_ai_per_fte
+benchmarking:
+  enabled: true
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 40
+  good: 25
+  warning: 10
+  critical: 0
+data_quality:
+  minimum_coverage: 70
+  confidence_threshold: 0.8
+missing_data_strategy: exclude_portco
+owner_persona:
+- operating_partner
+- business_lead
+dashboard_visibility:
+- operations_dashboard
+example_calculation: output_pre=100 units/FTE, output_post=132 => gain=32%
+status: active
+kpi_id: productivity_gain

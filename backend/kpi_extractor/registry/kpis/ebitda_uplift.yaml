@@ -1,0 +1,45 @@
+name: EBITDA Uplift
+category: Value Creation
+tier: executive
+description: Percentage point improvement in EBITDA margin attributable to AI-driven
+  cost reduction and process efficiency.
+business_value: Directly links AI initiatives to PE value creation through margin
+  expansion.
+formula: (ebitda_post_ai - ebitda_pre_ai) / revenue_base * 100
+unit: percentage_points
+aggregation: portfolio_weighted_average
+frequency: quarterly
+required_facts:
+- ebitda_post_ai
+- ebitda_pre_ai
+- revenue_base
+derived_facts:
+- ebitda_delta
+required_documents:
+- financial
+- board_deck
+dependencies:
+- ebitda_post_ai
+- ebitda_pre_ai
+- revenue_base
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: pe_benchmark_panel
+thresholds:
+  excellent: 15.0
+  good: 8.0
+  warning: 3.0
+  critical: 0.0
+data_quality:
+  minimum_coverage: 80
+  confidence_threshold: 0.85
+missing_data_strategy: insufficient_data
+owner_persona:
+- cxo
+- operating_partner
+dashboard_visibility:
+- executive_dashboard
+example_calculation: ebitda_post=25M, ebitda_pre=21M, revenue=100M => uplift=4.0pp
+status: active
+kpi_id: ebitda_uplift

@@ -1,0 +1,38 @@
+name: Adoption Velocity Rank
+category: Benchmarking
+tier: executive
+description: Portfolio percentile ranking on speed of AI adoption relative to PE benchmark
+  panel.
+business_value: Provides competitive intelligence on adoption pace vs peer PE firms.
+formula: percentile_rank(portfolio_adoption_velocity, benchmark_adoption_velocity_distribution)
+unit: percentile
+aggregation: latest_value
+frequency: quarterly
+required_facts:
+- portfolio_adoption_velocity
+- benchmark_adoption_velocity_distribution
+derived_facts: []
+required_documents:
+- benchmark
+dependencies:
+- portfolio_adoption_velocity
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: pe_benchmark_panel
+thresholds:
+  excellent: 90
+  good: 75
+  warning: 50
+  critical: 25
+data_quality:
+  minimum_coverage: 70
+  confidence_threshold: 0.8
+missing_data_strategy: use_last_known
+owner_persona:
+- cxo
+dashboard_visibility:
+- benchmark_dashboard
+example_calculation: portfolio adoption velocity ranks at 92nd percentile
+status: active
+kpi_id: adoption_velocity_rank

@@ -1,0 +1,36 @@
+name: P95 Latency
+category: Reliability
+tier: operational
+description: 95th percentile response time for consumer-facing LLM inference requests.
+business_value: Ensures AI system responsiveness meets user experience and SLA thresholds.
+formula: percentile(api_response_time_ms, 95)
+unit: milliseconds
+aggregation: average
+frequency: daily
+required_facts:
+- api_response_time_ms
+derived_facts: []
+required_documents:
+- telemetry
+dependencies:
+- api_response_time_ms
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: sre_standards
+thresholds:
+  excellent: 500
+  good: 1500
+  warning: 3000
+  critical: 5000
+data_quality:
+  minimum_coverage: 99
+  confidence_threshold: 0.99
+missing_data_strategy: use_worst_case
+owner_persona:
+- technology_lead
+dashboard_visibility:
+- operations_dashboard
+example_calculation: P95 across all LLM endpoints = 1420ms
+status: active
+kpi_id: p95_latency

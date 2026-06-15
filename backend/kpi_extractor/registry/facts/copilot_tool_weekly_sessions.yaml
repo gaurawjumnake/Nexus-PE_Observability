@@ -1,0 +1,42 @@
+fact_id: copilot_tool_weekly_sessions
+name: Copilot Tool Weekly Sessions
+category: usage
+description: Count of an employee's weekly sessions using AI copilot tools (coding/writing assistants).
+business_definition: The number of weekly sessions an employee has with AI copilot-type tools such as
+  coding assistants or writing assistants, used to measure copilot adoption.
+data_type: integer
+unit: count
+fact_type: raw
+source_priority:
+- telemetry
+- hr
+document_sources:
+- telemetry
+- hr
+possible_aliases:
+- copilot weekly sessions
+- copilot tool usage sessions
+- weekly copilot interactions
+extraction_patterns:
+- copilot weekly sessions
+- weekly copilot tool usage
+- coding assistant sessions per week
+validation_rules:
+  min: 0
+  required_type: integer
+normalization_rules: {}
+aggregation_strategy: sum
+related_facts:
+- copilot_adoption
+used_by_kpis:
+- copilot_adoption
+example_values:
+- 1
+- 5
+- 12
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

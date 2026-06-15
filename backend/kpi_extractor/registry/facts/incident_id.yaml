@@ -1,0 +1,47 @@
+fact_id: incident_id
+name: Incident ID
+category: governance
+description: Unique identifier for an AI incident record.
+business_definition: A unique key identifying a recorded AI incident (failure, policy violation, or service
+  degradation), used to join incident severity, status, and resolution data.
+data_type: string
+unit: string
+fact_type: raw
+source_priority:
+- governance
+- audit
+- telemetry
+document_sources:
+- governance
+- telemetry
+- audit
+possible_aliases:
+- incident id
+- incident identifier
+- ai incident record id
+extraction_patterns:
+- incident id
+- ai incident identifier
+validation_rules:
+  required_type: string
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- incident_period
+- incident_resolution_time_minutes
+- incident_severity
+- incident_status
+- incident_type
+used_by_kpis:
+- ai_incident_rate
+- critical_incident_count
+- mttr
+example_values:
+- INC-7781
+- INC-9023
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: mark_unavailable
+status: active

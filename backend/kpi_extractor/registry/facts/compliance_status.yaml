@@ -1,0 +1,46 @@
+fact_id: compliance_status
+name: Compliance Status
+category: governance
+description: Compliance status of a third-party AI vendor (e.g., compliant, non_compliant, pending_review).
+business_definition: A categorical status indicating whether a third-party AI vendor meets minimum PE-defined
+  security and compliance requirements, used to compute the Vendor Compliance KPI.
+data_type: enum
+unit: string
+fact_type: raw
+source_priority:
+- governance
+- audit
+document_sources:
+- governance
+- audit
+possible_aliases:
+- compliance status
+- vendor compliance state
+- vendor security compliance status
+extraction_patterns:
+- compliance status = compliant
+- vendor marked non-compliant
+- vendor compliance review status
+validation_rules:
+  required_type: enum
+  allowed_values:
+  - compliant
+  - non_compliant
+  - pending_review
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- vendor_compliance
+- vendor_id
+used_by_kpis:
+- vendor_compliance
+example_values:
+- compliant
+- non_compliant
+- pending_review
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_worst_case
+status: active

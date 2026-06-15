@@ -1,0 +1,39 @@
+name: Vendor Compliance
+category: Governance
+tier: operational
+description: Percentage of third-party AI vendors meeting minimum PE-defined security
+  and compliance requirements.
+business_value: Manages third-party AI risk in the supply chain.
+formula: count(vendors WHERE compliance_status = 'compliant') / count(vendors) * 100
+unit: percentage
+aggregation: average
+frequency: quarterly
+required_facts:
+- vendor_id
+- compliance_status
+derived_facts: []
+required_documents:
+- governance
+- audit
+dependencies:
+- compliance_status
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 98
+  good: 90
+  warning: 80
+  critical: 65
+data_quality:
+  minimum_coverage: 90
+  confidence_threshold: 0.9
+missing_data_strategy: use_worst_case
+owner_persona:
+- compliance_lead
+dashboard_visibility:
+- governance_dashboard
+example_calculation: 96.4% of third-party vendors compliant
+status: active
+kpi_id: vendor_compliance

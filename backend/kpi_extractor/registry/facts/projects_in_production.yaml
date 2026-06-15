@@ -1,0 +1,42 @@
+fact_id: projects_in_production
+name: Projects in Production
+category: project
+description: Count of AI projects currently live in production environments.
+business_definition: The number of AI projects whose project_stage equals 'production', representing initiatives
+  that have reached value-generating deployment.
+data_type: integer
+unit: count
+fact_type: derived
+source_priority:
+- project_portfolio
+document_sources:
+- project_portfolio
+possible_aliases:
+- projects in production
+- live ai projects
+- production-stage ai projects
+extraction_patterns:
+- projects in production
+- ai projects live in production
+- production deployments count
+validation_rules:
+  min: 0
+  required_type: integer
+normalization_rules: {}
+aggregation_strategy: sum
+related_facts:
+- percent_ai_in_production
+- production_ratio
+- project_id
+- project_stage
+used_by_kpis:
+- percent_ai_in_production
+- production_ratio
+example_values:
+- 53
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

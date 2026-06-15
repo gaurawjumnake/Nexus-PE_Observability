@@ -1,0 +1,44 @@
+name: Human Review Coverage
+category: Governance
+tier: operational
+description: Percentage of AI outputs subjected to human-in-the-loop audit for high-criticality
+  decisions.
+business_value: Ensures human oversight is maintained for AI decisions with significant
+  business or legal impact.
+formula: count(outputs WHERE human_review_completed = true AND criticality = 'high')
+  / count(outputs WHERE criticality = 'high') * 100
+unit: percentage
+aggregation: average
+frequency: monthly
+required_facts:
+- output_id
+- human_review_completed
+- output_criticality
+derived_facts: []
+required_documents:
+- audit
+- governance
+dependencies:
+- human_review_completed
+- output_criticality
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 98
+  good: 88
+  warning: 70
+  critical: 50
+data_quality:
+  minimum_coverage: 90
+  confidence_threshold: 0.9
+missing_data_strategy: use_worst_case
+owner_persona:
+- compliance_lead
+- operating_partner
+dashboard_visibility:
+- governance_dashboard
+example_calculation: 880 reviewed / 1000 high-criticality outputs => 88%
+status: active
+kpi_id: human_review_coverage

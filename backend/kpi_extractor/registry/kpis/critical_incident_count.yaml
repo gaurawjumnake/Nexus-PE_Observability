@@ -1,0 +1,44 @@
+name: Critical Incident Count
+category: Governance
+tier: operational
+description: Total number of active or unresolved critical AI incidents including
+  data leakage, drift, and hallucinations.
+business_value: Tracks open risks requiring immediate escalation and remediation.
+formula: count(incidents WHERE severity = 'critical' AND status != 'resolved')
+unit: count
+aggregation: sum
+frequency: daily
+required_facts:
+- incident_id
+- incident_severity
+- incident_status
+derived_facts: []
+required_documents:
+- governance
+- audit
+- telemetry
+dependencies:
+- incident_severity
+- incident_status
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 0
+  good: 1
+  warning: 3
+  critical: 5
+data_quality:
+  minimum_coverage: 99
+  confidence_threshold: 0.99
+missing_data_strategy: use_worst_case
+owner_persona:
+- technology_lead
+- compliance_lead
+dashboard_visibility:
+- governance_dashboard
+- operations_dashboard
+example_calculation: 2 unresolved critical incidents open
+status: active
+kpi_id: critical_incident_count

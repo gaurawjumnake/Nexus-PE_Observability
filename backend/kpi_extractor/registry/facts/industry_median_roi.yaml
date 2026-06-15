@@ -1,0 +1,40 @@
+fact_id: industry_median_roi
+name: Industry Median ROI
+category: benchmark
+description: Median AI ROI across the PE benchmark panel of industry peers.
+business_definition: The median AI ROI ratio observed across the PE benchmark panel of industry peers,
+  used as the denominator for the Industry Benchmark Ratio KPI.
+data_type: float
+unit: ratio
+fact_type: raw
+source_priority:
+- financial
+- benchmark
+document_sources:
+- financial
+- benchmark
+possible_aliases:
+- industry median roi
+- peer median ai roi
+- benchmark panel median roi
+extraction_patterns:
+- industry median ai roi
+- peer panel median roi figure
+validation_rules:
+  min: 0
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- industry_benchmark_ratio
+- portfolio_avg_roi
+used_by_kpis:
+- industry_benchmark_ratio
+example_values:
+- 2.4
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

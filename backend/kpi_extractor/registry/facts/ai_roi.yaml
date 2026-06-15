@@ -1,0 +1,59 @@
+fact_id: ai_roi
+name: AI ROI
+category: financial
+description: Total financial return generated per dollar of AI investment across the portfolio.
+business_definition: The ratio of combined AI revenue and cost savings to total AI spend, representing
+  the portfolio-wide financial return on AI investment, used as an input to Industry Benchmark Ratio.
+data_type: float
+unit: ratio
+fact_type: derived
+source_priority:
+- financial
+- telemetry
+- operations
+- project_portfolio
+- inventory
+- benchmark
+document_sources:
+- financial
+- project_portfolio
+- telemetry
+- operations
+- benchmark
+- inventory
+possible_aliases:
+- ai roi
+- return on ai investment
+- ai investment return ratio
+extraction_patterns:
+- ai roi
+- return on ai investment ratio
+validation_rules:
+  min: 0
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: portfolio_weighted_average
+related_facts:
+- ai_revenue
+- cost_savings
+- industry_benchmark_ratio
+- payback_period
+- portfolio_avg_roi
+- total_ai_spend
+used_by_kpis:
+- ai_roi
+- budget_adherence
+- budget_variance
+- cost_per_outcome
+- industry_benchmark_ratio
+- payback_period
+- spend_by_model_family
+example_values:
+- 7.0
+- 3.9
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: insufficient_data
+status: active

@@ -1,0 +1,40 @@
+name: Budget Adherence
+category: FinOps
+tier: operational
+description: Closeness of actual AI operational spend to forecasted budget, expressed
+  as a percentage.
+business_value: Ensures AI spending discipline and prevents cost overruns.
+formula: (1 - abs(total_ai_spend - approved_ai_budget) / approved_ai_budget) * 100
+unit: percentage
+aggregation: average
+frequency: monthly
+required_facts:
+- total_ai_spend
+- approved_ai_budget
+derived_facts: []
+required_documents:
+- financial
+dependencies:
+- total_ai_spend
+- approved_ai_budget
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 98
+  good: 92
+  warning: 85
+  critical: 70
+data_quality:
+  minimum_coverage: 90
+  confidence_threshold: 0.9
+missing_data_strategy: use_last_known
+owner_persona:
+- cfo
+- operating_partner
+dashboard_visibility:
+- finops_dashboard
+example_calculation: spend=12.8M, budget=13M => adherence=98.5%
+status: active
+kpi_id: budget_adherence

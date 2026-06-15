@@ -1,0 +1,45 @@
+fact_id: opex_pre_ai_baseline
+name: OpEx Pre-AI Baseline
+category: cost
+description: Operating expense baseline measured before AI deployment.
+business_definition: The operating expense figure for the relevant cost center prior to AI deployment,
+  used as the comparison baseline for cost savings calculations.
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+- operations
+document_sources:
+- financial
+- operations
+possible_aliases:
+- pre-ai opex baseline
+- opex before ai
+- baseline operating expense
+extraction_patterns:
+- pre-ai opex baseline
+- operating expense before ai deployment
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: latest_value
+related_facts:
+- cost_savings
+- opex_current_period
+used_by_kpis:
+- cost_savings
+example_values:
+- 50000000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

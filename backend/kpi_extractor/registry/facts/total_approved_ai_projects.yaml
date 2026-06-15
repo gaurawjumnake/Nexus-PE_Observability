@@ -1,0 +1,38 @@
+fact_id: total_approved_ai_projects
+name: Total Approved AI Projects
+category: project
+description: Total count of AI use cases formally approved for development or deployment.
+business_definition: The total number of AI use cases that have received formal approval (e.g., from governance
+  committee), used as the denominator for the percent-in-production KPI.
+data_type: integer
+unit: count
+fact_type: raw
+source_priority:
+- project_portfolio
+document_sources:
+- project_portfolio
+possible_aliases:
+- total approved ai projects
+- approved ai use cases
+- approved ai initiatives count
+extraction_patterns:
+- total approved ai projects
+- approved ai use cases count
+validation_rules:
+  min: 0
+  required_type: integer
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- percent_ai_in_production
+- projects_in_production
+used_by_kpis:
+- percent_ai_in_production
+example_values:
+- 37
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: exclude_portco
+status: active

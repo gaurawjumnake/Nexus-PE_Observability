@@ -1,0 +1,41 @@
+name: Data Privacy Compliance
+category: Governance
+tier: operational
+description: Compliance score measuring adherence to data privacy regulations (GDPR,
+  CCPA) in AI data pipelines.
+business_value: Reduces regulatory risk and protects LP/PortCo from privacy violation
+  fines.
+formula: compliant_data_pipelines / total_data_pipelines * 100
+unit: score_0_100
+aggregation: average
+frequency: monthly
+required_facts:
+- compliant_data_pipelines
+- total_data_pipelines
+derived_facts: []
+required_documents:
+- governance
+- audit
+dependencies:
+- compliant_data_pipelines
+- total_data_pipelines
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: pe_benchmark_panel
+thresholds:
+  excellent: 98
+  good: 90
+  warning: 75
+  critical: 60
+data_quality:
+  minimum_coverage: 90
+  confidence_threshold: 0.9
+missing_data_strategy: use_worst_case
+owner_persona:
+- compliance_lead
+dashboard_visibility:
+- governance_dashboard
+example_calculation: 76 compliant / 100 pipelines => 76/100 score
+status: active
+kpi_id: data_privacy_compliance

@@ -1,0 +1,56 @@
+fact_id: project_stage
+name: Project Stage
+category: project
+description: Current pipeline stage of an AI project (e.g., poc, pilot, production, stalled, deprioritized).
+business_definition: A categorical label indicating where in the delivery lifecycle an AI project currently
+  sits, used to compute project portfolio KPIs such as production ratio and stalled project counts.
+data_type: enum
+unit: string
+fact_type: raw
+source_priority:
+- telemetry
+- project_portfolio
+document_sources:
+- project_portfolio
+- telemetry
+possible_aliases:
+- project stage
+- project status
+- initiative pipeline stage
+extraction_patterns:
+- project stage = production
+- project currently in pilot stage
+- 'stage: poc'
+validation_rules:
+  required_type: enum
+  allowed_values:
+  - poc
+  - pilot
+  - production
+  - stalled
+  - deprioritized
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- percent_ai_in_production
+- production_ratio
+- project_id
+- projects_in_poc
+- projects_in_production
+- stalled_projects
+used_by_kpis:
+- projects_in_poc
+- projects_in_production
+- stalled_projects
+example_values:
+- poc
+- pilot
+- production
+- stalled
+- deprioritized
+confidence_rules:
+  minimum_confidence: 0.9
+  auto_approve: 0.97
+  manual_review_below: 0.9
+missing_value_strategy: use_last_known
+status: active

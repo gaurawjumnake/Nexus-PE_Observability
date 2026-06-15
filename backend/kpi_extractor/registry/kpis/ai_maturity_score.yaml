@@ -1,0 +1,48 @@
+name: AI Maturity Score
+category: Maturity
+tier: executive
+description: Cross-portfolio assessment of AI engineering culture, data readiness,
+  and governance capability on a 5-point scale.
+business_value: Provides PE-level composite view of long-term AI capability and risk.
+formula: (strategic_alignment_score + technical_maturity_score + talent_readiness_score
+  + governance_maturity_score) / 4
+unit: score_0_5
+aggregation: average
+frequency: quarterly
+required_facts:
+- strategic_alignment_score
+- technical_maturity_score
+- talent_readiness_score
+- governance_maturity_score
+derived_facts: []
+required_documents:
+- governance
+- project_portfolio
+- hr
+dependencies:
+- strategic_alignment_score
+- technical_maturity_score
+- talent_readiness_score
+- governance_maturity_score
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: pe_benchmark_panel
+thresholds:
+  excellent: 4.5
+  good: 3.5
+  warning: 2.5
+  critical: 1.5
+data_quality:
+  minimum_coverage: 80
+  confidence_threshold: 0.8
+missing_data_strategy: exclude_portco
+owner_persona:
+- cxo
+- technology_lead
+dashboard_visibility:
+- executive_dashboard
+- benchmark_dashboard
+example_calculation: strategic=4.1, technical=2.8, talent=3.3, governance=3.4 => avg=3.4
+status: active
+kpi_id: ai_maturity_score

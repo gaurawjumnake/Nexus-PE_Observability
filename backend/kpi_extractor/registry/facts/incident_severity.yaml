@@ -1,0 +1,52 @@
+fact_id: incident_severity
+name: Incident Severity
+category: governance
+description: Severity classification of an AI incident (e.g., critical, high, medium, low).
+business_definition: A categorical severity rating assigned to an AI incident, used to filter incident
+  counts for the AI Incident Rate and Critical Incident Count KPIs.
+data_type: enum
+unit: string
+fact_type: raw
+source_priority:
+- governance
+- audit
+- telemetry
+document_sources:
+- governance
+- telemetry
+- audit
+possible_aliases:
+- incident severity
+- severity level
+- incident criticality
+extraction_patterns:
+- incident severity = critical
+- severity rated as high
+- critical severity incident
+validation_rules:
+  required_type: enum
+  allowed_values:
+  - critical
+  - high
+  - medium
+  - low
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- ai_incident_rate
+- critical_incident_count
+- incident_id
+used_by_kpis:
+- ai_incident_rate
+- critical_incident_count
+example_values:
+- critical
+- high
+- medium
+- low
+confidence_rules:
+  minimum_confidence: 0.9
+  auto_approve: 0.97
+  manual_review_below: 0.9
+missing_value_strategy: use_worst_case
+status: active

@@ -1,0 +1,38 @@
+fact_id: embedded_analytics_weekly_sessions
+name: Embedded Analytics Weekly Sessions
+category: usage
+description: Count of an employee's weekly sessions using AI-powered embedded analytics features.
+business_definition: The number of weekly sessions an employee has with AI-powered embedded analytics
+  features within business applications, used to measure adoption of analytics AI.
+data_type: integer
+unit: count
+fact_type: raw
+source_priority:
+- telemetry
+document_sources:
+- telemetry
+possible_aliases:
+- embedded analytics weekly sessions
+- ai analytics feature usage sessions
+extraction_patterns:
+- embedded analytics weekly sessions
+- weekly ai analytics feature usage
+validation_rules:
+  min: 0
+  required_type: integer
+normalization_rules: {}
+aggregation_strategy: sum
+related_facts:
+- embedded_analytics_adoption
+used_by_kpis:
+- embedded_analytics_adoption
+example_values:
+- 0
+- 2
+- 6
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

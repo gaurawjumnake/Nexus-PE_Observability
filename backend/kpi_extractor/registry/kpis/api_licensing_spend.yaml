@@ -1,0 +1,39 @@
+name: API Licensing Spend
+category: FinOps
+tier: operational
+description: Total spend on AI API access and model licensing from commercial providers.
+business_value: Tracks third-party AI dependency costs and enables vendor negotiation
+  leverage.
+formula: sum(vendor_invoices WHERE spend_category = 'api_licensing')
+unit: USD
+aggregation: sum
+frequency: monthly
+required_facts:
+- vendor_invoice_amount
+- spend_category
+derived_facts: []
+required_documents:
+- financial
+- inventory
+dependencies:
+- spend_category
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 1000000
+  good: 2500000
+  warning: 4000000
+  critical: 6000000
+data_quality:
+  minimum_coverage: 95
+  confidence_threshold: 0.95
+missing_data_strategy: use_last_known
+owner_persona:
+- cfo
+dashboard_visibility:
+- finops_dashboard
+example_calculation: OpenAI + Anthropic API invoices => $2.9M
+status: active
+kpi_id: api_licensing_spend

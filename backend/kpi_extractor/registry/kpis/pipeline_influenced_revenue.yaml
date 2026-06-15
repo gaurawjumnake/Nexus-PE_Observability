@@ -1,0 +1,39 @@
+name: Pipeline Influenced Revenue
+category: Revenue Growth
+tier: operational
+description: Revenue from pipeline opportunities that were generated or materially
+  influenced by AI-driven marketing or outreach.
+business_value: Measures AI's contribution to top-of-funnel revenue generation.
+formula: sum(revenue_lines WHERE ai_attribution_type = 'pipeline_influenced')
+unit: USD
+aggregation: sum
+frequency: monthly
+required_facts:
+- revenue_line_amount
+- ai_attribution_type
+derived_facts: []
+required_documents:
+- financial
+- crm
+dependencies:
+- ai_attribution_type
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 10000000
+  good: 5000000
+  warning: 1000000
+  critical: 0
+data_quality:
+  minimum_coverage: 75
+  confidence_threshold: 0.8
+missing_data_strategy: insufficient_data
+owner_persona:
+- business_lead
+dashboard_visibility:
+- revenue_dashboard
+example_calculation: pipeline AI attribution lines => $18.9M
+status: active
+kpi_id: pipeline_influenced_revenue

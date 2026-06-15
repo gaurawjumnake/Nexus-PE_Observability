@@ -1,0 +1,44 @@
+name: AI Incident Rate (Critical)
+category: Governance
+tier: operational
+description: Count of high-impact AI failures or policy violations in the current
+  month.
+business_value: Early warning signal for AI reliability failures with reputational
+  or financial consequences.
+formula: count(incidents WHERE severity IN ['critical','high'] AND period = current_month)
+unit: count
+aggregation: sum
+frequency: monthly
+required_facts:
+- incident_id
+- incident_severity
+- incident_period
+derived_facts: []
+required_documents:
+- governance
+- audit
+- telemetry
+dependencies:
+- incident_severity
+benchmarking:
+  enabled: true
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 0
+  good: 2
+  warning: 5
+  critical: 10
+data_quality:
+  minimum_coverage: 95
+  confidence_threshold: 0.95
+missing_data_strategy: use_worst_case
+owner_persona:
+- technology_lead
+- compliance_lead
+dashboard_visibility:
+- governance_dashboard
+- operations_dashboard
+example_calculation: 2 critical incidents in month => ai_incident_rate=2
+status: active
+kpi_id: ai_incident_rate

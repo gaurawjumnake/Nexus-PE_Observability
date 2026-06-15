@@ -1,0 +1,66 @@
+fact_id: total_ai_spend
+name: Total AI Spend
+category: cost
+description: Year-to-date cloud, licensing, and compute costs for all AI initiatives across the portfolio.
+business_definition: The aggregate operating cost of AI initiatives, summing cloud compute, API/model
+  licensing, storage, and dedicated AI talent costs across all PortCos.
+data_type: currency
+unit: USD
+fact_type: derived
+source_priority:
+- financial
+- telemetry
+- operations
+- project_portfolio
+- inventory
+document_sources:
+- financial
+- project_portfolio
+- telemetry
+- operations
+- inventory
+possible_aliases:
+- total ai spend
+- total ai cost
+- aggregate ai expenditure
+- total ai operating cost
+extraction_patterns:
+- total ai spend
+- total ai cost
+- aggregate ai expenditure ytd
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: sum
+related_facts:
+- ai_roi
+- api_licensing_spend
+- budget_adherence
+- budget_variance
+- cloud_spend
+- cost_per_outcome
+- payback_period
+- spend_by_model_family
+- storage_data_spend
+- talent_ai_teams_spend
+used_by_kpis:
+- ai_roi
+- budget_adherence
+- budget_variance
+- cost_per_outcome
+- payback_period
+- spend_by_model_family
+example_values:
+- 12800000
+confidence_rules:
+  minimum_confidence: 0.9
+  auto_approve: 0.97
+  manual_review_below: 0.9
+missing_value_strategy: insufficient_data
+status: active

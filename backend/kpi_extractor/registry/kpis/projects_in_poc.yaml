@@ -1,0 +1,37 @@
+name: Projects in PoC / Pilot
+category: Project Portfolio
+tier: operational
+description: Count of AI projects currently in proof-of-concept or pilot stage.
+business_value: Tracks the pipeline feeding future production deployments.
+formula: count(projects WHERE project_stage IN ['poc', 'pilot'])
+unit: count
+aggregation: sum
+frequency: monthly
+required_facts:
+- project_id
+- project_stage
+derived_facts: []
+required_documents:
+- project_portfolio
+dependencies:
+- project_stage
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 20
+  good: 10
+  warning: 5
+  critical: 0
+data_quality:
+  minimum_coverage: 90
+  confidence_threshold: 0.9
+missing_data_strategy: use_last_known
+owner_persona:
+- technology_lead
+dashboard_visibility:
+- operations_dashboard
+example_calculation: 12 projects in PoC/Pilot stage
+status: active
+kpi_id: projects_in_poc

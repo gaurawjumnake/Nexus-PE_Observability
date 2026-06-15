@@ -1,0 +1,45 @@
+fact_id: api_status_code
+name: API Status Code
+category: telemetry
+description: HTTP status code returned by an AI API call.
+business_definition: The HTTP status code returned for an individual AI API call, used to compute API
+  success rate and error rate KPIs (e.g., codes >=500 indicate errors).
+data_type: integer
+unit: code
+fact_type: raw
+source_priority:
+- telemetry
+document_sources:
+- telemetry
+possible_aliases:
+- api status code
+- http response code
+- api response status
+extraction_patterns:
+- api status code
+- http status code for api call
+- response status code
+validation_rules:
+  min: 100
+  max: 599
+  required_type: integer
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- api_call_id
+- api_success_rate
+- error_rate
+used_by_kpis:
+- api_success_rate
+- error_rate
+example_values:
+- 200
+- 429
+- 500
+- 503
+confidence_rules:
+  minimum_confidence: 0.9
+  auto_approve: 0.97
+  manual_review_below: 0.9
+missing_value_strategy: use_worst_case
+status: active

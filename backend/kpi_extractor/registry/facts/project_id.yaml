@@ -1,0 +1,44 @@
+fact_id: project_id
+name: Project ID
+category: project
+description: Unique identifier for an AI project record in the portfolio.
+business_definition: A unique key identifying an individual AI initiative within the project portfolio,
+  used to count and segment projects by stage and status.
+data_type: string
+unit: string
+fact_type: raw
+source_priority:
+- telemetry
+- project_portfolio
+document_sources:
+- project_portfolio
+- telemetry
+possible_aliases:
+- project id
+- initiative id
+- ai project identifier
+extraction_patterns:
+- project id
+- ai initiative identifier
+validation_rules:
+  required_type: string
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- ai_flag
+- days_since_last_update
+- project_stage
+used_by_kpis:
+- projects_in_poc
+- projects_in_production
+- stalled_projects
+- total_ai_projects
+example_values:
+- PRJ-2031
+- PRJ-4502
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: mark_unavailable
+status: active

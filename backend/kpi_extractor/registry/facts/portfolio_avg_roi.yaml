@@ -1,0 +1,41 @@
+fact_id: portfolio_avg_roi
+name: Portfolio Average ROI
+category: benchmark
+description: Portfolio-wide average AI ROI, used for comparison against industry median ROI.
+business_definition: The portfolio-wide average AI ROI ratio, used as the numerator for the Industry Benchmark
+  Ratio KPI comparing portfolio performance to industry median.
+data_type: float
+unit: ratio
+fact_type: raw
+source_priority:
+- financial
+- benchmark
+document_sources:
+- financial
+- benchmark
+possible_aliases:
+- portfolio average roi
+- portfolio-wide ai roi
+- average ai roi across portfolio
+extraction_patterns:
+- portfolio average ai roi
+- portfolio-wide roi figure
+validation_rules:
+  min: 0
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: average
+related_facts:
+- ai_roi
+- industry_benchmark_ratio
+- industry_median_roi
+used_by_kpis:
+- industry_benchmark_ratio
+example_values:
+- 3.9
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

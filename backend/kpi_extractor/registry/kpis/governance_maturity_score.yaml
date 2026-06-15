@@ -1,0 +1,41 @@
+name: Governance Maturity Score
+category: Maturity
+tier: operational
+description: Assessment of AI governance frameworks, policy completeness, and audit
+  trail quality.
+business_value: Measures readiness to govern AI at scale with PE-required compliance
+  standards.
+formula: average(portco_governance_maturity_rating) WHERE portco_governance_maturity_rating
+  IN [0,5]
+unit: score_0_5
+aggregation: average
+frequency: quarterly
+required_facts:
+- portco_governance_maturity_rating
+derived_facts: []
+required_documents:
+- governance
+- audit
+dependencies:
+- portco_governance_maturity_rating
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: pe_benchmark_panel
+thresholds:
+  excellent: 4.5
+  good: 3.5
+  warning: 2.5
+  critical: 1.5
+data_quality:
+  minimum_coverage: 80
+  confidence_threshold: 0.8
+missing_data_strategy: exclude_portco
+owner_persona:
+- compliance_lead
+- cxo
+dashboard_visibility:
+- governance_dashboard
+example_calculation: portfolio average governance maturity = 3.4/5
+status: active
+kpi_id: governance_maturity_score

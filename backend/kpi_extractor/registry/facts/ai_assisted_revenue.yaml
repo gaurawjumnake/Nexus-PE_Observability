@@ -1,0 +1,53 @@
+fact_id: ai_assisted_revenue
+name: AI-Assisted Revenue
+category: revenue
+description: Revenue from deals or renewals where AI tools materially assisted sales or customer success
+  workflows.
+business_definition: Revenue attributable to deals, upsells, or renewals where AI tooling (e.g., AI-powered
+  sales enablement) materially influenced the outcome but was not the core product.
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+- crm
+document_sources:
+- financial
+- crm
+possible_aliases:
+- ai assisted revenue
+- ai-supported revenue
+- revenue assisted by ai tools
+- ai-enabled sales revenue
+extraction_patterns:
+- ai-assisted revenue
+- revenue assisted by ai
+- ai supported deals revenue
+- sales accelerated by ai
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: sum
+related_facts:
+- ai_attribution_type
+- ai_revenue
+- direct_ai_revenue
+- pipeline_influenced_revenue
+- revenue_line_amount
+used_by_kpis:
+- ai_revenue
+example_values:
+- 6400000
+- 2100000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: insufficient_data
+status: active

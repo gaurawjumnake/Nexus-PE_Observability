@@ -1,0 +1,40 @@
+fact_id: total_data_pipelines
+name: Total Data Pipelines
+category: governance
+description: Total count of AI data pipelines subject to privacy compliance audit.
+business_definition: The total number of AI data pipelines in scope for the privacy compliance audit,
+  used as the denominator for the data privacy compliance score.
+data_type: integer
+unit: count
+fact_type: raw
+source_priority:
+- governance
+- audit
+document_sources:
+- governance
+- audit
+possible_aliases:
+- total data pipelines
+- total ai data pipelines audited
+- data pipeline count
+extraction_patterns:
+- total data pipelines
+- total ai data pipelines in scope
+validation_rules:
+  min: 0
+  required_type: integer
+normalization_rules: {}
+aggregation_strategy: sum
+related_facts:
+- compliant_data_pipelines
+- data_privacy_compliance
+used_by_kpis:
+- data_privacy_compliance
+example_values:
+- 100
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_worst_case
+status: active

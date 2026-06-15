@@ -1,0 +1,40 @@
+name: Talent Readiness Score
+category: Maturity
+tier: operational
+description: Assessment of workforce AI skill levels, training completion, and AI
+  talent density.
+business_value: Identifies human capital gaps that constrain AI adoption velocity.
+formula: average(portco_talent_readiness_rating) WHERE portco_talent_readiness_rating
+  IN [0,5]
+unit: score_0_5
+aggregation: average
+frequency: quarterly
+required_facts:
+- portco_talent_readiness_rating
+derived_facts: []
+required_documents:
+- hr
+- governance
+dependencies:
+- portco_talent_readiness_rating
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: pe_benchmark_panel
+thresholds:
+  excellent: 4.5
+  good: 3.5
+  warning: 2.5
+  critical: 1.5
+data_quality:
+  minimum_coverage: 80
+  confidence_threshold: 0.8
+missing_data_strategy: exclude_portco
+owner_persona:
+- operating_partner
+- hr_lead
+dashboard_visibility:
+- operations_dashboard
+example_calculation: portfolio average talent readiness = 3.3/5
+status: active
+kpi_id: talent_readiness_score

@@ -1,0 +1,40 @@
+fact_id: model_bias_risk_score
+name: Model Bias Risk Score
+category: governance
+description: Composite score measuring the risk of bias in AI model outputs.
+business_definition: A 0-100 score representing the assessed risk level of bias in AI model outputs across
+  the portfolio, used as an input to the AI Governance Score.
+data_type: float
+unit: score_0_100
+fact_type: raw
+source_priority:
+- governance
+- audit
+document_sources:
+- governance
+- audit
+possible_aliases:
+- model bias risk score
+- ai bias risk rating
+- bias risk assessment score
+extraction_patterns:
+- model bias risk score
+- ai model bias risk assessment
+validation_rules:
+  min: 0
+  max: 100
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: average
+related_facts:
+- ai_governance_score
+used_by_kpis:
+- ai_governance_score
+example_values:
+- 71
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_worst_case
+status: active

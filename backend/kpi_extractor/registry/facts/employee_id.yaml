@@ -1,0 +1,40 @@
+fact_id: employee_id
+name: Employee ID
+category: hr
+description: Unique identifier for an employee record used in adoption and HR analytics.
+business_definition: A unique key identifying an individual employee, used to join HR records with telemetry
+  usage data for adoption metrics.
+data_type: string
+unit: string
+fact_type: raw
+source_priority:
+- telemetry
+- hr
+document_sources:
+- telemetry
+- hr
+possible_aliases:
+- employee id
+- employee identifier
+- staff id
+extraction_patterns:
+- employee id
+- employee identifier
+validation_rules:
+  required_type: string
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- active_ai_users
+- weekly_ai_interactions
+used_by_kpis:
+- active_ai_users
+example_values:
+- EMP-10234
+- EMP-88291
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: mark_unavailable
+status: active

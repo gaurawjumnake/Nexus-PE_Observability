@@ -1,0 +1,37 @@
+name: Custom Agent Adoption
+category: User Adoption
+tier: operational
+description: Count of employees actively using custom-built AI agents deployed by
+  PortCos.
+business_value: Measures adoption of bespoke AI automation beyond off-the-shelf tools.
+formula: count(employees WHERE custom_agent_weekly_sessions >= 1)
+unit: count
+aggregation: sum
+frequency: weekly
+required_facts:
+- custom_agent_weekly_sessions
+derived_facts: []
+required_documents:
+- telemetry
+dependencies:
+- custom_agent_weekly_sessions
+benchmarking:
+  enabled: true
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 1000
+  good: 600
+  warning: 200
+  critical: 50
+data_quality:
+  minimum_coverage: 85
+  confidence_threshold: 0.85
+missing_data_strategy: use_last_known
+owner_persona:
+- technology_lead
+dashboard_visibility:
+- adoption_dashboard
+example_calculation: 900 employees using custom agents weekly
+status: active
+kpi_id: custom_agent_adoption

@@ -1,0 +1,41 @@
+fact_id: portfolio_avg_maturity_score
+name: Portfolio Average Maturity Score
+category: benchmark
+description: Portfolio-wide average AI maturity score, used for percentile ranking against industry benchmark.
+business_definition: The portfolio-wide average AI maturity score, used as the numerator input for the
+  Portfolio Benchmark Score percentile calculation against the industry benchmark distribution.
+data_type: float
+unit: score
+fact_type: raw
+source_priority:
+- board_deck
+- benchmark
+document_sources:
+- benchmark
+- board_deck
+possible_aliases:
+- portfolio average maturity score
+- portfolio-wide ai maturity score
+- average ai maturity across portfolio
+extraction_patterns:
+- portfolio average ai maturity score
+- portfolio-wide maturity figure
+validation_rules:
+  min: 0
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: average
+related_facts:
+- ai_maturity_score
+- benchmark_distribution
+- portfolio_benchmark_score
+used_by_kpis:
+- portfolio_benchmark_score
+example_values:
+- 3.4
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

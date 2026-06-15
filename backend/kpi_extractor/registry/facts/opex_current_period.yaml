@@ -1,0 +1,46 @@
+fact_id: opex_current_period
+name: OpEx Current Period
+category: cost
+description: Operating expense for the current reporting period, post-AI deployment.
+business_definition: The current-period operating expense figure for the relevant cost center, used to
+  compute realized cost savings versus the pre-AI baseline.
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+- operations
+document_sources:
+- financial
+- operations
+possible_aliases:
+- current opex
+- opex current period
+- post-ai operating expense
+extraction_patterns:
+- current period opex
+- operating expense this period
+- post-ai opex
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: latest_value
+related_facts:
+- cost_savings
+- opex_pre_ai_baseline
+used_by_kpis:
+- cost_savings
+example_values:
+- 37200000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

@@ -1,0 +1,41 @@
+name: Industry Benchmark Ratio
+category: Benchmarking
+tier: executive
+description: Ratio of portfolio average ROI to industry median ROI from peer PE benchmark
+  panel.
+business_value: Enables LP-ready narrative on AI alpha generation versus sector median.
+formula: portfolio_avg_roi / industry_median_roi
+unit: ratio
+aggregation: latest_value
+frequency: quarterly
+required_facts:
+- portfolio_avg_roi
+- industry_median_roi
+derived_facts: []
+required_documents:
+- benchmark
+- financial
+dependencies:
+- portfolio_avg_roi
+- industry_median_roi
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: pe_benchmark_panel
+thresholds:
+  excellent: 2.0
+  good: 1.5
+  warning: 1.1
+  critical: 0.9
+data_quality:
+  minimum_coverage: 70
+  confidence_threshold: 0.8
+missing_data_strategy: use_last_known
+owner_persona:
+- cxo
+- operating_partner
+dashboard_visibility:
+- benchmark_dashboard
+example_calculation: portfolio_roi=3.9x, industry_median=2.4x => ratio=1.625
+status: active
+kpi_id: industry_benchmark_ratio

@@ -1,0 +1,45 @@
+fact_id: incident_resolution_time_minutes
+name: Incident Resolution Time (Minutes)
+category: reliability
+description: Time in minutes taken to resolve an AI service degradation incident.
+business_definition: The elapsed time, in minutes, between detection and resolution of an AI service degradation
+  incident, used to compute the MTTR KPI.
+data_type: float
+unit: minutes
+fact_type: raw
+source_priority:
+- audit
+- telemetry
+document_sources:
+- telemetry
+- audit
+possible_aliases:
+- incident resolution time
+- time to resolve incident
+- mttr minutes
+extraction_patterns:
+- incident resolution time in minutes
+- time to recover from incident
+validation_rules:
+  min: 0
+  required_type: float
+normalization_rules:
+  normalize_to: minutes
+  hours_to_minutes_multiplier: 60
+aggregation_strategy: average
+related_facts:
+- incident_id
+- incident_type
+- mttr
+used_by_kpis:
+- mttr
+example_values:
+- 24
+- 12
+- 45
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_worst_case
+status: active

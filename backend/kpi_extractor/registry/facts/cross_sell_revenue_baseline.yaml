@@ -1,0 +1,46 @@
+fact_id: cross_sell_revenue_baseline
+name: Cross-Sell Revenue Baseline
+category: revenue
+description: Baseline (pre-AI or non-AI) cross-sell revenue used for comparison.
+business_definition: Cross-sell/upsell revenue that would be expected without AI-driven customer intelligence,
+  used as the comparison baseline for the cross-sell uplift calculation.
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+- crm
+document_sources:
+- financial
+- crm
+possible_aliases:
+- cross-sell baseline revenue
+- pre-ai cross-sell revenue
+- baseline cross-sell revenue
+extraction_patterns:
+- cross-sell baseline
+- baseline cross-sell revenue
+- pre-ai cross-sell revenue
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: sum
+related_facts:
+- cross_sell_revenue_with_ai
+- cross_sell_uplift
+used_by_kpis:
+- cross_sell_uplift
+example_values:
+- 3500000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: exclude_portco
+status: active

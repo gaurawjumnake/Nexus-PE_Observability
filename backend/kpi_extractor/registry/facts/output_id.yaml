@@ -1,0 +1,40 @@
+fact_id: output_id
+name: Output ID
+category: governance
+description: Unique identifier for an AI output record subjected to human review evaluation.
+business_definition: A unique key identifying an individual AI model output, used to join human review
+  completion and criticality data for the Human Review Coverage KPI.
+data_type: string
+unit: string
+fact_type: raw
+source_priority:
+- governance
+- audit
+document_sources:
+- governance
+- audit
+possible_aliases:
+- output id
+- ai output identifier
+- review record id
+extraction_patterns:
+- output id
+- ai output identifier for review
+validation_rules:
+  required_type: string
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- human_review_completed
+- human_review_coverage
+- output_criticality
+used_by_kpis:
+- human_review_coverage
+example_values:
+- out-77821
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: mark_unavailable
+status: active

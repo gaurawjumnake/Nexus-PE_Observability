@@ -1,0 +1,39 @@
+fact_id: benchmark_distribution
+name: Benchmark Distribution
+category: benchmark
+description: Distribution of AI maturity scores across industry-matched PE firm benchmarks.
+business_definition: A statistical distribution of AI maturity scores from industry-matched PE firm benchmarks,
+  used as the comparison set for computing the Portfolio Benchmark Score percentile.
+data_type: string
+unit: distribution
+fact_type: raw
+source_priority:
+- board_deck
+- benchmark
+document_sources:
+- benchmark
+- board_deck
+possible_aliases:
+- benchmark distribution
+- industry maturity benchmark distribution
+- peer maturity score distribution
+extraction_patterns:
+- benchmark distribution data
+- industry-matched pe firm benchmark distribution
+validation_rules:
+  required_type: string
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- portfolio_avg_maturity_score
+- portfolio_benchmark_score
+used_by_kpis:
+- portfolio_benchmark_score
+example_values:
+- benchmark_panel_2026_q2
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

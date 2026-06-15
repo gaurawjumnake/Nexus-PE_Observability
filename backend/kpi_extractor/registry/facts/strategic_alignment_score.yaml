@@ -1,0 +1,43 @@
+fact_id: strategic_alignment_score
+name: Strategic Alignment Score
+category: maturity
+description: Portfolio-wide average of how well AI initiatives align with PortCo business strategy.
+business_definition: The portfolio-wide average of individual PortCo strategic alignment ratings, used
+  as one of four inputs to the AI Maturity Score.
+data_type: float
+unit: score_0_5
+fact_type: derived
+source_priority:
+- governance
+- project_portfolio
+- hr
+document_sources:
+- governance
+- project_portfolio
+- hr
+possible_aliases:
+- strategic alignment score
+- ai strategy alignment score
+- portfolio strategic alignment
+extraction_patterns:
+- strategic alignment score
+- portfolio average strategic alignment
+validation_rules:
+  min: 0
+  max: 5
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: average
+related_facts:
+- ai_maturity_score
+- portco_strategic_alignment_rating
+used_by_kpis:
+- ai_maturity_score
+example_values:
+- 4.1
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: exclude_portco
+status: active

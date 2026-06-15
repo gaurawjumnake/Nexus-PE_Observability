@@ -1,0 +1,40 @@
+fact_id: portco_industry_maturity_percentile
+name: PortCo Industry Maturity Percentile
+category: benchmark
+description: Individual PortCo's AI maturity percentile ranking within the industry benchmark.
+business_definition: The percentile ranking (0-100) of an individual PortCo's AI maturity relative to
+  the industry benchmark, used to compute the Top Quartile Position KPI.
+data_type: float
+unit: percentile
+fact_type: raw
+source_priority:
+- benchmark
+document_sources:
+- benchmark
+possible_aliases:
+- portco industry maturity percentile
+- company maturity percentile rank
+- individual portco benchmark percentile
+extraction_patterns:
+- portco industry maturity percentile
+- company-level maturity percentile vs industry
+validation_rules:
+  min: 0
+  max: 100
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- top_quartile_position
+used_by_kpis:
+- top_quartile_position
+example_values:
+- 82
+- 45
+- 91
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: exclude_portco
+status: active

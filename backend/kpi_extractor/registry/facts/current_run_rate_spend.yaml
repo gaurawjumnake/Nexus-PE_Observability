@@ -1,0 +1,46 @@
+fact_id: current_run_rate_spend
+name: Current Run-Rate Spend
+category: cost
+description: Current monthly run-rate of AI spend, used to project forward spend.
+business_definition: The most recent monthly AI spend figure, used as the basis for projecting future
+  months' spend in the forecast calculation.
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+- inventory
+document_sources:
+- financial
+- inventory
+possible_aliases:
+- current run-rate spend
+- monthly ai run rate
+- current monthly ai spend
+extraction_patterns:
+- current run-rate spend
+- monthly ai spend run rate
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: latest_value
+related_facts:
+- committed_spend
+- forecasted_ai_spend
+- remaining_months_in_year
+used_by_kpis:
+- forecasted_ai_spend
+example_values:
+- 4100000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

@@ -1,0 +1,39 @@
+fact_id: benchmark_cost_efficiency_distribution
+name: Benchmark Cost Efficiency Distribution
+category: benchmark
+description: Distribution of AI cost efficiency metrics across the PE benchmark panel.
+business_definition: A statistical distribution of AI cost-per-outcome metrics from the PE benchmark panel,
+  used as the comparison set for computing the portfolio's cost efficiency percentile rank.
+data_type: string
+unit: distribution
+fact_type: raw
+source_priority:
+- financial
+- benchmark
+document_sources:
+- financial
+- benchmark
+possible_aliases:
+- benchmark cost efficiency distribution
+- peer cost efficiency distribution
+- industry cost efficiency benchmark
+extraction_patterns:
+- benchmark cost efficiency distribution
+- peer panel cost efficiency data
+validation_rules:
+  required_type: string
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- cost_efficiency_rank
+- portfolio_cost_per_outcome
+used_by_kpis:
+- cost_efficiency_rank
+example_values:
+- benchmark_panel_2026_q2
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

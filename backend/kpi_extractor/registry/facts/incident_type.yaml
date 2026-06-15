@@ -1,0 +1,48 @@
+fact_id: incident_type
+name: Incident Type
+category: reliability
+description: Classification of an incident's type (e.g., ai_service_degradation, data_breach).
+business_definition: A categorical label classifying the nature of an incident, used to filter incidents
+  to AI service degradation events for the MTTR calculation.
+data_type: enum
+unit: string
+fact_type: raw
+source_priority:
+- audit
+- telemetry
+document_sources:
+- telemetry
+- audit
+possible_aliases:
+- incident type
+- incident category
+- incident classification
+extraction_patterns:
+- incident type = ai_service_degradation
+- classified as service degradation incident
+validation_rules:
+  required_type: enum
+  allowed_values:
+  - ai_service_degradation
+  - data_breach
+  - model_drift
+  - policy_violation
+  - other
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- incident_id
+- incident_resolution_time_minutes
+- mttr
+used_by_kpis:
+- mttr
+example_values:
+- ai_service_degradation
+- data_breach
+- model_drift
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_worst_case
+status: active

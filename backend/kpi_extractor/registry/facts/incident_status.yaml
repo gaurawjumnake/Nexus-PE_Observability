@@ -1,0 +1,48 @@
+fact_id: incident_status
+name: Incident Status
+category: governance
+description: Resolution status of an AI incident (e.g., open, in_progress, resolved).
+business_definition: A categorical status indicating whether an AI incident is open, in progress, or resolved,
+  used to filter the Critical Incident Count to unresolved incidents.
+data_type: enum
+unit: string
+fact_type: raw
+source_priority:
+- governance
+- audit
+- telemetry
+document_sources:
+- governance
+- telemetry
+- audit
+possible_aliases:
+- incident status
+- resolution status
+- incident state
+extraction_patterns:
+- incident status = resolved
+- incident still open
+- unresolved incident status
+validation_rules:
+  required_type: enum
+  allowed_values:
+  - open
+  - in_progress
+  - resolved
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- critical_incident_count
+- incident_id
+used_by_kpis:
+- critical_incident_count
+example_values:
+- open
+- in_progress
+- resolved
+confidence_rules:
+  minimum_confidence: 0.9
+  auto_approve: 0.97
+  manual_review_below: 0.9
+missing_value_strategy: use_worst_case
+status: active

@@ -1,0 +1,46 @@
+name: Total AI Spend
+category: FinOps
+tier: operational
+description: Year-to-date cloud, licensing, and compute costs for all AI initiatives
+  across portfolio.
+business_value: Provides full cost visibility enabling FinOps governance and budget
+  control.
+formula: cloud_spend + api_licensing_spend + storage_data_spend + talent_ai_teams_spend
+unit: USD
+aggregation: sum
+frequency: monthly
+required_facts:
+- cloud_spend
+- api_licensing_spend
+- storage_data_spend
+- talent_ai_teams_spend
+derived_facts: []
+required_documents:
+- financial
+- inventory
+dependencies:
+- cloud_spend
+- api_licensing_spend
+- storage_data_spend
+- talent_ai_teams_spend
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 5000000
+  good: 10000000
+  warning: 15000000
+  critical: 20000000
+data_quality:
+  minimum_coverage: 95
+  confidence_threshold: 0.95
+missing_data_strategy: insufficient_data
+owner_persona:
+- cfo
+- operating_partner
+dashboard_visibility:
+- finops_dashboard
+example_calculation: cloud=6.4M, api=2.9M, storage=3.5M => total=12.8M
+status: active
+kpi_id: total_ai_spend

@@ -1,0 +1,48 @@
+fact_id: spend_category
+name: Spend Category
+category: cost
+description: Classification of vendor invoice spend (e.g., api_licensing, cloud, storage, talent).
+business_definition: A categorical label assigned to vendor invoices indicating the type of AI-related
+  cost, used to segment total AI spend into sub-components.
+data_type: enum
+unit: string
+fact_type: raw
+source_priority:
+- financial
+- inventory
+document_sources:
+- financial
+- inventory
+possible_aliases:
+- spend category
+- cost category
+- expense classification
+extraction_patterns:
+- spend category = api_licensing
+- categorized as api licensing
+validation_rules:
+  required_type: enum
+  allowed_values:
+  - api_licensing
+  - cloud
+  - storage
+  - talent
+  - other
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- api_licensing_spend
+- vendor_invoice_amount
+used_by_kpis:
+- api_licensing_spend
+example_values:
+- api_licensing
+- cloud
+- storage
+- talent
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: mark_unavailable
+status: active

@@ -1,0 +1,42 @@
+name: Forecasted AI Spend
+category: FinOps
+tier: operational
+description: Projected end-of-year AI spend based on current token usage velocity
+  and committed contracts.
+business_value: Enables proactive budget management and prevents year-end overspend
+  surprises.
+formula: committed_spend + (current_run_rate_spend * remaining_months_in_year)
+unit: USD
+aggregation: sum
+frequency: monthly
+required_facts:
+- committed_spend
+- current_run_rate_spend
+- remaining_months_in_year
+derived_facts: []
+required_documents:
+- financial
+- inventory
+dependencies:
+- committed_spend
+- current_run_rate_spend
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 15000000
+  good: 18000000
+  warning: 22000000
+  critical: 30000000
+data_quality:
+  minimum_coverage: 85
+  confidence_threshold: 0.85
+missing_data_strategy: use_last_known
+owner_persona:
+- cfo
+dashboard_visibility:
+- finops_dashboard
+example_calculation: committed=14.1M + run_rate=4.1M*1mo remaining => forecasted=18.2M
+status: active
+kpi_id: forecasted_ai_spend

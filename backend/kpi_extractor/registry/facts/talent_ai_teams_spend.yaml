@@ -1,0 +1,45 @@
+fact_id: talent_ai_teams_spend
+name: AI Talent Teams Spend
+category: cost
+description: Total compensation and contractor spend for dedicated AI engineering and data science teams.
+business_definition: The portion of AI operating cost attributable to salaries, benefits, and contractor
+  fees for personnel dedicated to AI initiatives.
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+- inventory
+document_sources:
+- financial
+- inventory
+possible_aliases:
+- ai talent spend
+- ai team compensation cost
+- ai staffing cost
+extraction_patterns:
+- ai talent team spend
+- ai engineering team cost
+- dedicated ai staff cost
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: sum
+related_facts:
+- total_ai_spend
+used_by_kpis:
+- total_ai_spend
+example_values:
+- 3000000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

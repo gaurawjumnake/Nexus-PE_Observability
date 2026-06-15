@@ -1,0 +1,45 @@
+fact_id: cross_sell_revenue_with_ai
+name: Cross-Sell Revenue With AI
+category: revenue
+description: Cross-sell revenue generated with the assistance of AI-driven customer intelligence.
+business_definition: Total cross-sell/upsell revenue realized in the period where AI-driven customer intelligence
+  tools (recommendation engines, propensity models) were used in the sales process.
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+- crm
+document_sources:
+- financial
+- crm
+possible_aliases:
+- cross-sell revenue with ai
+- ai-enabled cross-sell revenue
+- cross sell revenue ai-assisted
+extraction_patterns:
+- cross-sell revenue with ai
+- ai-driven cross-sell revenue
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: sum
+related_facts:
+- cross_sell_revenue_baseline
+- cross_sell_uplift
+used_by_kpis:
+- cross_sell_uplift
+example_values:
+- 5000000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: exclude_portco
+status: active

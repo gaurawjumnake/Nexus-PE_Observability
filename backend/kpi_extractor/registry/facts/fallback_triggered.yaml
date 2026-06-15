@@ -1,0 +1,40 @@
+fact_id: fallback_triggered
+name: Fallback Triggered
+category: telemetry
+description: Boolean indicator of whether an AI request triggered a fallback to a secondary system or
+  human escalation.
+business_definition: A true/false flag indicating whether a given AI request fell back to a secondary
+  model or human escalation due to primary model failure, used to compute the Fallback Rate KPI.
+data_type: boolean
+unit: boolean
+fact_type: raw
+source_priority:
+- telemetry
+document_sources:
+- telemetry
+possible_aliases:
+- fallback triggered
+- fallback flag
+- secondary system fallback indicator
+extraction_patterns:
+- fallback triggered = true
+- request fell back to secondary system
+- human escalation triggered
+validation_rules:
+  required_type: boolean
+normalization_rules: {}
+aggregation_strategy: average
+related_facts:
+- fallback_rate
+- request_id
+used_by_kpis:
+- fallback_rate
+example_values:
+- true
+- false
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_worst_case
+status: active

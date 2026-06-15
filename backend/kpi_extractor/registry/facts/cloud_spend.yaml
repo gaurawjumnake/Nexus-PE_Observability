@@ -1,0 +1,48 @@
+fact_id: cloud_spend
+name: Cloud Compute Spend
+category: cost
+description: Total cloud infrastructure costs for AI workloads including GPU instances and storage.
+business_definition: The sum of all cloud provider invoice line items tagged as AI workloads, representing
+  the largest single cost driver for AI operations.
+data_type: currency
+unit: USD
+fact_type: derived
+source_priority:
+- financial
+- inventory
+document_sources:
+- financial
+- inventory
+possible_aliases:
+- cloud spend
+- cloud compute cost
+- ai cloud cost
+- gpu compute spend
+extraction_patterns:
+- cloud compute spend
+- ai cloud infrastructure cost
+- gpu instance spend
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: sum
+related_facts:
+- cloud_invoice_amount
+- total_ai_spend
+- workload_tag
+used_by_kpis:
+- total_ai_spend
+example_values:
+- 6400000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

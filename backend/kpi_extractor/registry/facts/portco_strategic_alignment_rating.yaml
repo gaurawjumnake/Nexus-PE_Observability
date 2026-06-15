@@ -1,0 +1,43 @@
+fact_id: portco_strategic_alignment_rating
+name: PortCo Strategic Alignment Rating
+category: maturity
+description: Individual PortCo's strategic alignment rating on a 0-5 scale.
+business_definition: A 0-5 assessment rating of how well an individual PortCo's AI initiatives align with
+  its core business strategy and goals, used to compute the portfolio strategic alignment score.
+data_type: float
+unit: score_0_5
+fact_type: raw
+source_priority:
+- board_deck
+- governance
+document_sources:
+- governance
+- board_deck
+possible_aliases:
+- strategic alignment rating
+- portco strategic alignment score
+- ai strategy alignment rating
+extraction_patterns:
+- strategic alignment rating for portco
+- portco ai strategic alignment assessment
+validation_rules:
+  min: 0
+  max: 5
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- ai_maturity_score
+- strategic_alignment_score
+used_by_kpis:
+- strategic_alignment_score
+example_values:
+- 4.1
+- 3.8
+- 2.9
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: exclude_portco
+status: active

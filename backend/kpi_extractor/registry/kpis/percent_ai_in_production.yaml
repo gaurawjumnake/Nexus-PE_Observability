@@ -1,0 +1,41 @@
+name: '% AI in Production'
+category: Project Portfolio
+tier: operational
+description: Ratio of approved AI use cases currently in a live production state.
+business_value: Tracks conversion from AI experimentation to value-generating production
+  deployments.
+formula: projects_in_production / total_approved_ai_projects * 100
+unit: percentage
+aggregation: portfolio_weighted_average
+frequency: monthly
+required_facts:
+- projects_in_production
+- total_approved_ai_projects
+derived_facts: []
+required_documents:
+- project_portfolio
+dependencies:
+- projects_in_production
+- total_approved_ai_projects
+benchmarking:
+  enabled: true
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 70
+  good: 50
+  warning: 30
+  critical: 15
+data_quality:
+  minimum_coverage: 85
+  confidence_threshold: 0.85
+missing_data_strategy: exclude_portco
+owner_persona:
+- technology_lead
+- operating_partner
+dashboard_visibility:
+- adoption_dashboard
+- operations_dashboard
+example_calculation: 18 live / 37 approved => 48.6% (technology view shows 64%)
+status: active
+kpi_id: percent_ai_in_production

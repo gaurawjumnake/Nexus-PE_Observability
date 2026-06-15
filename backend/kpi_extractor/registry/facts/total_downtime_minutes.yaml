@@ -1,0 +1,41 @@
+fact_id: total_downtime_minutes
+name: Total Downtime Minutes
+category: telemetry
+description: Total minutes of downtime across critical AI-driven infrastructure endpoints in the period.
+business_definition: The total accumulated minutes of unplanned downtime across critical AI infrastructure
+  endpoints during the reporting period, used to compute the System Availability (Uptime) KPI.
+data_type: float
+unit: minutes
+fact_type: raw
+source_priority:
+- telemetry
+document_sources:
+- telemetry
+possible_aliases:
+- total downtime minutes
+- ai system downtime
+- unplanned downtime minutes
+extraction_patterns:
+- total downtime minutes
+- ai infrastructure downtime in minutes
+validation_rules:
+  min: 0
+  required_type: float
+normalization_rules:
+  normalize_to: minutes
+  hours_to_minutes_multiplier: 60
+aggregation_strategy: sum
+related_facts:
+- availability_uptime
+- total_minutes_in_period
+used_by_kpis:
+- availability_uptime
+example_values:
+- 4.3
+- 12.5
+confidence_rules:
+  minimum_confidence: 0.9
+  auto_approve: 0.97
+  manual_review_below: 0.9
+missing_value_strategy: use_worst_case
+status: active

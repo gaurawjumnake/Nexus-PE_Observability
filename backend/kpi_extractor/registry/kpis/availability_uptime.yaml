@@ -1,0 +1,40 @@
+name: System Availability (Uptime)
+category: Reliability
+tier: operational
+description: System uptime percentage across all critical AI-driven infrastructure
+  endpoints.
+business_value: Ensures AI systems meet SLA commitments and do not disrupt business
+  operations.
+formula: (total_minutes_in_period - total_downtime_minutes) / total_minutes_in_period
+  * 100
+unit: percentage
+aggregation: average
+frequency: monthly
+required_facts:
+- total_minutes_in_period
+- total_downtime_minutes
+derived_facts: []
+required_documents:
+- telemetry
+dependencies:
+- total_downtime_minutes
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: sre_standards
+thresholds:
+  excellent: 99.9
+  good: 99.5
+  warning: 99.0
+  critical: 98.0
+data_quality:
+  minimum_coverage: 99
+  confidence_threshold: 0.99
+missing_data_strategy: use_worst_case
+owner_persona:
+- technology_lead
+dashboard_visibility:
+- operations_dashboard
+example_calculation: downtime=4.3min in 43800min period => 99.99%
+status: active
+kpi_id: availability_uptime

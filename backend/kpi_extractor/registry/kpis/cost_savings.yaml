@@ -1,0 +1,43 @@
+name: Cost Savings (OpEx)
+category: Value Creation
+tier: executive
+description: Realized reduction in operational expenses resulting from AI deployment
+  vs pre-AI baseline.
+business_value: Validates AI's role in margin improvement through measurable OpEx
+  reduction.
+formula: opex_pre_ai_baseline - opex_current_period
+unit: USD
+aggregation: sum
+frequency: monthly
+required_facts:
+- opex_pre_ai_baseline
+- opex_current_period
+derived_facts: []
+required_documents:
+- financial
+- operations
+dependencies:
+- opex_pre_ai_baseline
+- opex_current_period
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 5000000
+  good: 2000000
+  warning: 500000
+  critical: 0
+data_quality:
+  minimum_coverage: 80
+  confidence_threshold: 0.85
+missing_data_strategy: use_last_known
+owner_persona:
+- operating_partner
+- cfo
+dashboard_visibility:
+- executive_dashboard
+- finops_dashboard
+example_calculation: opex_pre=50M, opex_current=37.2M => savings=12.8M
+status: active
+kpi_id: cost_savings

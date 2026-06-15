@@ -1,0 +1,42 @@
+fact_id: active_ai_users
+name: Active AI Users
+category: adoption
+description: Total employees with at least 5 meaningful AI tool interactions per week across portfolio.
+business_definition: The count of employees meeting the minimum weekly engagement threshold (>=5 meaningful
+  AI interactions), used as the primary measure of genuine workforce AI adoption.
+data_type: integer
+unit: count
+fact_type: derived
+source_priority:
+- telemetry
+- hr
+document_sources:
+- telemetry
+- hr
+possible_aliases:
+- active ai users
+- active ai adoption count
+- weekly active ai users
+extraction_patterns:
+- active ai users
+- employees actively using ai weekly
+- weekly active ai user count
+validation_rules:
+  min: 0
+  required_type: integer
+normalization_rules: {}
+aggregation_strategy: sum
+related_facts:
+- employee_id
+- power_user_ratio
+- weekly_ai_interactions
+used_by_kpis:
+- power_user_ratio
+example_values:
+- 2772
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

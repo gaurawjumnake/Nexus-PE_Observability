@@ -1,0 +1,41 @@
+fact_id: workload_tag
+name: Workload Tag
+category: cost
+description: Tag applied to cloud resources/invoices indicating workload type (e.g., 'ai').
+business_definition: A metadata tag attached to cloud cost line items used to identify whether the underlying
+  compute/storage is attributable to AI workloads.
+data_type: string
+unit: string
+fact_type: raw
+source_priority:
+- financial
+- inventory
+document_sources:
+- financial
+- inventory
+possible_aliases:
+- workload tag
+- cost tag
+- resource tag
+- ai workload label
+extraction_patterns:
+- workload tag = ai
+- tagged as ai workload
+validation_rules:
+  required_type: string
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- cloud_invoice_amount
+- cloud_spend
+used_by_kpis:
+- cloud_spend
+example_values:
+- ai
+- non-ai
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: mark_unavailable
+status: active

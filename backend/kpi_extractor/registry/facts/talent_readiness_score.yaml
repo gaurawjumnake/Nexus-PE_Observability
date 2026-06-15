@@ -1,0 +1,44 @@
+fact_id: talent_readiness_score
+name: Talent Readiness Score
+category: maturity
+description: Portfolio-wide average assessment of workforce AI skill levels, training completion, and
+  AI talent density.
+business_definition: The portfolio-wide average of individual PortCo talent readiness ratings, used as
+  one of four inputs to the AI Maturity Score.
+data_type: float
+unit: score_0_5
+fact_type: derived
+source_priority:
+- governance
+- project_portfolio
+- hr
+document_sources:
+- governance
+- project_portfolio
+- hr
+possible_aliases:
+- talent readiness score
+- ai talent maturity score
+- portfolio talent readiness
+extraction_patterns:
+- talent readiness score
+- portfolio average talent readiness
+validation_rules:
+  min: 0
+  max: 5
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: average
+related_facts:
+- ai_maturity_score
+- portco_talent_readiness_rating
+used_by_kpis:
+- ai_maturity_score
+example_values:
+- 3.3
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: exclude_portco
+status: active

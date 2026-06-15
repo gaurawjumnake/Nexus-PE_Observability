@@ -1,0 +1,54 @@
+fact_id: revenue_line_amount
+name: Revenue Line Amount
+category: revenue
+description: Individual revenue line item amount from financial or CRM systems, prior to AI attribution
+  categorization.
+business_definition: The raw dollar amount of an individual revenue transaction or line item, used as
+  the base unit for AI attribution classification (direct/assisted/pipeline_influenced).
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+- crm
+document_sources:
+- financial
+- crm
+possible_aliases:
+- revenue line item
+- revenue amount
+- line item revenue
+- deal revenue amount
+extraction_patterns:
+- revenue line
+- deal amount
+- revenue line item amount
+- transaction revenue amount
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: sum
+related_facts:
+- ai_assisted_revenue
+- ai_attribution_type
+- direct_ai_revenue
+- pipeline_influenced_revenue
+used_by_kpis:
+- ai_assisted_revenue
+- direct_ai_revenue
+- pipeline_influenced_revenue
+example_values:
+- 125000
+- 48000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: insufficient_data
+status: active

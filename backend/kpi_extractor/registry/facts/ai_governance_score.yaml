@@ -1,0 +1,43 @@
+fact_id: ai_governance_score
+name: AI Governance Score
+category: governance
+description: Composite risk metric evaluating policy adherence, audit readiness, and model risk management.
+business_definition: A weighted composite of data privacy compliance, model bias risk, and regulatory
+  readiness, providing PE-level governance assurance and used as input to the governance benchmark rank.
+data_type: float
+unit: score_0_100
+fact_type: derived
+source_priority:
+- governance
+- benchmark
+document_sources:
+- governance
+- benchmark
+possible_aliases:
+- ai governance score
+- governance risk composite score
+- ai compliance composite score
+extraction_patterns:
+- ai governance score
+- governance composite risk score
+validation_rules:
+  min: 0
+  max: 100
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: weighted_average
+related_facts:
+- data_privacy_compliance
+- governance_rank
+- model_bias_risk_score
+- regulatory_readiness
+used_by_kpis:
+- governance_rank
+example_values:
+- 72.1
+confidence_rules:
+  minimum_confidence: 0.9
+  auto_approve: 0.97
+  manual_review_below: 0.9
+missing_value_strategy: use_worst_case
+status: active

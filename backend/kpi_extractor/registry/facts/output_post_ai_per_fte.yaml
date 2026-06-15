@@ -1,0 +1,40 @@
+fact_id: output_post_ai_per_fte
+name: Output Post-AI Per FTE
+category: operations
+description: Average output per full-time-equivalent employee measured after AI deployment.
+business_definition: The current productivity figure (output units per FTE) for an AI-enabled department
+  after AI deployment, used to compute the Productivity Gain KPI versus the pre-AI baseline.
+data_type: float
+unit: units_per_fte
+fact_type: raw
+source_priority:
+- operations
+- hr
+document_sources:
+- operations
+- hr
+possible_aliases:
+- output post-ai per fte
+- current productivity per fte
+- post-ai output per employee
+extraction_patterns:
+- output post-ai per fte
+- current output per fte after ai
+validation_rules:
+  min: 0
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: average
+related_facts:
+- output_pre_ai_per_fte
+- productivity_gain
+used_by_kpis:
+- productivity_gain
+example_values:
+- 132
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: exclude_portco
+status: active

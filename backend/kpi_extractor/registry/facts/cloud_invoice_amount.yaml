@@ -1,0 +1,46 @@
+fact_id: cloud_invoice_amount
+name: Cloud Invoice Amount
+category: cost
+description: Individual cloud infrastructure invoice amount, prior to AI workload tagging.
+business_definition: The raw dollar amount on a cloud provider invoice line item, prior to filtering by
+  AI workload tag.
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+- inventory
+document_sources:
+- financial
+- inventory
+possible_aliases:
+- cloud invoice amount
+- cloud bill amount
+- cloud cost line item
+extraction_patterns:
+- cloud invoice amount
+- cloud bill line item
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: sum
+related_facts:
+- cloud_spend
+- workload_tag
+used_by_kpis:
+- cloud_spend
+example_values:
+- 450000
+- 120000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

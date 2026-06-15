@@ -1,0 +1,43 @@
+name: Policy Compliance Rate
+category: Governance
+tier: operational
+description: Percentage of employees and vendors adhering to the Global AI Acceptable
+  Use Policy.
+business_value: Ensures organizational AI usage aligns with legal, ethical, and regulatory
+  standards.
+formula: compliant_entities / total_entities * 100
+unit: percentage
+aggregation: average
+frequency: monthly
+required_facts:
+- compliant_entities
+- total_entities
+derived_facts: []
+required_documents:
+- governance
+- hr
+- audit
+dependencies:
+- compliant_entities
+- total_entities
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 98
+  good: 92
+  warning: 80
+  critical: 65
+data_quality:
+  minimum_coverage: 90
+  confidence_threshold: 0.9
+missing_data_strategy: use_worst_case
+owner_persona:
+- compliance_lead
+- operating_partner
+dashboard_visibility:
+- governance_dashboard
+example_calculation: 9800 compliant / 10000 total => 98.0%
+status: active
+kpi_id: policy_compliance_rate

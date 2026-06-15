@@ -1,0 +1,43 @@
+fact_id: portco_revenue_weight
+name: PortCo Revenue Weight
+category: financial
+description: Revenue-based weighting factor for a PortCo used in portfolio-wide weighted averages.
+business_definition: A weighting factor proportional to a PortCo's revenue contribution to the portfolio,
+  used to compute revenue-weighted composite KPIs such as the portfolio AI adoption score.
+data_type: float
+unit: weight
+fact_type: raw
+source_priority:
+- operations
+- project_portfolio
+document_sources:
+- project_portfolio
+- operations
+possible_aliases:
+- portco revenue weight
+- revenue weighting factor
+- portco weight by revenue
+extraction_patterns:
+- portco revenue weight
+- revenue-based weighting for portco
+validation_rules:
+  min: 0
+  max: 1
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- portco_adoption_score
+- portfolio_ai_adoption_score
+used_by_kpis:
+- portfolio_ai_adoption_score
+example_values:
+- 0.45
+- 0.3
+- 0.25
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: exclude_portco
+status: active

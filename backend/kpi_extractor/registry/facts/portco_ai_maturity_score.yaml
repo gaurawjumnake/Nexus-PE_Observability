@@ -1,0 +1,43 @@
+fact_id: portco_ai_maturity_score
+name: PortCo AI Maturity Score
+category: maturity
+description: Individual PortCo's overall AI maturity score on a 0-5 scale.
+business_definition: A 0-5 composite maturity score for an individual PortCo, combining strategic, technical,
+  talent, and governance dimensions, used to rank PortCos within the portfolio.
+data_type: float
+unit: score_0_5
+fact_type: raw
+source_priority:
+- governance
+- project_portfolio
+document_sources:
+- governance
+- project_portfolio
+possible_aliases:
+- portco ai maturity score
+- company ai maturity rating
+- individual portco maturity score
+extraction_patterns:
+- portco ai maturity score
+- ai maturity rating for portco
+validation_rules:
+  min: 0
+  max: 5
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- ai_maturity_score
+- company_maturity_rank
+used_by_kpis:
+- company_maturity_rank
+example_values:
+- 4.8
+- 4.6
+- 2.8
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: exclude_portco
+status: active

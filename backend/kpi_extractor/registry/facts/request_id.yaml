@@ -1,0 +1,36 @@
+fact_id: request_id
+name: Request ID
+category: telemetry
+description: Unique identifier for an individual AI request record.
+business_definition: A unique key identifying a single AI request, used to join fallback-triggered status
+  for the Fallback Rate KPI.
+data_type: string
+unit: string
+fact_type: raw
+source_priority:
+- telemetry
+document_sources:
+- telemetry
+possible_aliases:
+- request id
+- ai request identifier
+extraction_patterns:
+- request id
+- ai request identifier
+validation_rules:
+  required_type: string
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- fallback_rate
+- fallback_triggered
+used_by_kpis:
+- fallback_rate
+example_values:
+- req-558821
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: mark_unavailable
+status: active

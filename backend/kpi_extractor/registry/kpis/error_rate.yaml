@@ -1,0 +1,38 @@
+name: Error Rate
+category: Reliability
+tier: operational
+description: Percentage of AI API requests resulting in uncaught exceptions or 5xx
+  server errors.
+business_value: Primary reliability health signal for AI infrastructure teams.
+formula: count(api_calls WHERE status_code >= 500) / count(api_calls) * 100
+unit: percentage
+aggregation: average
+frequency: daily
+required_facts:
+- api_call_id
+- api_status_code
+derived_facts: []
+required_documents:
+- telemetry
+dependencies:
+- api_status_code
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: sre_standards
+thresholds:
+  excellent: 0.05
+  good: 0.1
+  warning: 0.5
+  critical: 2.0
+data_quality:
+  minimum_coverage: 99
+  confidence_threshold: 0.99
+missing_data_strategy: use_worst_case
+owner_persona:
+- technology_lead
+dashboard_visibility:
+- operations_dashboard
+example_calculation: 8 errors / 10000 calls => 0.08%
+status: active
+kpi_id: error_rate

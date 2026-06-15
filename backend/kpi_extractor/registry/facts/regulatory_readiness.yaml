@@ -1,0 +1,41 @@
+fact_id: regulatory_readiness
+name: Regulatory Readiness
+category: governance
+description: Portfolio-wide average assessment of preparedness for current and upcoming AI regulations.
+business_definition: The portfolio-wide average of individual PortCo regulatory readiness ratings, used
+  as an input to the AI Governance Score.
+data_type: float
+unit: score_0_100
+fact_type: derived
+source_priority:
+- governance
+- audit
+document_sources:
+- governance
+- audit
+possible_aliases:
+- regulatory readiness score
+- ai regulation preparedness score
+- portfolio regulatory readiness
+extraction_patterns:
+- regulatory readiness score
+- portfolio average regulatory readiness
+validation_rules:
+  min: 0
+  max: 100
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: average
+related_facts:
+- ai_governance_score
+- portco_regulatory_readiness_rating
+used_by_kpis:
+- ai_governance_score
+example_values:
+- 68
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_worst_case
+status: active

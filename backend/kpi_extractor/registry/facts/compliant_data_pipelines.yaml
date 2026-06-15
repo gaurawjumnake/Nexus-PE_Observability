@@ -1,0 +1,40 @@
+fact_id: compliant_data_pipelines
+name: Compliant Data Pipelines
+category: governance
+description: Count of AI data pipelines that meet data privacy regulatory requirements.
+business_definition: The number of AI data pipelines audited and confirmed compliant with applicable data
+  privacy regulations, used as the numerator for the data privacy compliance score.
+data_type: integer
+unit: count
+fact_type: raw
+source_priority:
+- governance
+- audit
+document_sources:
+- governance
+- audit
+possible_aliases:
+- compliant data pipelines
+- privacy-compliant pipelines count
+- compliant ai pipelines
+extraction_patterns:
+- compliant data pipelines count
+- data pipelines meeting privacy requirements
+validation_rules:
+  min: 0
+  required_type: integer
+normalization_rules: {}
+aggregation_strategy: sum
+related_facts:
+- data_privacy_compliance
+- total_data_pipelines
+used_by_kpis:
+- data_privacy_compliance
+example_values:
+- 76
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_worst_case
+status: active

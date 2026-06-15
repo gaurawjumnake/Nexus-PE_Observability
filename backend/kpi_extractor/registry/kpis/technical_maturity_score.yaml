@@ -1,0 +1,39 @@
+name: Technical Maturity Score
+category: Maturity
+tier: operational
+description: Assessment of MLOps rigor, data infrastructure quality, and AI engineering
+  practices.
+business_value: Identifies technical gaps that limit AI scalability and reliability.
+formula: average(portco_technical_maturity_rating) WHERE portco_technical_maturity_rating
+  IN [0,5]
+unit: score_0_5
+aggregation: average
+frequency: quarterly
+required_facts:
+- portco_technical_maturity_rating
+derived_facts: []
+required_documents:
+- governance
+- project_portfolio
+dependencies:
+- portco_technical_maturity_rating
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: pe_benchmark_panel
+thresholds:
+  excellent: 4.5
+  good: 3.5
+  warning: 2.5
+  critical: 1.5
+data_quality:
+  minimum_coverage: 80
+  confidence_threshold: 0.8
+missing_data_strategy: exclude_portco
+owner_persona:
+- technology_lead
+dashboard_visibility:
+- operations_dashboard
+example_calculation: portfolio average technical maturity = 2.8/5
+status: active
+kpi_id: technical_maturity_score

@@ -1,0 +1,53 @@
+fact_id: direct_ai_revenue
+name: Direct AI Revenue
+category: revenue
+description: Revenue from products or features where AI is the primary value driver.
+business_definition: Revenue generated directly by AI-native products or AI-led feature lines, where AI
+  is the core value proposition rather than a supporting capability.
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+- crm
+document_sources:
+- financial
+- crm
+possible_aliases:
+- direct ai revenue
+- direct AI product revenue
+- AI-native revenue
+- pure AI revenue
+- AI primary revenue
+extraction_patterns:
+- direct ai revenue
+- revenue from ai-native products
+- ai-led feature revenue
+- ai primary driver revenue
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: sum
+related_facts:
+- ai_assisted_revenue
+- ai_attribution_type
+- ai_revenue
+- pipeline_influenced_revenue
+- revenue_line_amount
+used_by_kpis:
+- ai_revenue
+example_values:
+- 14100000
+- 5200000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: insufficient_data
+status: active

@@ -1,0 +1,45 @@
+fact_id: weekly_ai_interactions
+name: Weekly AI Interactions
+category: usage
+description: Count of an employee's meaningful AI tool interactions in a given week.
+business_definition: The number of times an individual employee meaningfully interacted with AI tools
+  (queries, completions, sessions) within a calendar week, used to assess adoption depth.
+data_type: integer
+unit: count
+fact_type: raw
+source_priority:
+- telemetry
+- hr
+document_sources:
+- telemetry
+- hr
+possible_aliases:
+- weekly ai interactions
+- weekly ai usage count
+- weekly ai tool sessions
+extraction_patterns:
+- weekly ai interactions
+- ai tool interactions per week
+- weekly ai usage count
+validation_rules:
+  min: 0
+  required_type: integer
+normalization_rules: {}
+aggregation_strategy: sum
+related_facts:
+- active_ai_users
+- employee_id
+- power_user_ratio
+used_by_kpis:
+- active_ai_users
+- power_user_ratio
+example_values:
+- 3
+- 22
+- 47
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

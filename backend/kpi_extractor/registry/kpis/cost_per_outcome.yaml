@@ -1,0 +1,44 @@
+name: Cost per AI Outcome
+category: FinOps
+tier: operational
+description: Normalized cost per meaningful business result (e.g. ticket resolved,
+  sales assist completed) from AI systems.
+business_value: Enables unit economics benchmarking and identifies inefficient AI
+  deployments.
+formula: total_ai_spend / total_ai_successful_outcomes
+unit: USD
+aggregation: average
+frequency: monthly
+required_facts:
+- total_ai_spend
+- total_ai_successful_outcomes
+derived_facts: []
+required_documents:
+- financial
+- telemetry
+- operations
+dependencies:
+- total_ai_spend
+- total_ai_successful_outcomes
+benchmarking:
+  enabled: true
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 0.2
+  good: 0.42
+  warning: 0.8
+  critical: 2.0
+data_quality:
+  minimum_coverage: 80
+  confidence_threshold: 0.85
+missing_data_strategy: exclude_portco
+owner_persona:
+- cfo
+- technology_lead
+dashboard_visibility:
+- finops_dashboard
+- operations_dashboard
+example_calculation: spend=12.8M, outcomes=30.5M => $0.42 per outcome
+status: active
+kpi_id: cost_per_outcome

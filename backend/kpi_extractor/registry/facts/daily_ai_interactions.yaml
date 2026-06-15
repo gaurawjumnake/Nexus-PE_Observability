@@ -1,0 +1,41 @@
+fact_id: daily_ai_interactions
+name: Daily AI Interactions
+category: usage
+description: Count of an employee's meaningful AI tool interactions on a given day.
+business_definition: The number of times an individual employee meaningfully interacted with AI production
+  tools on a given calendar day, used to compute daily active AI users.
+data_type: integer
+unit: count
+fact_type: raw
+source_priority:
+- telemetry
+document_sources:
+- telemetry
+possible_aliases:
+- daily ai interactions
+- daily ai usage count
+- daily ai tool sessions
+extraction_patterns:
+- daily ai interactions
+- ai interactions per day
+- daily ai usage count
+validation_rules:
+  min: 0
+  required_type: integer
+normalization_rules: {}
+aggregation_strategy: sum
+related_facts:
+- dau_mau_intensity
+- interaction_date
+used_by_kpis:
+- dau_mau_intensity
+example_values:
+- 0
+- 4
+- 9
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

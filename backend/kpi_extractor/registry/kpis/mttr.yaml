@@ -1,0 +1,41 @@
+name: MTTR (Incident Response)
+category: Reliability
+tier: operational
+description: Mean time to recover from AI-specific service degradation incidents.
+business_value: Measures operational maturity and resilience of AI infrastructure
+  teams.
+formula: average(incident_resolution_time_minutes) WHERE incident_type = 'ai_service_degradation'
+unit: minutes
+aggregation: average
+frequency: monthly
+required_facts:
+- incident_id
+- incident_resolution_time_minutes
+- incident_type
+derived_facts: []
+required_documents:
+- telemetry
+- audit
+dependencies:
+- incident_resolution_time_minutes
+- incident_type
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: sre_standards
+thresholds:
+  excellent: 15
+  good: 30
+  warning: 60
+  critical: 120
+data_quality:
+  minimum_coverage: 90
+  confidence_threshold: 0.9
+missing_data_strategy: use_worst_case
+owner_persona:
+- technology_lead
+dashboard_visibility:
+- operations_dashboard
+example_calculation: average recovery across 4 incidents = 24 minutes
+status: active
+kpi_id: mttr

@@ -1,0 +1,41 @@
+fact_id: days_since_last_update
+name: Days Since Last Update
+category: project
+description: Number of days elapsed since an AI project record was last updated.
+business_definition: The count of calendar days since the last activity or status update on an AI project
+  record, used to identify stalled or deprioritized initiatives.
+data_type: integer
+unit: days
+fact_type: raw
+source_priority:
+- project_portfolio
+document_sources:
+- project_portfolio
+possible_aliases:
+- days since last update
+- days inactive
+- project staleness days
+extraction_patterns:
+- days since last update
+- days since last activity on project
+validation_rules:
+  min: 0
+  required_type: integer
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- project_id
+- project_stage
+- stalled_projects
+used_by_kpis:
+- stalled_projects
+example_values:
+- 5
+- 35
+- 90
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_worst_case
+status: active

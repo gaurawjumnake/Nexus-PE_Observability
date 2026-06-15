@@ -1,0 +1,43 @@
+fact_id: incident_period
+name: Incident Period
+category: governance
+description: Reporting period (typically month) in which an AI incident occurred.
+business_definition: The calendar period (month) during which an AI incident occurred, used to filter
+  incident counts to the current reporting month for the AI Incident Rate KPI.
+data_type: date
+unit: date
+fact_type: raw
+source_priority:
+- governance
+- audit
+- telemetry
+document_sources:
+- governance
+- telemetry
+- audit
+possible_aliases:
+- incident period
+- incident month
+- period of occurrence
+extraction_patterns:
+- incident occurred in period
+- incident period = current month
+validation_rules:
+  required_type: date
+normalization_rules:
+  date_format: YYYY-MM
+aggregation_strategy: latest_value
+related_facts:
+- ai_incident_rate
+- incident_id
+used_by_kpis:
+- ai_incident_rate
+example_values:
+- 2026-05
+- 2026-06
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_worst_case
+status: active

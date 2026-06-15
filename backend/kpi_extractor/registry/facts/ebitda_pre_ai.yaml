@@ -1,0 +1,48 @@
+fact_id: ebitda_pre_ai
+name: EBITDA Pre-AI
+category: financial
+description: EBITDA figure for the baseline period prior to AI-driven initiatives.
+business_definition: The company's EBITDA for a prior baseline period before AI-driven initiatives took
+  effect, used as the comparison point for EBITDA uplift.
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+- board_deck
+document_sources:
+- financial
+- board_deck
+possible_aliases:
+- ebitda pre ai
+- baseline ebitda
+- pre-ai ebitda
+extraction_patterns:
+- ebitda pre-ai
+- ebitda before ai initiatives
+- baseline period ebitda
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: latest_value
+related_facts:
+- ebitda_delta
+- ebitda_post_ai
+- ebitda_uplift
+- revenue_base
+used_by_kpis:
+- ebitda_uplift
+example_values:
+- 21000000
+confidence_rules:
+  minimum_confidence: 0.9
+  auto_approve: 0.97
+  manual_review_below: 0.9
+missing_value_strategy: insufficient_data
+status: active

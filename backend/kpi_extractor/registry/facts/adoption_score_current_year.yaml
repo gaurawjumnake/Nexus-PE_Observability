@@ -1,0 +1,41 @@
+fact_id: adoption_score_current_year
+name: Adoption Score (Current Year)
+category: adoption
+description: Portfolio-wide AI adoption score for the current year.
+business_definition: The portfolio-wide composite AI adoption maturity score measured for the current
+  year, used as the numerator input for the Adoption YoY Growth KPI.
+data_type: float
+unit: score_0_100
+fact_type: raw
+source_priority:
+- operations
+- project_portfolio
+document_sources:
+- project_portfolio
+- operations
+possible_aliases:
+- adoption score current year
+- current year ai adoption score
+- this year's adoption score
+extraction_patterns:
+- adoption score for current year
+- current year ai adoption maturity score
+validation_rules:
+  min: 0
+  max: 100
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- adoption_score_prior_year
+- adoption_yoy_growth
+used_by_kpis:
+- adoption_yoy_growth
+example_values:
+- 71
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: insufficient_data
+status: active

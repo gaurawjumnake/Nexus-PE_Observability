@@ -1,0 +1,38 @@
+name: Embedded Analytics Adoption
+category: User Adoption
+tier: operational
+description: Count of employees actively using AI-powered embedded analytics features
+  in business applications.
+business_value: Tracks data-driven decision making enabled by AI-powered analytics.
+formula: count(employees WHERE embedded_analytics_weekly_sessions >= 1)
+unit: count
+aggregation: sum
+frequency: weekly
+required_facts:
+- embedded_analytics_weekly_sessions
+derived_facts: []
+required_documents:
+- telemetry
+dependencies:
+- embedded_analytics_weekly_sessions
+benchmarking:
+  enabled: true
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 800
+  good: 500
+  warning: 200
+  critical: 50
+data_quality:
+  minimum_coverage: 85
+  confidence_threshold: 0.85
+missing_data_strategy: use_last_known
+owner_persona:
+- technology_lead
+- business_lead
+dashboard_visibility:
+- adoption_dashboard
+example_calculation: 700 employees with weekly embedded analytics sessions
+status: active
+kpi_id: embedded_analytics_adoption

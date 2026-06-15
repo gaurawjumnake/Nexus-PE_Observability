@@ -1,0 +1,46 @@
+fact_id: revenue_base
+name: Revenue Base
+category: financial
+description: Total revenue base used as the denominator for EBITDA uplift percentage calculation.
+business_definition: The total revenue figure for the relevant period/entity, used as the normalization
+  base when expressing EBITDA changes as a percentage of revenue.
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+- board_deck
+document_sources:
+- financial
+- board_deck
+possible_aliases:
+- revenue base
+- total revenue base
+- baseline revenue
+extraction_patterns:
+- revenue base
+- total company revenue for period
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: latest_value
+related_facts:
+- ebitda_post_ai
+- ebitda_pre_ai
+- ebitda_uplift
+used_by_kpis:
+- ebitda_uplift
+example_values:
+- 100000000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: insufficient_data
+status: active

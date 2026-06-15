@@ -1,0 +1,40 @@
+name: Strategic Alignment Score
+category: Maturity
+tier: operational
+description: Assessment of how well AI initiatives align with each PortCo's core business
+  strategy and goals.
+business_value: Ensures AI investments support business objectives rather than tech-for-tech-sake.
+formula: average(portco_strategic_alignment_rating) WHERE portco_strategic_alignment_rating
+  IN [0,5]
+unit: score_0_5
+aggregation: average
+frequency: quarterly
+required_facts:
+- portco_strategic_alignment_rating
+derived_facts: []
+required_documents:
+- governance
+- board_deck
+dependencies:
+- portco_strategic_alignment_rating
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 4.5
+  good: 3.5
+  warning: 2.5
+  critical: 1.5
+data_quality:
+  minimum_coverage: 80
+  confidence_threshold: 0.8
+missing_data_strategy: exclude_portco
+owner_persona:
+- cxo
+- operating_partner
+dashboard_visibility:
+- executive_dashboard
+example_calculation: portfolio average strategic alignment = 4.1/5
+status: active
+kpi_id: strategic_alignment_score

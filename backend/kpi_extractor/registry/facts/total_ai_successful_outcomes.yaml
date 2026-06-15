@@ -1,0 +1,43 @@
+fact_id: total_ai_successful_outcomes
+name: Total AI Successful Outcomes
+category: operations
+description: Count of meaningful business outcomes successfully delivered by AI systems in the period.
+business_definition: The total count of business-meaningful outcomes (e.g., tickets resolved, sales assists
+  completed) successfully delivered by AI systems, used as the denominator for unit-economics KPIs.
+data_type: integer
+unit: count
+fact_type: raw
+source_priority:
+- financial
+- telemetry
+- operations
+document_sources:
+- financial
+- telemetry
+- operations
+possible_aliases:
+- total ai successful outcomes
+- ai outcomes delivered
+- successful ai-driven outcomes
+extraction_patterns:
+- total ai successful outcomes
+- ai-driven outcomes completed
+- outcomes resolved by ai
+validation_rules:
+  min: 0
+  required_type: integer
+normalization_rules: {}
+aggregation_strategy: sum
+related_facts:
+- cost_per_outcome
+- total_ai_spend
+used_by_kpis:
+- cost_per_outcome
+example_values:
+- 30500000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: exclude_portco
+status: active

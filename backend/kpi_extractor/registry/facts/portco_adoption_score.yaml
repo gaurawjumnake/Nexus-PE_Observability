@@ -1,0 +1,43 @@
+fact_id: portco_adoption_score
+name: PortCo Adoption Score
+category: maturity
+description: Individual PortCo's AI adoption score on a 0-100 scale.
+business_definition: A 0-100 composite score representing a single PortCo's depth and breadth of AI deployment,
+  used as input to the revenue-weighted portfolio adoption score.
+data_type: float
+unit: score_0_100
+fact_type: raw
+source_priority:
+- operations
+- project_portfolio
+document_sources:
+- project_portfolio
+- operations
+possible_aliases:
+- portco adoption score
+- company ai adoption score
+- individual portco adoption rating
+extraction_patterns:
+- portco adoption score
+- ai adoption score for portco
+validation_rules:
+  min: 0
+  max: 100
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- portco_revenue_weight
+- portfolio_ai_adoption_score
+used_by_kpis:
+- portfolio_ai_adoption_score
+example_values:
+- 76
+- 62
+- 81
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: exclude_portco
+status: active

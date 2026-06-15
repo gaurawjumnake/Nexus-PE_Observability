@@ -1,0 +1,45 @@
+name: AI Revenue
+category: Revenue Growth
+tier: executive
+description: Total incremental revenue directly attributable to AI-driven products,
+  features, and services.
+business_value: Quantifies AI's top-line contribution and justifies continued investment.
+formula: direct_ai_revenue + ai_assisted_revenue + pipeline_influenced_revenue
+unit: USD
+aggregation: sum
+frequency: monthly
+required_facts:
+- direct_ai_revenue
+- ai_assisted_revenue
+- pipeline_influenced_revenue
+derived_facts: []
+required_documents:
+- financial
+- crm
+dependencies:
+- direct_ai_revenue
+- ai_assisted_revenue
+- pipeline_influenced_revenue
+benchmarking:
+  enabled: true
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 10000000
+  good: 5000000
+  warning: 2000000
+  critical: 500000
+data_quality:
+  minimum_coverage: 85
+  confidence_threshold: 0.9
+missing_data_strategy: insufficient_data
+owner_persona:
+- cxo
+- business_lead
+dashboard_visibility:
+- executive_dashboard
+- revenue_dashboard
+example_calculation: direct=14.1M, assisted=6.4M, pipeline=18.9M => total=39.4M (portfolio-wide;
+  per PortCo varies)
+status: active
+kpi_id: ai_revenue

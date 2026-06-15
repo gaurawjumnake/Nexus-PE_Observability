@@ -1,0 +1,39 @@
+fact_id: vendor_id
+name: Vendor ID
+category: governance
+description: Unique identifier for a third-party AI vendor record.
+business_definition: A unique key identifying a third-party AI vendor, used to join compliance status
+  data for the Vendor Compliance KPI.
+data_type: string
+unit: string
+fact_type: raw
+source_priority:
+- governance
+- audit
+document_sources:
+- governance
+- audit
+possible_aliases:
+- vendor id
+- third-party vendor identifier
+- ai vendor record id
+extraction_patterns:
+- vendor id
+- third-party ai vendor identifier
+validation_rules:
+  required_type: string
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- compliance_status
+- vendor_compliance
+used_by_kpis:
+- vendor_compliance
+example_values:
+- VND-1029
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: mark_unavailable
+status: active

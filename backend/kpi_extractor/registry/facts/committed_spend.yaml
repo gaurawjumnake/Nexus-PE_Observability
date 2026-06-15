@@ -1,0 +1,45 @@
+fact_id: committed_spend
+name: Committed Spend
+category: cost
+description: Contractually committed AI spend for the remainder of the fiscal year.
+business_definition: The portion of AI spend already committed via signed contracts or purchase commitments
+  for the remainder of the fiscal year.
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+- inventory
+document_sources:
+- financial
+- inventory
+possible_aliases:
+- committed spend
+- contracted ai spend
+- committed ai contracts
+extraction_patterns:
+- committed spend
+- contractually committed ai spend
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: sum
+related_facts:
+- current_run_rate_spend
+- forecasted_ai_spend
+used_by_kpis:
+- forecasted_ai_spend
+example_values:
+- 14100000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

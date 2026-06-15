@@ -1,0 +1,55 @@
+fact_id: ai_maturity_score
+name: AI Maturity Score
+category: maturity
+description: Cross-portfolio assessment of AI engineering culture, data readiness, and governance capability
+  on a 5-point scale.
+business_definition: The average of strategic alignment, technical maturity, talent readiness, and governance
+  maturity scores, providing a composite view of long-term AI capability and risk, used to compute Company
+  Maturity Rank.
+data_type: float
+unit: score_0_5
+fact_type: derived
+source_priority:
+- board_deck
+- governance
+- project_portfolio
+- hr
+- benchmark
+document_sources:
+- governance
+- project_portfolio
+- hr
+- benchmark
+- board_deck
+possible_aliases:
+- ai maturity score
+- portfolio ai maturity score
+- cross-portfolio ai capability score
+extraction_patterns:
+- ai maturity score
+- cross-portfolio ai maturity assessment
+validation_rules:
+  min: 0
+  max: 5
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: average
+related_facts:
+- governance_maturity_score
+- portco_ai_maturity_score
+- portfolio_avg_maturity_score
+- strategic_alignment_score
+- talent_readiness_score
+- technical_maturity_score
+used_by_kpis:
+- ai_maturity_score
+- company_maturity_rank
+- portfolio_benchmark_score
+example_values:
+- 3.4
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: exclude_portco
+status: active

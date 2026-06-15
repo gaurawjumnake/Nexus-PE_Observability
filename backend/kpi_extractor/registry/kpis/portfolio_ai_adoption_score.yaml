@@ -1,0 +1,42 @@
+name: Portfolio AI Adoption Score
+category: Adoption
+tier: executive
+description: Composite index measuring AI deployment depth and breadth across PortCos,
+  weighted by revenue.
+business_value: Single adoption health score enabling portfolio-wide AI progress tracking.
+formula: sum(portco_adoption_score * portco_revenue_weight) / sum(portco_revenue_weight)
+unit: score_0_100
+aggregation: weighted_average
+frequency: monthly
+required_facts:
+- portco_adoption_score
+- portco_revenue_weight
+derived_facts: []
+required_documents:
+- project_portfolio
+- operations
+dependencies:
+- portco_adoption_score
+- portco_revenue_weight
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: pe_benchmark_panel
+thresholds:
+  excellent: 85
+  good: 70
+  warning: 55
+  critical: 40
+data_quality:
+  minimum_coverage: 85
+  confidence_threshold: 0.85
+missing_data_strategy: exclude_portco
+owner_persona:
+- cxo
+- operating_partner
+dashboard_visibility:
+- executive_dashboard
+- adoption_dashboard
+example_calculation: '3 portcos: scores 76,62,81 weighted by revenue => composite=71/100'
+status: active
+kpi_id: portfolio_ai_adoption_score

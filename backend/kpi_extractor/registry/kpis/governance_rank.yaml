@@ -1,0 +1,40 @@
+name: Governance Rank
+category: Benchmarking
+tier: executive
+description: Portfolio percentile ranking on AI governance maturity relative to PE
+  benchmark panel.
+business_value: Demonstrates governance leadership to LPs and regulators.
+formula: percentile_rank(ai_governance_score, benchmark_governance_distribution)
+unit: percentile
+aggregation: latest_value
+frequency: quarterly
+required_facts:
+- ai_governance_score
+- benchmark_governance_distribution
+derived_facts: []
+required_documents:
+- benchmark
+- governance
+dependencies:
+- ai_governance_score
+benchmarking:
+  enabled: true
+  benchmark_type: industry
+  benchmark_source: pe_benchmark_panel
+thresholds:
+  excellent: 90
+  good: 75
+  warning: 50
+  critical: 25
+data_quality:
+  minimum_coverage: 70
+  confidence_threshold: 0.8
+missing_data_strategy: use_last_known
+owner_persona:
+- cxo
+- compliance_lead
+dashboard_visibility:
+- benchmark_dashboard
+example_calculation: governance score ranks at 94th percentile
+status: active
+kpi_id: governance_rank

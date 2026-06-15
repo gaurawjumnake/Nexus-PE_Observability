@@ -1,0 +1,47 @@
+fact_id: output_criticality
+name: Output Criticality
+category: governance
+description: Criticality classification of an AI output (e.g., high, medium, low).
+business_definition: A categorical criticality rating assigned to an AI output indicating its potential
+  business or legal impact, used to filter outputs for the Human Review Coverage KPI denominator.
+data_type: enum
+unit: string
+fact_type: raw
+source_priority:
+- governance
+- audit
+document_sources:
+- governance
+- audit
+possible_aliases:
+- output criticality
+- decision criticality level
+- ai output impact rating
+extraction_patterns:
+- output criticality = high
+- high-criticality ai decision
+- criticality rating of output
+validation_rules:
+  required_type: enum
+  allowed_values:
+  - high
+  - medium
+  - low
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- human_review_completed
+- human_review_coverage
+- output_id
+used_by_kpis:
+- human_review_coverage
+example_values:
+- high
+- medium
+- low
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_worst_case
+status: active

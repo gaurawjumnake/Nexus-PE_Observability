@@ -1,0 +1,39 @@
+fact_id: evaluated_output_id
+name: Evaluated Output ID
+category: telemetry
+description: Unique identifier for an AI output record subjected to hallucination evaluation.
+business_definition: A unique key identifying an individual AI model output that has been evaluated for
+  hallucination, used to join hallucination flag data for the Hallucination Rate KPI.
+data_type: string
+unit: string
+fact_type: raw
+source_priority:
+- audit
+- telemetry
+document_sources:
+- telemetry
+- audit
+possible_aliases:
+- evaluated output id
+- ai output identifier
+- hallucination evaluation record id
+extraction_patterns:
+- evaluated output id
+- ai output identifier for hallucination check
+validation_rules:
+  required_type: string
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- hallucination_flag
+- hallucination_rate
+used_by_kpis:
+- hallucination_rate
+example_values:
+- out-44123
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: mark_unavailable
+status: active

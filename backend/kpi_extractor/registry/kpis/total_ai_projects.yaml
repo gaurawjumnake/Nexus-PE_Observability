@@ -1,0 +1,40 @@
+name: Total AI Projects
+category: Project Portfolio
+tier: operational
+description: Aggregate count of all AI initiatives across all pipeline stages in the
+  portfolio.
+business_value: Provides complete pipeline visibility for investment and resource
+  planning.
+formula: count(projects WHERE ai_flag = true)
+unit: count
+aggregation: sum
+frequency: monthly
+required_facts:
+- project_id
+- ai_flag
+derived_facts: []
+required_documents:
+- project_portfolio
+dependencies:
+- ai_flag
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 100
+  good: 60
+  warning: 30
+  critical: 10
+data_quality:
+  minimum_coverage: 95
+  confidence_threshold: 0.95
+missing_data_strategy: use_last_known
+owner_persona:
+- technology_lead
+- operating_partner
+dashboard_visibility:
+- operations_dashboard
+example_calculation: 156 AI projects across all stages
+status: active
+kpi_id: total_ai_projects

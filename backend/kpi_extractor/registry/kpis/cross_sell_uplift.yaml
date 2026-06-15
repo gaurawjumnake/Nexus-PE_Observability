@@ -1,0 +1,40 @@
+name: Cross-Sell Uplift
+category: Revenue Growth
+tier: operational
+description: Incremental revenue from cross-sell opportunities enabled by AI-driven
+  customer intelligence.
+business_value: Quantifies AI's contribution to customer expansion revenue.
+formula: cross_sell_revenue_with_ai - cross_sell_revenue_baseline
+unit: USD
+aggregation: sum
+frequency: monthly
+required_facts:
+- cross_sell_revenue_with_ai
+- cross_sell_revenue_baseline
+derived_facts: []
+required_documents:
+- crm
+- financial
+dependencies:
+- cross_sell_revenue_with_ai
+- cross_sell_revenue_baseline
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 2000000
+  good: 500000
+  warning: 100000
+  critical: 0
+data_quality:
+  minimum_coverage: 75
+  confidence_threshold: 0.8
+missing_data_strategy: exclude_portco
+owner_persona:
+- business_lead
+dashboard_visibility:
+- revenue_dashboard
+example_calculation: cross_sell_ai=5M, baseline=3.5M => uplift=1.5M
+status: active
+kpi_id: cross_sell_uplift

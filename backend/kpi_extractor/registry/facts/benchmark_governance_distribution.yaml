@@ -1,0 +1,39 @@
+fact_id: benchmark_governance_distribution
+name: Benchmark Governance Distribution
+category: benchmark
+description: Distribution of AI governance scores across the PE benchmark panel.
+business_definition: A statistical distribution of AI governance scores from the PE benchmark panel, used
+  as the comparison set for computing the portfolio's governance percentile rank.
+data_type: string
+unit: distribution
+fact_type: raw
+source_priority:
+- governance
+- benchmark
+document_sources:
+- governance
+- benchmark
+possible_aliases:
+- benchmark governance distribution
+- peer governance score distribution
+- industry governance benchmark
+extraction_patterns:
+- benchmark governance distribution
+- peer panel governance score data
+validation_rules:
+  required_type: string
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- ai_governance_score
+- governance_rank
+used_by_kpis:
+- governance_rank
+example_values:
+- benchmark_panel_2026_q2
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

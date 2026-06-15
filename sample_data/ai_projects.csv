@@ -1,0 +1,51 @@
+project_id,portco_id,project_name,stage,expected_benefit_usd,actual_benefit_usd
+PR001,PC001,Customer Support Bot,Pilot,2326741,0
+PR002,PC001,Sales Copilot,Production,2107896,2419874
+PR003,PC001,Invoice Automation,Production,1236025,1089083
+PR004,PC001,Demand Forecasting,Stalled,355118,0
+PR005,PC001,Fraud Detection,Production,599388,555707
+PR006,PC002,Contract Analyzer,Pilot,1146089,0
+PR007,PC002,Predictive Maintenance,Pilot,2104287,0
+PR008,PC002,Knowledge Assistant,Stalled,442615,0
+PR009,PC002,HR Copilot,Stalled,864613,0
+PR010,PC002,Document Intelligence,Production,643305,824069
+PR011,PC003,Customer Support Bot,Production,790131,797068
+PR012,PC003,Sales Copilot,Production,2271025,2923490
+PR013,PC003,Invoice Automation,Pilot,2185400,0
+PR014,PC003,Demand Forecasting,Production,1258503,1131367
+PR015,PC003,Fraud Detection,Production,1770265,1550275
+PR016,PC004,Contract Analyzer,Production,2084639,2405139
+PR017,PC004,Predictive Maintenance,Production,2391853,3086169
+PR018,PC004,Knowledge Assistant,Production,1063171,1446871
+PR019,PC004,HR Copilot,Pilot,2223673,0
+PR020,PC004,Document Intelligence,Production,1286555,1488898
+PR021,PC005,Customer Support Bot,Production,2312356,2615244
+PR022,PC005,Sales Copilot,Production,544921,644080
+PR023,PC005,Invoice Automation,Pilot,1636481,0
+PR024,PC005,Demand Forecasting,Stalled,1060780,0
+PR025,PC005,Fraud Detection,Production,1086675,1374423
+PR026,PC006,Contract Analyzer,Stalled,601120,0
+PR027,PC006,Predictive Maintenance,Stalled,2269523,0
+PR028,PC006,Knowledge Assistant,Production,1763481,2426356
+PR029,PC006,HR Copilot,Production,1800553,2441525
+PR030,PC006,Document Intelligence,Production,754977,888081
+PR031,PC007,Customer Support Bot,Stalled,567299,0
+PR032,PC007,Sales Copilot,Production,793560,879731
+PR033,PC007,Invoice Automation,Production,2376262,2037197
+PR034,PC007,Demand Forecasting,Pilot,441881,0
+PR035,PC007,Fraud Detection,Production,512152,559934
+PR036,PC008,Contract Analyzer,Stalled,1198587,0
+PR037,PC008,Predictive Maintenance,Production,449040,559354
+PR038,PC008,Knowledge Assistant,Production,2215221,2012441
+PR039,PC008,HR Copilot,Production,330675,393193
+PR040,PC008,Document Intelligence,Production,1229459,1328924
+PR041,PC009,Customer Support Bot,Stalled,416699,0
+PR042,PC009,Sales Copilot,Pilot,1264949,0
+PR043,PC009,Invoice Automation,Production,1109783,1188197
+PR044,PC009,Demand Forecasting,Pilot,2417158,0
+PR045,PC009,Fraud Detection,Production,1022469,1306769
+PR046,PC010,Contract Analyzer,Pilot,1050046,0
+PR047,PC010,Predictive Maintenance,Production,525633,649270
+PR048,PC010,Knowledge Assistant,Production,2382542,3147636
+PR049,PC010,HR Copilot,Stalled,490874,0
+PR050,PC010,Document Intelligence,Stalled,2106996,0

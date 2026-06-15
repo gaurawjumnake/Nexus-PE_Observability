@@ -1,0 +1,39 @@
+name: AI-Assisted Revenue
+category: Revenue Growth
+tier: operational
+description: Revenue from deals or renewals where AI tools materially assisted sales
+  or customer success workflows.
+business_value: Captures AI's indirect revenue contribution through sales acceleration.
+formula: sum(revenue_lines WHERE ai_attribution_type = 'assisted')
+unit: USD
+aggregation: sum
+frequency: monthly
+required_facts:
+- revenue_line_amount
+- ai_attribution_type
+derived_facts: []
+required_documents:
+- financial
+- crm
+dependencies:
+- ai_attribution_type
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 3000000
+  good: 1000000
+  warning: 200000
+  critical: 0
+data_quality:
+  minimum_coverage: 80
+  confidence_threshold: 0.85
+missing_data_strategy: insufficient_data
+owner_persona:
+- business_lead
+dashboard_visibility:
+- revenue_dashboard
+example_calculation: assisted AI sales lines => $6.4M
+status: active
+kpi_id: ai_assisted_revenue

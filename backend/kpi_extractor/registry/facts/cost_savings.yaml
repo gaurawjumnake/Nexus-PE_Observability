@@ -1,0 +1,50 @@
+fact_id: cost_savings
+name: Cost Savings (OpEx)
+category: cost
+description: Realized reduction in operational expenses resulting from AI deployment vs pre-AI baseline.
+business_definition: The dollar amount of operating expense reduction attributable to AI deployment, computed
+  as the difference between pre-AI OpEx baseline and current-period OpEx.
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+- project_portfolio
+document_sources:
+- financial
+- project_portfolio
+possible_aliases:
+- cost savings
+- ai cost savings
+- opex reduction from ai
+- ai-driven savings
+extraction_patterns:
+- cost savings from ai
+- opex reduction attributable to ai
+- ai-driven cost savings
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: sum
+related_facts:
+- ai_roi
+- opex_current_period
+- opex_pre_ai_baseline
+- payback_period
+used_by_kpis:
+- ai_roi
+- payback_period
+example_values:
+- 12800000
+confidence_rules:
+  minimum_confidence: 0.9
+  auto_approve: 0.97
+  manual_review_below: 0.9
+missing_value_strategy: use_last_known
+status: active

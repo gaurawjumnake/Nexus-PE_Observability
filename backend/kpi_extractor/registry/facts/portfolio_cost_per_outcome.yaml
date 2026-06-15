@@ -1,0 +1,46 @@
+fact_id: portfolio_cost_per_outcome
+name: Portfolio Cost Per Outcome
+category: benchmark
+description: Portfolio-wide cost per AI outcome, used for percentile ranking against industry peers.
+business_definition: The portfolio-wide aggregate cost-per-outcome figure, used as the numerator input
+  for the Cost Efficiency Rank percentile calculation against the PE benchmark panel.
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+- benchmark
+document_sources:
+- financial
+- benchmark
+possible_aliases:
+- portfolio cost per outcome
+- portfolio unit economics ai cost
+- portfolio cost efficiency metric
+extraction_patterns:
+- portfolio cost per outcome
+- portfolio-wide ai unit cost
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: latest_value
+related_facts:
+- benchmark_cost_efficiency_distribution
+- cost_efficiency_rank
+- cost_per_outcome
+used_by_kpis:
+- cost_efficiency_rank
+example_values:
+- 0.42
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

@@ -1,0 +1,47 @@
+fact_id: approved_ai_budget
+name: Approved AI Budget
+category: cost
+description: The board/finance-approved budget allocation for AI spend in the period.
+business_definition: The officially approved budget figure for AI-related expenditure for the reporting
+  period, against which actual spend is measured for adherence and variance.
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+document_sources:
+- financial
+possible_aliases:
+- approved ai budget
+- ai budget allocation
+- board-approved ai budget
+extraction_patterns:
+- approved ai budget
+- ai budget for the period
+- board-approved ai spend allocation
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: latest_value
+related_facts:
+- budget_adherence
+- budget_variance
+- total_ai_spend
+used_by_kpis:
+- budget_adherence
+- budget_variance
+example_values:
+- 13000000
+- 13300000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_last_known
+status: active

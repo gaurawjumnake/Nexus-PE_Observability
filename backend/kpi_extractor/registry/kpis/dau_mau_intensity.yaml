@@ -1,0 +1,38 @@
+name: DAU / MAU Intensity
+category: User Adoption
+tier: operational
+description: Total employees actively interacting with AI production tools on a daily
+  basis.
+business_value: Measures depth of daily AI engagement beyond weekly adoption metrics.
+formula: count(employees WHERE daily_ai_interactions >= 1 AND interaction_date = current_date)
+unit: count
+aggregation: sum
+frequency: daily
+required_facts:
+- daily_ai_interactions
+- interaction_date
+derived_facts: []
+required_documents:
+- telemetry
+dependencies:
+- daily_ai_interactions
+benchmarking:
+  enabled: true
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 3000
+  good: 2000
+  warning: 1000
+  critical: 500
+data_quality:
+  minimum_coverage: 90
+  confidence_threshold: 0.9
+missing_data_strategy: use_last_known
+owner_persona:
+- technology_lead
+dashboard_visibility:
+- adoption_dashboard
+example_calculation: 2800 employees with daily AI interactions
+status: active
+kpi_id: dau_mau_intensity

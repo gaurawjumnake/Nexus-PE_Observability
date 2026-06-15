@@ -1,0 +1,52 @@
+fact_id: pipeline_influenced_revenue
+name: Pipeline Influenced Revenue
+category: revenue
+description: Revenue from pipeline opportunities generated or materially influenced by AI-driven marketing
+  or outreach.
+business_definition: Revenue from sales pipeline opportunities that were sourced, qualified, or substantially
+  influenced by AI-driven marketing, lead-scoring, or outreach systems.
+data_type: currency
+unit: USD
+fact_type: raw
+source_priority:
+- financial
+- crm
+document_sources:
+- financial
+- crm
+possible_aliases:
+- pipeline influenced revenue
+- ai-sourced pipeline revenue
+- ai-driven pipeline revenue
+- ai marketing influenced revenue
+extraction_patterns:
+- pipeline influenced by ai
+- revenue from ai-generated pipeline
+- ai-driven outreach revenue
+validation_rules:
+  min: 0
+  required_type: currency
+normalization_rules:
+  currency: USD
+  scale:
+    K: 1000
+    M: 1000000
+    B: 1000000000
+aggregation_strategy: sum
+related_facts:
+- ai_assisted_revenue
+- ai_attribution_type
+- ai_revenue
+- direct_ai_revenue
+- revenue_line_amount
+used_by_kpis:
+- ai_revenue
+example_values:
+- 18900000
+- 7300000
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: insufficient_data
+status: active

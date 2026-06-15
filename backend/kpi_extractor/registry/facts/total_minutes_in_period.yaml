@@ -1,0 +1,39 @@
+fact_id: total_minutes_in_period
+name: Total Minutes in Period
+category: telemetry
+description: Total number of minutes in the reporting period, used as the denominator for uptime calculation.
+business_definition: The total elapsed minutes within the reporting period (e.g., 43,800 minutes in a
+  30-day month), used as the denominator for the System Availability KPI.
+data_type: integer
+unit: minutes
+fact_type: raw
+source_priority:
+- telemetry
+document_sources:
+- telemetry
+possible_aliases:
+- total minutes in period
+- total period minutes
+- reporting period minutes
+extraction_patterns:
+- total minutes in the reporting period
+- period duration in minutes
+validation_rules:
+  min: 0
+  required_type: integer
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- availability_uptime
+- total_downtime_minutes
+used_by_kpis:
+- availability_uptime
+example_values:
+- 43800
+- 44640
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_worst_case
+status: active

@@ -1,0 +1,43 @@
+name: Hallucination Detection Rate
+category: Governance
+tier: operational
+description: Percentage of AI model outputs flagged as factually incorrect or fabricated
+  by automated detection systems.
+business_value: Critical quality signal for AI reliability and trust, especially in
+  financial and legal contexts.
+formula: count(outputs WHERE hallucination_flag = true) / count(evaluated_outputs)
+  * 100
+unit: percentage
+aggregation: average
+frequency: daily
+required_facts:
+- evaluated_output_id
+- hallucination_flag
+derived_facts: []
+required_documents:
+- telemetry
+- audit
+dependencies:
+- hallucination_flag
+benchmarking:
+  enabled: true
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 0.5
+  good: 1.0
+  warning: 3.0
+  critical: 5.0
+data_quality:
+  minimum_coverage: 85
+  confidence_threshold: 0.85
+missing_data_strategy: use_worst_case
+owner_persona:
+- technology_lead
+- compliance_lead
+dashboard_visibility:
+- governance_dashboard
+- operations_dashboard
+example_calculation: 2.4% of evaluated outputs flagged as hallucinations
+status: active
+kpi_id: hallucination_rate

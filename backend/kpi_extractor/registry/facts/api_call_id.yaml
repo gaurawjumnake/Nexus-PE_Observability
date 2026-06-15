@@ -1,0 +1,39 @@
+fact_id: api_call_id
+name: API Call ID
+category: telemetry
+description: Unique identifier for an individual AI API call record.
+business_definition: A unique key identifying a single AI API request/response event, used to join status
+  code data for reliability KPIs.
+data_type: string
+unit: string
+fact_type: raw
+source_priority:
+- telemetry
+document_sources:
+- telemetry
+possible_aliases:
+- api call id
+- api request identifier
+- api call record id
+extraction_patterns:
+- api call id
+- api request identifier
+validation_rules:
+  required_type: string
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- api_status_code
+- api_success_rate
+- error_rate
+used_by_kpis:
+- api_success_rate
+- error_rate
+example_values:
+- call-9981234
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: mark_unavailable
+status: active

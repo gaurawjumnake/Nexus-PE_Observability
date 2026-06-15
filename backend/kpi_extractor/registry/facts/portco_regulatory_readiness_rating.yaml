@@ -1,0 +1,43 @@
+fact_id: portco_regulatory_readiness_rating
+name: PortCo Regulatory Readiness Rating
+category: governance
+description: Individual PortCo's regulatory readiness rating on a 0-100 scale.
+business_definition: A 0-100 assessment rating of an individual PortCo's preparedness for current and
+  upcoming AI regulations, used to compute the portfolio regulatory readiness score.
+data_type: float
+unit: score_0_100
+fact_type: raw
+source_priority:
+- governance
+- audit
+document_sources:
+- governance
+- audit
+possible_aliases:
+- regulatory readiness rating
+- portco regulatory readiness score
+- ai regulation preparedness rating
+extraction_patterns:
+- regulatory readiness rating for portco
+- portco ai regulation preparedness assessment
+validation_rules:
+  min: 0
+  max: 100
+  required_type: float
+normalization_rules: {}
+aggregation_strategy: latest_value
+related_facts:
+- ai_governance_score
+- regulatory_readiness
+used_by_kpis:
+- regulatory_readiness
+example_values:
+- 68
+- 75
+- 55
+confidence_rules:
+  minimum_confidence: 0.8
+  auto_approve: 0.95
+  manual_review_below: 0.8
+missing_value_strategy: use_worst_case
+status: active

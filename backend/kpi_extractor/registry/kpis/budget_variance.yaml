@@ -1,0 +1,39 @@
+name: Budget Variance
+category: FinOps
+tier: operational
+description: Absolute and percentage difference between actual AI spend and approved
+  AI budget for the period.
+business_value: Provides early warning for budget overruns requiring governance intervention.
+formula: total_ai_spend - approved_ai_budget
+unit: USD
+aggregation: sum
+frequency: monthly
+required_facts:
+- total_ai_spend
+- approved_ai_budget
+derived_facts: []
+required_documents:
+- financial
+dependencies:
+- total_ai_spend
+- approved_ai_budget
+benchmarking:
+  enabled: false
+  benchmark_type: portfolio
+  benchmark_source: internal
+thresholds:
+  excellent: 0
+  good: 500000
+  warning: 1000000
+  critical: 2000000
+data_quality:
+  minimum_coverage: 95
+  confidence_threshold: 0.95
+missing_data_strategy: insufficient_data
+owner_persona:
+- cfo
+dashboard_visibility:
+- finops_dashboard
+example_calculation: spend=12.8M, budget=13.3M => variance=-0.5M (under budget)
+status: active
+kpi_id: budget_variance
