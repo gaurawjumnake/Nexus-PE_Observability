@@ -30,7 +30,7 @@ class ParsedDocument:
     processing_time: float
 
 class LlamaCloudDocumentParser:
-    SUPPORTED_EXTENSIONS = os.getenv("SUPPORTED_DOC_TYPE_EXTENSIONS")
+    SUPPORTED_EXTENSIONS = os.getenv("SUPPORTED_DOC_TYPE_EXTENSIONS", ".pdf,.docx,.pptx,.xlsx,.md,.txt,.csv").split(",")
 
     def __init__(self, max_timeout: int = 300):
         api_key = os.getenv("LLAMA_CLOUD_API_KEY")
