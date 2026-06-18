@@ -31,6 +31,7 @@ DEFAULT_MODEL = os.getenv("NEXUS_ORCHESTRATOR_MODEL", os.getenv("GEMINI_MODEL", 
 class AgenticAskRequest(BaseModel):
     question: str = Field(..., min_length=1)
     company_id: Optional[str] = None
+    period: Optional[str] = None
     document_ids: Optional[list[str]] = None
     top_k: int = Field(default=8, ge=1, le=20)
     sql_db_path: Optional[str] = None
@@ -59,6 +60,7 @@ def get_crewai_llm():
     if not api_key:
         raise ValueError("Missing GEMINI_API_KEY or GOOGLE_API_KEY for CrewAI Gemini LLM")
 
+    log.log_info(f"Creating CrewAI orchestrator LLM with model={DEFAULT_MODEL}")
     return LLM(model=DEFAULT_MODEL, api_key=api_key, temperature=0)
 
 
@@ -127,7 +129,12 @@ def heuristic_route(question: str, has_documents: bool) -> RoutePlan:
 def choose_route(request: AgenticAskRequest) -> RoutePlan:
     from crewai import Agent, Crew, Process, Task
 
-    fallback = heuristic_route(request.question, bool(request.document_ids and request.company_id))
+    can_use_rag = bool(request.company_id)
+    fallback = heuristic_route(request.question, can_use_rag)
+    log.log_info(
+        f"Choosing route: question={request.question}, company_id={request.company_id}, "
+        f"period={request.period}, document_ids={request.document_ids}, fallback={fallback.model_dump()}"
+    )
     route_agent = Agent(
         role="RAG SQL Routing Analyst",
         goal="Select the best tool route for a user analytics question.",
@@ -144,11 +151,13 @@ def choose_route(request: AgenticAskRequest) -> RoutePlan:
             "Decide the route for this query.\n\n"
             "Question: {question}\n"
             "Company id provided: {has_company}\n"
-            "Document ids provided: {has_documents}\n"
+            "Document ids provided: {has_document_ids}\n"
+            "Company-level RAG available: {can_use_rag}\n"
             "SQL database available: true\n\n"
             "Route meanings:\n"
             "- rag: use document retrieval when the user asks why, explain, "
-            "summarize, evidence, document details, or qualitative context.\n"
+            "summarize, evidence, document details, or qualitative context. "
+            "Document ids are optional; company_id can retrieve all indexed company documents.\n"
             "- sql: use text-to-SQL when the user asks for metrics, totals, "
             "averages, rankings, comparisons, trends, filters, dates, or table data.\n"
             "- both: use both when the user needs numeric results plus explanation "
@@ -169,22 +178,25 @@ def choose_route(request: AgenticAskRequest) -> RoutePlan:
             inputs={
                 "question": request.question,
                 "has_company": bool(request.company_id),
-                "has_documents": bool(request.document_ids),
+                "has_document_ids": bool(request.document_ids),
+                "can_use_rag": can_use_rag,
             }
         )
         payload = parse_json_object(result)
+        log.log_info(f"Routing agent raw payload: {payload}")
         route = str(payload.get("route", fallback.route)).lower()
         if route not in {"rag", "sql", "both"}:
+            log.log_warning(f"Routing agent returned invalid route={route}; using fallback")
             return fallback
         if route in {"rag", "both"} and not request.company_id:
             return RoutePlan(route="sql", confidence=0.5, reasoning="RAG needs company_id; falling back to SQL.")
-        if route in {"rag", "both"} and not request.document_ids:
-            return RoutePlan(route="sql", confidence=0.5, reasoning="RAG needs document_ids; falling back to SQL.")
-        return RoutePlan(
+        selected = RoutePlan(
             route=route,
             confidence=float(payload.get("confidence", fallback.confidence)),
             reasoning=str(payload.get("reasoning", fallback.reasoning)),
         )
+        log.log_info(f"Route selected by agent: {selected.model_dump()}")
+        return selected
     except Exception as exc:
         log.log_warning(f"Routing agent failed, using heuristic route: {exc}")
         return fallback
@@ -192,6 +204,10 @@ def choose_route(request: AgenticAskRequest) -> RoutePlan:
 
 async def run_sql(request: AgenticAskRequest) -> dict[str, Any]:
     def _ask() -> dict[str, Any]:
+        log.log_info(
+            f"Text-to-SQL execution started: db_path={request.sql_db_path}, "
+            f"row_limit={request.sql_row_limit}, show_sql={request.show_sql}"
+        )
         bot = FinancialTextToSQLChatbot(
             db_path=Path(request.sql_db_path) if request.sql_db_path else None,
             row_limit=request.sql_row_limit,
@@ -203,16 +219,22 @@ async def run_sql(request: AgenticAskRequest) -> dict[str, Any]:
     if not request.show_sql:
         result = dict(result)
         result.pop("sql", None)
+    log.log_info(f"Text-to-SQL execution completed: row_count={result.get('row_count')}")
     return result
 
 
 async def run_rag(request: AgenticAskRequest) -> ChatQueryResponse:
     if not request.company_id:
         raise ValueError("company_id is required for RAG")
+    log.log_info(
+        f"RAG execution started: company_id={request.company_id}, period={request.period}, "
+        f"document_ids={request.document_ids}, top_k={request.top_k}"
+    )
     return await run_rag_query(
         ChatQueryRequest(
             question=request.question,
             company_id=request.company_id,
+            period=request.period,
             document_ids=request.document_ids,
             top_k=request.top_k,
         )
@@ -227,8 +249,10 @@ def synthesize_answer(
     verbose: bool,
 ) -> str:
     if route_plan.route == "rag" and rag_result:
+        log.log_info("Returning direct RAG answer")
         return rag_result.answer
     if route_plan.route == "sql" and sql_result:
+        log.log_info("Returning direct SQL answer")
         return str(sql_result.get("answer", "")).strip()
 
     from crewai import Agent, Crew, Process, Task
@@ -273,19 +297,24 @@ def synthesize_answer(
             "rag_result": rag_result.model_dump() if rag_result else {},
         }
     )
-    return str(getattr(result, "raw", result)).strip()
+    answer = str(getattr(result, "raw", result)).strip()
+    log.log_info(f"Synthesis completed, chars={len(answer)}")
+    return answer
 
 
 @router.post("/ask", response_model=AgenticAskResponse)
 async def ask_agentic(request: AgenticAskRequest):
     try:
+        log.log_info(f"Agentic ask started: {request.model_dump()}")
         route_plan = choose_route(request)
         rag_result: Optional[ChatQueryResponse] = None
         sql_result: Optional[dict[str, Any]] = None
 
         if route_plan.route in {"sql", "both"}:
+            log.log_info("Route includes SQL; invoking text-to-SQL")
             sql_result = await run_sql(request)
         if route_plan.route in {"rag", "both"}:
+            log.log_info("Route includes RAG; invoking document retrieval")
             rag_result = await run_rag(request)
 
         answer = synthesize_answer(
@@ -296,12 +325,17 @@ async def ask_agentic(request: AgenticAskRequest):
             verbose=request.verbose,
         )
 
-        return AgenticAskResponse(
+        response = AgenticAskResponse(
             answer=answer,
             route_plan=route_plan,
             rag=rag_result.model_dump() if rag_result else None,
             sql=sql_result,
         )
+        log.log_info(
+            f"Agentic ask completed: route={route_plan.route}, "
+            f"has_rag={rag_result is not None}, has_sql={sql_result is not None}"
+        )
+        return response
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
     except Exception as exc:

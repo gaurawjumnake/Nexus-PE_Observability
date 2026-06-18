@@ -18,6 +18,7 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from backend.document_parser.llama_parsing import LlamaCloudDocumentParser
 from backend.kpi_extractor.app.core.chunking import chunk_markdown
 import backend.kpi_extractor.app.db.db_client as db
+from backend.chatbot.chat import index_document_chunks
 from backend.utilites.app_logger import Logger
 
 log = Logger()
@@ -67,9 +68,42 @@ async def upload_document(
         raise HTTPException(status_code=422, detail="Parsing failed - empty content")
 
     # Persist document + chunks (kpi_extractor DB)
+    log.log_info(
+        f"Persisting parsed document: company_id={company_id}, period={period}, "
+        f"file_name={file.filename}, markdown_chars={len(markdown_text)}"
+    )
     document_id = db.save_document(company_id, file.filename) #type:ignore
     chunks = chunk_markdown(markdown_text, document_id)
     db.save_chunks(chunks)
+    log.log_info(f"Saved document_id={document_id} with {len(chunks)} chunk(s)")
+
+    try:
+        vector_index = index_document_chunks(
+            document_id=document_id,
+            company_id=company_id,
+            period=period,
+            file_name=file.filename,
+        )
+        vector_status = "indexed"
+        log.log_info(
+            f"Document auto-indexed in Chroma: document_id={document_id}, "
+            f"chunks_indexed={vector_index.get('chunks_indexed')}"
+        )
+    except Exception as exc:
+        log.log_error(
+            f"Document parsed but Chroma indexing failed for document_id={document_id}: "
+            f"{type(exc).__name__}: {exc}"
+        )
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "message": "Document was parsed and saved, but Chroma indexing failed.",
+                "document_id": document_id,
+                "company_id": company_id,
+                "period": period,
+                "error": str(exc),
+            },
+        )
 
     return {
         "document_id": document_id,
@@ -78,6 +112,8 @@ async def upload_document(
         "file_name": file.filename,
         "status": "parsed",
         "chunks_saved": len(chunks),
+        "vector_status": vector_status,
+        "vector_index": vector_index,
     }
 
 

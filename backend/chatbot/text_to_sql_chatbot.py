@@ -6,6 +6,8 @@ import sqlite3
 from pathlib import Path
 from typing import Any
 
+from backend.utilites.app_logger import Logger
+
 try:
     from dotenv import load_dotenv
 except ImportError:  # pragma: no cover
@@ -27,6 +29,7 @@ DANGEROUS_SQL = re.compile(
     r"\b(insert|update|delete|drop|alter|create|replace|truncate|attach|detach|vacuum|pragma)\b",
     re.IGNORECASE,
 )
+log = Logger()
 
 
 class SQLValidationError(ValueError):
@@ -52,8 +55,10 @@ def get_llm(model: str | None = None) -> LLM:
             "or in backend/chatbot/.env."
         )
 
+    selected_model = model or os.getenv("GEMINI_MODEL", DEFAULT_MODEL)
+    log.log_info(f"Creating CrewAI text-to-SQL LLM with model={selected_model}")
     return LLM(
-        model=model or os.getenv("GEMINI_MODEL", DEFAULT_MODEL),
+        model=selected_model,
         api_key=api_key,
         temperature=0,
     )
@@ -61,14 +66,20 @@ def get_llm(model: str | None = None) -> LLM:
 
 def resolve_db_path(db_path: Path | str | None = None) -> Path:
     if db_path:
-        return Path(db_path)
+        resolved = Path(db_path)
+        log.log_info(f"Text-to-SQL DB path supplied by request: {resolved}")
+        return resolved
 
     env_path = os.getenv("FINANCIAL_DATA_DB_PATH") or os.getenv("NEXUS_TEXT_TO_SQL_DB_PATH")
     if env_path:
-        return Path(env_path)
+        resolved = Path(env_path)
+        log.log_info(f"Text-to-SQL DB path supplied by env: {resolved}")
+        return resolved
 
     if DEFAULT_DB_PATH.exists():
+        log.log_info(f"Text-to-SQL DB path using backend chatbot default: {DEFAULT_DB_PATH}")
         return DEFAULT_DB_PATH
+    log.log_info(f"Text-to-SQL DB path using workspace fallback: {FALLBACK_DB_PATH}")
     return FALLBACK_DB_PATH
 
 
@@ -79,6 +90,7 @@ def connect(db_path: Path) -> sqlite3.Connection:
 
 
 def build_schema_context(db_path: Path) -> str:
+    log.log_info(f"Building SQLite schema context for db_path={db_path}")
     with connect(db_path) as conn:
         table_rows = conn.execute(
             "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
@@ -131,7 +143,7 @@ def build_schema_context(db_path: Path) -> str:
                 }
             )
 
-    return "\n\n".join(
+    schema_context = "\n\n".join(
         [
             "DATABASE SCHEMA",
             *sections,
@@ -139,6 +151,10 @@ def build_schema_context(db_path: Path) -> str:
             json.dumps(business_context, indent=2, default=str),
         ]
     )
+    log.log_info(
+        f"Schema context built: tables={len(table_rows)}, chars={len(schema_context)}"
+    )
+    return schema_context
 
 
 def strip_code_fence(text: str) -> str:
@@ -172,15 +188,18 @@ def normalize_sql(sql: str, row_limit: int) -> str:
         raise SQLValidationError("Only one SQL statement is allowed.")
     if not re.search(r"\blimit\s+\d+\b", lowered):
         sql = f"{sql} LIMIT {row_limit}"
+    log.log_info(f"Validated read-only SQL: {sql}")
     return sql
 
 
 def execute_sql(db_path: Path, sql: str, row_limit: int) -> dict[str, Any]:
     safe_sql = normalize_sql(sql, row_limit)
+    log.log_info(f"Executing SQLite query against {db_path}")
     with connect(db_path) as conn:
         conn.execute(f"EXPLAIN QUERY PLAN {safe_sql}").fetchall()
         rows = conn.execute(safe_sql).fetchmany(row_limit)
 
+    log.log_info(f"SQLite query completed: row_count={len(rows)}")
     return {
         "sql": safe_sql,
         "columns": list(rows[0].keys()) if rows else [],
@@ -208,14 +227,22 @@ class FinancialTextToSQLChatbot:
         self.verbose = verbose
         self.llm = get_llm(model)
         self.schema_context = build_schema_context(resolved_db_path)
+        log.log_info(
+            f"FinancialTextToSQLChatbot initialized: db_path={self.db_path}, "
+            f"row_limit={self.row_limit}"
+        )
 
     def ask(self, question: str) -> dict[str, Any]:
+        log.log_info(f"Text-to-SQL ask started: question={question}")
         sql_payload = self._generate_sql(question)
         last_error: str | None = None
         for attempt in range(3):
             try:
                 query_result = execute_sql(self.db_path, sql_payload["sql"], self.row_limit)
                 answer = self._answer_question(question, query_result)
+                log.log_info(
+                    f"Text-to-SQL ask completed: row_count={query_result['row_count']}"
+                )
                 return {
                     "question": question,
                     "sql": query_result["sql"],
@@ -226,6 +253,9 @@ class FinancialTextToSQLChatbot:
                 }
             except Exception as exc:
                 last_error = str(exc)
+                log.log_warning(
+                    f"Text-to-SQL attempt {attempt + 1} failed: {type(exc).__name__}: {exc}"
+                )
                 if attempt == 2:
                     break
                 sql_payload = self._repair_sql(question, sql_payload["sql"], last_error)
@@ -233,6 +263,7 @@ class FinancialTextToSQLChatbot:
         raise RuntimeError(f"Could not produce a valid SQL query: {last_error}")
 
     def _generate_sql(self, question: str) -> dict[str, Any]:
+        log.log_info("Starting CrewAI SQL generation")
         sql_architect = Agent(
             role="Financial SQLite Query Architect",
             goal="Convert business questions into precise, read-only SQLite SQL.",
@@ -288,9 +319,11 @@ class FinancialTextToSQLChatbot:
         payload = parse_json_object(result)
         if "sql" not in payload:
             raise ValueError(f"Crew did not return SQL: {payload}")
+        log.log_info(f"CrewAI SQL generation completed: {payload.get('sql')}")
         return payload
 
     def _repair_sql(self, question: str, bad_sql: str, error: str) -> dict[str, Any]:
+        log.log_info(f"Starting CrewAI SQL repair for error={error}")
         repair_agent = Agent(
             role="SQLite Query Repair Specialist",
             goal="Fix invalid SQLite SQL while preserving the user intent.",
@@ -327,9 +360,11 @@ class FinancialTextToSQLChatbot:
         payload = parse_json_object(result)
         if "sql" not in payload:
             raise ValueError(f"Repair crew did not return SQL: {payload}")
+        log.log_info(f"CrewAI SQL repair completed: {payload.get('sql')}")
         return payload
 
     def _answer_question(self, question: str, query_result: dict[str, Any]) -> str:
+        log.log_info("Starting CrewAI SQL result answer")
         analyst = Agent(
             role="Financial Data Analyst",
             goal="Explain SQL result rows as a concise business answer.",
@@ -362,7 +397,9 @@ class FinancialTextToSQLChatbot:
                 "query_result": json.dumps(query_result, indent=2, default=str),
             }
         )
-        return str(getattr(result, "raw", result)).strip()
+        answer = str(getattr(result, "raw", result)).strip()
+        log.log_info(f"CrewAI SQL result answer completed, chars={len(answer)}")
+        return answer
 
 
 def interactive_chat(args: argparse.Namespace) -> None:
