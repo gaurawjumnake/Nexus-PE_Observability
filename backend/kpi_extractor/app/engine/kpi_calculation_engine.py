@@ -104,7 +104,7 @@ class KPICalculationEngine:
     # Internal
     # ------------------------------------------------------------------
     def _all_kpi_ids(self) -> list[str]:
-        hits = self.registry.search_registry("", limit=500)
+        hits = self.registry.search_registry("kpi", limit=500)
         return [h["entity_id"] for h in hits if h["entity_type"] == "kpi"]
 
     def _calculate_one(
@@ -133,7 +133,11 @@ class KPICalculationEngine:
             # if all required facts present, the "value" is the derived fact itself
             derived_id = kpi_id.replace("_kpi", "")
             value = available.get(derived_id) or next(iter(available.values()))
-            return _result(kpi_id, float(value), coverage, "calculated_derived")
+            try:
+                final_val = float(value)
+            except (ValueError, TypeError):
+                final_val = value
+            return _result(kpi_id, final_val, coverage, "calculated_derived")
 
         try:
             value = _eval_formula(formula, available)
@@ -177,7 +181,10 @@ def _eval_node(node, variables: dict):
         # unwrap JSONB dict from Postgres if needed
         if isinstance(v, dict):
             v = next(iter(v.values()))
-        return float(v)
+        try:
+            return float(v)
+        except (ValueError, TypeError):
+            return v
 
     if isinstance(node, ast.Constant):
         return float(node.value)
@@ -188,7 +195,7 @@ def _eval_node(node, variables: dict):
 def _result(
     kpi_id: str, value, coverage: float, status: str, missing: list = None
 ) -> dict:
-    r = {"kpi_id": kpi_id, "value": value, "coverage": coverage, "status": status}
+    r = {"kpi_id": kpi_id, "kpi": kpi_id, "value": value, "coverage": coverage, "status": status}
     if missing:
         r["missing_facts"] = missing
     return r

@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "anthropic>=0.109.1",
+    "chromadb>=1.0.0",
     "crewai[azure-ai-inference]>=1.14.7",
     "fastapi>=0.137.0",
     "google-genai>=2.8.0",

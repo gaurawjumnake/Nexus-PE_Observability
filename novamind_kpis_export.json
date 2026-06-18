@@ -1,0 +1,533 @@
+[
+  {
+    "kpi_id": "active_ai_users",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.5,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "adoption_velocity_rank",
+    "company_id": "novamind",
+    "value": "p25: 52, p50: 68, p75: 84",
+    "coverage": 1.0,
+    "status": "calculated_derived",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "adoption_yoy_growth",
+    "company_id": "novamind",
+    "value": 12.121212121212121,
+    "coverage": 1.0,
+    "status": "calculated",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "ai_assisted_revenue",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.0,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "ai_governance_score",
+    "company_id": "novamind",
+    "value": 60.400000000000006,
+    "coverage": 1.0,
+    "status": "calculated",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "ai_incident_rate",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.0,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "ai_maturity_score",
+    "company_id": "novamind",
+    "value": 3.85,
+    "coverage": 1.0,
+    "status": "calculated",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "ai_revenue",
+    "company_id": "novamind",
+    "value": 18400000.0,
+    "coverage": 1.0,
+    "status": "calculated",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "ai_roi",
+    "company_id": "novamind",
+    "value": 4.153846153846154,
+    "coverage": 1.0,
+    "status": "calculated",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "api_licensing_spend",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.0,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "api_success_rate",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.0,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "availability_uptime",
+    "company_id": "novamind",
+    "value": 99.7,
+    "coverage": 1.0,
+    "status": "calculated",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "budget_adherence",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 1.0,
+    "status": "error: Unsupported AST node: Call",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "budget_variance",
+    "company_id": "novamind",
+    "value": -330000.0,
+    "coverage": 1.0,
+    "status": "calculated",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "cloud_spend",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.5,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "company_maturity_rank",
+    "company_id": "novamind",
+    "value": 3.8,
+    "coverage": 1.0,
+    "status": "calculated_derived",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "copilot_adoption",
+    "company_id": "novamind",
+    "value": 1200.0,
+    "coverage": 1.0,
+    "status": "calculated_derived",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "cost_efficiency_rank",
+    "company_id": "novamind",
+    "value": "p25: $290/outcome, p50: $410/outcome, p75: $580/outcome",
+    "coverage": 1.0,
+    "status": "calculated_derived",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "cost_per_outcome",
+    "company_id": "novamind",
+    "value": 350.87719298245617,
+    "coverage": 1.0,
+    "status": "calculated",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "cost_savings",
+    "company_id": "novamind",
+    "value": 3200000.0,
+    "coverage": 1.0,
+    "status": "calculated",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "critical_incident_count",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.3333333333333333,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "cross_sell_uplift",
+    "company_id": "novamind",
+    "value": 1900000.0,
+    "coverage": 1.0,
+    "status": "calculated",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "custom_agent_adoption",
+    "company_id": "novamind",
+    "value": 650.0,
+    "coverage": 1.0,
+    "status": "calculated_derived",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "data_privacy_compliance",
+    "company_id": "novamind",
+    "value": 96.0,
+    "coverage": 1.0,
+    "status": "calculated",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "dau_mau_intensity",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.5,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "direct_ai_revenue",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.0,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "ebitda_uplift",
+    "company_id": "novamind",
+    "value": 9.204693611473273,
+    "coverage": 1.0,
+    "status": "calculated",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "embedded_analytics_adoption",
+    "company_id": "novamind",
+    "value": 870.0,
+    "coverage": 1.0,
+    "status": "calculated_derived",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "error_rate",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.0,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "fallback_rate",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.5,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "forecasted_ai_spend",
+    "company_id": "novamind",
+    "value": 12498000.0,
+    "coverage": 1.0,
+    "status": "calculated",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "governance_maturity_score",
+    "company_id": "novamind",
+    "value": 4.1,
+    "coverage": 1.0,
+    "status": "calculated_derived",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "governance_rank",
+    "company_id": "novamind",
+    "value": 81.0,
+    "coverage": 1.0,
+    "status": "calculated_derived",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "hallucination_rate",
+    "company_id": "novamind",
+    "value": "EVAL-22041",
+    "coverage": 1.0,
+    "status": "calculated_derived",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "human_review_coverage",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.3333333333333333,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "industry_benchmark_ratio",
+    "company_id": "novamind",
+    "value": 1.1666666666666667,
+    "coverage": 1.0,
+    "status": "calculated",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "mttr",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.0,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "p95_latency",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 1.0,
+    "status": "error: Unsupported AST node: Call",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "payback_period",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.75,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "percent_ai_in_production",
+    "company_id": "novamind",
+    "value": 66.66666666666666,
+    "coverage": 1.0,
+    "status": "calculated",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "pipeline_influenced_revenue",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.0,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "policy_compliance_rate",
+    "company_id": "novamind",
+    "value": 94.0909090909091,
+    "coverage": 1.0,
+    "status": "calculated",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "portfolio_ai_adoption_score",
+    "company_id": "novamind",
+    "value": 74.0,
+    "coverage": 1.0,
+    "status": "calculated_derived",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "portfolio_benchmark_score",
+    "company_id": "novamind",
+    "value": "25th percentile of 2.8, median of 3.4, and 75th percentile of 4.0",
+    "coverage": 1.0,
+    "status": "calculated_derived",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "power_user_ratio",
+    "company_id": "novamind",
+    "value": 482.0,
+    "coverage": 1.0,
+    "status": "calculated_derived",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "production_ratio",
+    "company_id": "novamind",
+    "value": 2.4,
+    "coverage": 1.0,
+    "status": "calculated",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "productivity_gain",
+    "company_id": "novamind",
+    "value": 40.99999999999999,
+    "coverage": 1.0,
+    "status": "calculated",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "projects_in_poc",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.5,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "projects_in_production",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.5,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "regulatory_readiness",
+    "company_id": "novamind",
+    "value": 70.0,
+    "coverage": 1.0,
+    "status": "calculated_derived",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "spend_by_model_family",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.5,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "stalled_projects",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.3333333333333333,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "strategic_alignment_score",
+    "company_id": "novamind",
+    "value": 4.3,
+    "coverage": 1.0,
+    "status": "calculated_derived",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "talent_readiness_score",
+    "company_id": "novamind",
+    "value": 3.4,
+    "coverage": 1.0,
+    "status": "calculated_derived",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "technical_maturity_score",
+    "company_id": "novamind",
+    "value": 3.6,
+    "coverage": 1.0,
+    "status": "calculated_derived",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "top_quartile_position",
+    "company_id": "novamind",
+    "value": 78.0,
+    "coverage": 1.0,
+    "status": "calculated_derived",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "total_ai_projects",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.5,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "total_ai_spend",
+    "company_id": "novamind",
+    "value": 5200000.0,
+    "coverage": 1.0,
+    "status": "calculated",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:36"
+  },
+  {
+    "kpi_id": "vendor_compliance",
+    "company_id": "novamind",
+    "value": null,
+    "coverage": 0.5,
+    "status": "insufficient_data",
+    "period": "2025-2026",
+    "timestamp": "2026-06-17 04:43:37"
+  }
+]

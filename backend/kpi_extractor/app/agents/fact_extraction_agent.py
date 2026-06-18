@@ -42,6 +42,8 @@ Document excerpt:
 Respond ONLY with JSON:
 {{"value": <number, string, bool, or null>, "confidence": <0.0-1.0>, "verbatim": "<exact phrase found>"}}
 
+CRITICAL RULES:
+- If Data Type is numeric (number/float/integer), the "value" MUST be a pure number (e.g., 2.8, 3.4) without any descriptive text, units, or commas.
 - Set value=null and confidence=0.0 if the fact is not clearly present.
 - confidence=1.0 means the value is explicitly stated with no ambiguity.
 - verbatim is the exact text in the document that supports the value."""

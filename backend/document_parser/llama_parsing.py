@@ -30,7 +30,7 @@ class ParsedDocument:
     processing_time: float
 
 class LlamaCloudDocumentParser:
-    SUPPORTED_EXTENSIONS = os.getenv("SUPPORTED_DOC_TYPE_EXTENSIONS")
+    SUPPORTED_EXTENSIONS = os.getenv("SUPPORTED_DOC_TYPE_EXTENSIONS", ".pdf,.docx,.pptx,.xlsx,.md,.txt,.csv").split(",")
 
     def __init__(self, max_timeout: int = 300):
         api_key = os.getenv("LLAMA_CLOUD_API_KEY")
@@ -99,19 +99,21 @@ class LlamaCloudDocumentParser:
         try:
             log.log_info(f"Starting to parse: {file_path}")
             
-            import concurrent.futures
-            import asyncio
-
-            def run_in_thread():
-                new_loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(new_loop)
-                try:
-                    return new_loop.run_until_complete(self.parser.aload_data(file_path))
-                finally:
-                    new_loop.close()
-
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                documents = list(executor.submit(run_in_thread).result())
+            try:
+                documents = self.parser.load_data(file_path)
+            except Exception as e:
+                log.log_warning(f"Sync load_data failed ({e}), attempting async execution fallback...")
+                import concurrent.futures
+                import asyncio
+                def run_in_thread():
+                    new_loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(new_loop)
+                    try:
+                        return new_loop.run_until_complete(self.parser.aload_data(file_path))
+                    finally:
+                        new_loop.close()
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    documents = list(executor.submit(run_in_thread).result())
             
             if not documents:
                 log.log_error(f"No content extracted from: {file_path}")

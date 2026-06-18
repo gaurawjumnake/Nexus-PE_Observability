@@ -23,9 +23,6 @@ from backend.utilites.app_logger import Logger
 log = Logger()
 router = APIRouter(prefix="/documents", tags=["documents"])
 
-_parser = LlamaCloudDocumentParser()
-
-
 def clean_text(text: str) -> str:
     """Collapse repeated whitespace/newlines from raw parser output."""
     if not text:
@@ -56,7 +53,8 @@ async def upload_document(
     try:
         base_name = tmp_path.stem
         log.log_info(f"Running parser for: {tmp_path} with base_name: {base_name}")
-        raw_text = _parser.extract_all_text(modified_name=base_name, file_path=str(tmp_path))
+        parser = LlamaCloudDocumentParser()
+        raw_text = parser.extract_all_text(modified_name=base_name, file_path=str(tmp_path))
     except Exception as e:
         tmp_path.unlink(missing_ok=True)
         raise HTTPException(status_code=500, detail=f"Parsing failed: {e}")

@@ -9,6 +9,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.api.deps import init_shared_resources, shutdown_shared_resources
+from backend.chatbot.orchestrator import router as analytics_router
+from backend.chatbot.chat import router as chat_router
 from backend.api.documents_router import router as documents_router
 from backend.api.kpi_router import router as kpi_router
 
@@ -35,6 +37,8 @@ app.add_middleware(
 
 app.include_router(documents_router)
 app.include_router(kpi_router)
+app.include_router(chat_router)
+app.include_router(analytics_router)
 
 
 @app.get("/health")
