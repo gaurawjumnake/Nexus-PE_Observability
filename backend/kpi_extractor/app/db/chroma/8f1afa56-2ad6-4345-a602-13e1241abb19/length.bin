@@ -1,6 +1,1 @@
-## Page 24
-- Implement response caching and semantic deduplication for high-frequency query patterns.
-- Evaluate dedicated inference infrastructure for top-5 highest-traffic AI applications.
-**Priority 6: Bottom-Quartile ROI Improvement (2026–2027)**
-**Target:** Lift P25 AI ROI from 7.7% to 20%+ across the portfolio.
-- Identify the 25% of AI deployments generating <7.7% ROI and assess root cause
+invalid type: string "## 2. AI ROI Benchmark\nNovaMind's AI ROI (return on AI investment) this quarter: 3.1x. The industry median ROI (peer median AI ROI) across the benchmark panel of 14 fintech companies: 2.4x, placing NovaMind in the top quartile.\nPortfolio-wide average AI ROI across all four Summit Capital AI portfolio companies (portfolio-wide AI ROI) this quarter: 2.8x.", expected f64, expe
