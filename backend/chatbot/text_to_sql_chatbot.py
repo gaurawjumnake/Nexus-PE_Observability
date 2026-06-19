@@ -20,9 +20,9 @@ except ImportError as exc:  # pragma: no cover
 
 
 BASE_DIR = Path(__file__).resolve().parent
-WORKSPACE_ROOT = BASE_DIR.parents[2]
-DEFAULT_DB_PATH = WORKSPACE_ROOT / "backend" / "kpi_extractor" / "app" / "db" / "nexus.db"
-FALLBACK_DB_PATH = WORKSPACE_ROOT / "tests_chatbot" / "financial_data.db"
+WORKSPACE_ROOT = BASE_DIR.parents[1]
+DEFAULT_DB_PATH = WORKSPACE_ROOT / "backend" / "db" / "nexus.db"
+FALLBACK_DB_PATH = WORKSPACE_ROOT / "backend" / "db" / "nexus_1.db"
 DEFAULT_MODEL = "gemini/gemini-2.5-flash"
 READ_ONLY_PREFIXES = ("select", "with")
 DANGEROUS_SQL = re.compile(
@@ -219,8 +219,8 @@ class FinancialTextToSQLChatbot:
         resolved_db_path = resolve_db_path(db_path)
         if not resolved_db_path.exists():
             raise FileNotFoundError(
-                f"Database not found: {resolved_db_path}. Set FINANCIAL_DATA_DB_PATH "
-                "or copy financial_data.db into backend/chatbot/."
+                f"Database not found: {resolved_db_path}. Set NEXUS_TEXT_TO_SQL_DB_PATH "
+                "or point FINANCIAL_DATA_DB_PATH to a valid SQLite database."
             )
         self.db_path = resolved_db_path
         self.row_limit = row_limit
