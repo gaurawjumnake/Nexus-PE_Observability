@@ -226,7 +226,7 @@ def retrieve_context(request: ChatQueryRequest) -> RetrievedContext:
     )
 
 
-def answer_with_rag(question: str, context: RetrievedContext) -> str:
+async def answer_with_rag(question: str, context: RetrievedContext) -> str:
     if not context.context_blocks:
         log.log_warning("RAG answer skipped because no Chroma context was retrieved")
         return "I could not find relevant information in the indexed documents."
@@ -264,7 +264,7 @@ def answer_with_rag(question: str, context: RetrievedContext) -> str:
         process=Process.sequential,
         verbose=False,
     )
-    result = crew.kickoff(
+    result = await crew.kickoff_async(
         inputs={
             "question": question,
             "context": "\n\n".join(context.context_blocks),
@@ -277,8 +277,8 @@ def answer_with_rag(question: str, context: RetrievedContext) -> str:
 
 async def run_rag_query(request: ChatQueryRequest) -> ChatQueryResponse:
     log.log_info(f"RAG query started: question={request.question}")
-    context = retrieve_context(request)
-    answer = await asyncio.to_thread(answer_with_rag, request.question, context)
+    context = await asyncio.to_thread(retrieve_context, request)
+    answer = await answer_with_rag(request.question, context)
     log.log_info(f"RAG query completed with {len(context.citations)} citation(s)")
     return ChatQueryResponse(answer=answer, citations=context.citations)
 

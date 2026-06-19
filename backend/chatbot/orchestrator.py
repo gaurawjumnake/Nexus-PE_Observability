@@ -126,7 +126,7 @@ def heuristic_route(question: str, has_documents: bool) -> RoutePlan:
     return RoutePlan(route="sql", confidence=0.4, reasoning="No document scope was provided, so SQL is the available route.")
 
 
-def choose_route(request: AgenticAskRequest) -> RoutePlan:
+async def choose_route(request: AgenticAskRequest) -> RoutePlan:
     from crewai import Agent, Crew, Process, Task
 
     can_use_rag = bool(request.company_id)
@@ -169,12 +169,12 @@ def choose_route(request: AgenticAskRequest) -> RoutePlan:
         agent=route_agent,
     )
     try:
-        result = Crew(
+        result = await Crew(
             agents=[route_agent],
             tasks=[route_task],
             process=Process.sequential,
             verbose=request.verbose,
-        ).kickoff(
+        ).kickoff_async(
             inputs={
                 "question": request.question,
                 "has_company": bool(request.company_id),
@@ -203,19 +203,17 @@ def choose_route(request: AgenticAskRequest) -> RoutePlan:
 
 
 async def run_sql(request: AgenticAskRequest) -> dict[str, Any]:
-    def _ask() -> dict[str, Any]:
-        log.log_info(
-            f"Text-to-SQL execution started: db_path={request.sql_db_path}, "
-            f"row_limit={request.sql_row_limit}, show_sql={request.show_sql}"
-        )
-        bot = FinancialTextToSQLChatbot(
-            db_path=Path(request.sql_db_path) if request.sql_db_path else None,
-            row_limit=request.sql_row_limit,
-            verbose=request.verbose,
-        )
-        return bot.ask(request.question)
-
-    result = await asyncio.to_thread(_ask)
+    log.log_info(
+        f"Text-to-SQL execution started: db_path={request.sql_db_path}, "
+        f"row_limit={request.sql_row_limit}, show_sql={request.show_sql}"
+    )
+    bot = FinancialTextToSQLChatbot(
+        db_path=Path(request.sql_db_path) if request.sql_db_path else None,
+        row_limit=request.sql_row_limit,
+        verbose=request.verbose,
+    )
+    result = await bot.ask(request.question)
+    
     if not request.show_sql:
         result = dict(result)
         result.pop("sql", None)
@@ -241,7 +239,7 @@ async def run_rag(request: AgenticAskRequest) -> ChatQueryResponse:
     )
 
 
-def synthesize_answer(
+async def synthesize_answer(
     question: str,
     route_plan: RoutePlan,
     rag_result: Optional[ChatQueryResponse],
@@ -284,12 +282,12 @@ def synthesize_answer(
         expected_output="Concise markdown answer.",
         agent=synthesis_agent,
     )
-    result = Crew(
+    result = await Crew(
         agents=[synthesis_agent],
         tasks=[synthesis_task],
         process=Process.sequential,
         verbose=verbose,
-    ).kickoff(
+    ).kickoff_async(
         inputs={
             "question": question,
             "route_plan": route_plan.model_dump(),
@@ -306,7 +304,7 @@ def synthesize_answer(
 async def ask_agentic(request: AgenticAskRequest):
     try:
         log.log_info(f"Agentic ask started: {request.model_dump()}")
-        route_plan = choose_route(request)
+        route_plan = await choose_route(request)
         rag_result: Optional[ChatQueryResponse] = None
         sql_result: Optional[dict[str, Any]] = None
 
@@ -317,7 +315,7 @@ async def ask_agentic(request: AgenticAskRequest):
             log.log_info("Route includes RAG; invoking document retrieval")
             rag_result = await run_rag(request)
 
-        answer = synthesize_answer(
+        answer = await synthesize_answer(
             question=request.question,
             route_plan=route_plan,
             rag_result=rag_result,

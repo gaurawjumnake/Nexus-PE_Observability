@@ -232,14 +232,15 @@ class FinancialTextToSQLChatbot:
             f"row_limit={self.row_limit}"
         )
 
-    def ask(self, question: str) -> dict[str, Any]:
+    async def ask(self, question: str) -> dict[str, Any]:
         log.log_info(f"Text-to-SQL ask started: question={question}")
-        sql_payload = self._generate_sql(question)
+        sql_payload = await self._generate_sql(question)
         last_error: str | None = None
         for attempt in range(3):
             try:
-                query_result = execute_sql(self.db_path, sql_payload["sql"], self.row_limit)
-                answer = self._answer_question(question, query_result)
+                import asyncio
+                query_result = await asyncio.to_thread(execute_sql, self.db_path, sql_payload["sql"], self.row_limit)
+                answer = await self._answer_question(question, query_result)
                 log.log_info(
                     f"Text-to-SQL ask completed: row_count={query_result['row_count']}"
                 )
@@ -258,11 +259,11 @@ class FinancialTextToSQLChatbot:
                 )
                 if attempt == 2:
                     break
-                sql_payload = self._repair_sql(question, sql_payload["sql"], last_error)
+                sql_payload = await self._repair_sql(question, sql_payload["sql"], last_error)
 
         raise RuntimeError(f"Could not produce a valid SQL query: {last_error}")
 
-    def _generate_sql(self, question: str) -> dict[str, Any]:
+    async def _generate_sql(self, question: str) -> dict[str, Any]:
         log.log_info("Starting CrewAI SQL generation")
         sql_architect = Agent(
             role="Financial SQLite Query Architect",
@@ -304,12 +305,12 @@ class FinancialTextToSQLChatbot:
             agent=sql_reviewer,
             context=[draft_task],
         )
-        result = Crew(
+        result = await Crew(
             agents=[sql_architect, sql_reviewer],
             tasks=[draft_task, review_task],
             process=Process.sequential,
             verbose=self.verbose,
-        ).kickoff(
+        ).kickoff_async(
             inputs={
                 "schema_context": self.schema_context,
                 "question": question,
@@ -322,7 +323,7 @@ class FinancialTextToSQLChatbot:
         log.log_info(f"CrewAI SQL generation completed: {payload.get('sql')}")
         return payload
 
-    def _repair_sql(self, question: str, bad_sql: str, error: str) -> dict[str, Any]:
+    async def _repair_sql(self, question: str, bad_sql: str, error: str) -> dict[str, Any]:
         log.log_info(f"Starting CrewAI SQL repair for error={error}")
         repair_agent = Agent(
             role="SQLite Query Repair Specialist",
@@ -344,12 +345,12 @@ class FinancialTextToSQLChatbot:
             expected_output='JSON only: {"sql": "...", "rationale": "..."}',
             agent=repair_agent,
         )
-        result = Crew(
+        result = await Crew(
             agents=[repair_agent],
             tasks=[repair_task],
             process=Process.sequential,
             verbose=self.verbose,
-        ).kickoff(
+        ).kickoff_async(
             inputs={
                 "schema_context": self.schema_context,
                 "question": question,
@@ -363,7 +364,7 @@ class FinancialTextToSQLChatbot:
         log.log_info(f"CrewAI SQL repair completed: {payload.get('sql')}")
         return payload
 
-    def _answer_question(self, question: str, query_result: dict[str, Any]) -> str:
+    async def _answer_question(self, question: str, query_result: dict[str, Any]) -> str:
         log.log_info("Starting CrewAI SQL result answer")
         analyst = Agent(
             role="Financial Data Analyst",
@@ -386,12 +387,12 @@ class FinancialTextToSQLChatbot:
             expected_output="Concise markdown answer.",
             agent=analyst,
         )
-        result = Crew(
+        result = await Crew(
             agents=[analyst],
             tasks=[answer_task],
             process=Process.sequential,
             verbose=self.verbose,
-        ).kickoff(
+        ).kickoff_async(
             inputs={
                 "question": question,
                 "query_result": json.dumps(query_result, indent=2, default=str),
@@ -402,7 +403,7 @@ class FinancialTextToSQLChatbot:
         return answer
 
 
-def interactive_chat(args: argparse.Namespace) -> None:
+async def interactive_chat(args: argparse.Namespace) -> None:
     chatbot = FinancialTextToSQLChatbot(
         db_path=args.db,
         model=args.model,
@@ -419,7 +420,7 @@ def interactive_chat(args: argparse.Namespace) -> None:
         if not question:
             continue
         try:
-            result = chatbot.ask(question)
+            result = await chatbot.ask(question)
             if args.show_sql:
                 print(f"\nSQL:\n{result['sql']}")
             print(f"\nBot:\n{result['answer']}\n")
@@ -444,7 +445,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def main() -> None:
+async def async_main() -> None:
     args = parse_args()
     if args.question:
         chatbot = FinancialTextToSQLChatbot(
@@ -453,13 +454,18 @@ def main() -> None:
             row_limit=args.limit,
             verbose=args.verbose,
         )
-        result = chatbot.ask(" ".join(args.question))
+        result = await chatbot.ask(" ".join(args.question))
         if args.show_sql:
             print(f"SQL:\n{result['sql']}\n")
         print(result["answer"])
         return
 
-    interactive_chat(args)
+    await interactive_chat(args)
+
+
+def main() -> None:
+    import asyncio
+    asyncio.run(async_main())
 
 
 if __name__ == "__main__":
