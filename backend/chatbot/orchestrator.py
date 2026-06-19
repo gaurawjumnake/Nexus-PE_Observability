@@ -35,7 +35,6 @@ class AgenticAskRequest(BaseModel):
     period: Optional[str] = None
     document_ids: Optional[list[str]] = None
     top_k: int = Field(default=8, ge=1, le=20)
-    sql_db_path: Optional[str] = None
     sql_row_limit: int = Field(default=100, ge=1, le=1000)
     show_sql: bool = False
     verbose: bool = False
@@ -224,11 +223,11 @@ async def choose_route(request: AgenticAskRequest) -> RoutePlan:
 
 async def run_sql(request: AgenticAskRequest) -> dict[str, Any]:
     log.log_info(
-        f"Text-to-SQL execution started: db_path={request.sql_db_path}, "
-        f"row_limit={request.sql_row_limit}, show_sql={request.show_sql}"
+        f"Text-to-SQL execution started: row_limit={request.sql_row_limit}, "
+        f"show_sql={request.show_sql}"
     )
     bot = FinancialTextToSQLChatbot(
-        db_path=Path(request.sql_db_path) if request.sql_db_path else None,
+        db_path=None,
         row_limit=request.sql_row_limit,
         verbose=request.verbose,
     )
@@ -344,7 +343,7 @@ def make_rag_sql_tools(request: AgenticAskRequest):
     # Pre-initialise SQL chatbot (builds schema context once per request).
     try:
         sql_bot = FinancialTextToSQLChatbot(
-            db_path=Path(request.sql_db_path) if request.sql_db_path else None,
+            db_path=None,
             row_limit=request.sql_row_limit,
             verbose=request.verbose,
         )

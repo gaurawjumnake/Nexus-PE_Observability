@@ -21,7 +21,7 @@ except ImportError as exc:  # pragma: no cover
 
 BASE_DIR = Path(__file__).resolve().parent
 WORKSPACE_ROOT = BASE_DIR.parents[2]
-DEFAULT_DB_PATH = BASE_DIR / "financial_data.db"
+DEFAULT_DB_PATH = WORKSPACE_ROOT / "backend" / "kpi_extractor" / "app" / "db" / "nexus.db"
 FALLBACK_DB_PATH = WORKSPACE_ROOT / "tests_chatbot" / "financial_data.db"
 DEFAULT_MODEL = "gemini/gemini-2.5-flash"
 READ_ONLY_PREFIXES = ("select", "with")
