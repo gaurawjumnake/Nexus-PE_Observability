@@ -1,0 +1,2209 @@
+[
+  {
+    "filename": "tmpcaul0ovk.docx",
+    "file_type": ".docx",
+    "total_pages": 29,
+    "pages": [
+      {
+        "page_number": 1,
+        "text_content": "```markdown\n![Cover page of the AI Performance & Intelligence Report by Fluke Corporation.]\n\n# FLUKE CORPORATION\n\n## AI Performance & Intelligence Report\n\n### Multi-Year Analysis: 2023 – 2026\n\nPrepared by: Fluke AI Analytics Division  \nReporting Period: January 2023 – June 2026  \n**Classification: CONFIDENTIAL — FOR INTERNAL USE ONLY**\n\n----\n\nDataset: 1,208 daily observations across 60 performance dimensions\n\n----\n\nFluke Corporation — AI Analytics Division | Prepared: June 2026\n```\n",
+        "images": [],
+        "tables": [],
+        "metadata": {
+          "page_number": 1,
+          "content_length": 487,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 2,
+        "text_content": "\n# 1. Executive Summary\n\nThis report presents a comprehensive, multi-year analysis of Fluke Corporation’s AI adoption journey from 2023 through mid-2026. Drawing on daily operational data across 60 performance dimensions — spanning financial returns, infrastructure reliability, governance maturity, talent readiness, and product deployment velocity — the report surfaces the statistical patterns, inflection points, and strategic implications that define Fluke’s AI transformation.\n\n**Key findings at a glance:**\n\n- **AI ROI** expanded from a mean of –2.1% in January 2023 to +84.5% by December, with a full-year average of 35.5% and top-quartile performers achieving 59.8%+.\n- **Total AI revenue** reached a mean of $372,827 per observation period, against an average spend of $578,803, yielding a gross AI value multiplier of 0.64x — with the best-performing cohort exceeding 1.0x.\n- **Active AI users** grew from a median of 311 in Q1 2023 to 1,524 by Q4, a 4.9x expansion driven by Copilot rollout and embedded analytics initiatives.\n- **AI maturity score** improved from an average of 14.7 in January to a year-end mean of 33.2, reflecting successful PoC-to-production graduation across engineering, sales, and operations.\n- **Infrastructure reliability** held strong: API success rate averaged 87.6%, availability uptime 95.9%, and p95 latency declined from 513ms to 348ms by late 2026.\n- **Governance and compliance** improved year-over-year, with policy compliance rising from 75.3% to an estimated 82.4% by 2026, and governance maturity score increasing from 23.4 to 34.1.\n- **Production deployment ratio** remains a challenge: only 16.6% of projects reached full production on average, with 8.6% stalling — indicating continued need for deployment acceleration programs.\n\nThe data strongly supports continued AI investment, with AI-mature segments demonstrating 2.3x higher ROI, 41% lower error rates, and 68% greater productivity gains compared to early-stage adopters.\n\n----\n\n*Fluke Corporation — AI Analytics Division | Prepared: June 2026*\n",
+        "images": [],
+        "tables": [],
+        "metadata": {
+          "page_number": 2,
+          "content_length": 2055,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 3,
+        "text_content": "\n2. Company & Dataset Overview\n\n### 2.1 About Fluke Corporation\n\nFluke Corporation is a global leader in electronic test and measurement equipment, industrial networking solutions, and precision measurement instruments. Headquartered in Everett, Washington, with a significant operational footprint across North America, Europe, and Asia-Pacific, Fluke serves customers in manufacturing, utilities, healthcare, and building infrastructure.\n\nBeginning in 2022, Fluke embarked on an enterprise-wide AI transformation initiative — the Fluke Intelligence Platform (FIP) — aimed at embedding artificial intelligence across product development, customer operations, supply chain, and field service. By 2023, the program had scaled to structured measurement, and the four datasets in this report represent the systematic tracking of that programme's performance.\n\n### 2.2 Dataset Structure\n\nEach annual dataset contains 302 daily observations spanning the full calendar year (trading days, approximately one observation per working day). Each observation records 60 metrics across six performance domains:\n\n- **Financial Performance**: AI revenue, ROI, cost savings, EBITDA uplift, pipeline-influenced revenue, cross-sell uplift, payback period\n- **Adoption & Usage**: Active AI users, Copilot adoption, custom agent adoption, DAU/MAU intensity, power user ratio, adoption YoY growth\n- **Infrastructure & Reliability**: API success rate, availability uptime, p95 latency, MTTR, error rate, hallucination rate, fallback rate\n- **Governance & Compliance**: AI governance score, policy compliance rate, data privacy compliance, regulatory readiness, vendor compliance, governance maturity score\n- **Project Portfolio**: Total AI projects, projects in production, projects in PoC, stalled projects, percent AI in production, production ratio\n- **Talent & Strategy**: AI maturity score, talent readiness score, technical maturity score, strategic alignment score, budget adherence, spend efficiency\n\n| Dimension                  | Metric Count | Key Signals                                      | Update Frequency |\n|----------------------------|--------------|--------------------------------------------------|------------------|\n| Financial Performance      | 9            | ai_revenue, ai_roi, cost_savings, ebitda_uplift  | Daily            |\n| Adoption & Usage           | 10           | active_ai_users, copilot_adoption, dau_mau_intensity | Daily            |\n| Infrastructure & Reliability | 9          | api_success_rate, p95_latency, hallucination_rate | Daily            |\n| Governance & Compliance    | 8            | policy_compliance_rate, governance_maturity_score | Daily            |\n| Project Portfolio          | 7            | projects_in_production,                          | Daily            |\n\n*Fluke Corporation — AI Analytics Division | Prepared: June 2026*\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 20,
+            "end_index": 27,
+            "headers": [
+              "Dimension",
+              "Metric Count",
+              "Key Signals",
+              "Update Frequency"
+            ],
+            "row_count": 5,
+            "column_count": 4,
+            "data": [
+              [
+                "Financial Performance",
+                "9",
+                "ai_revenue, ai_roi, cost_savings, ebitda_uplift",
+                "Daily"
+              ],
+              [
+                "Adoption & Usage",
+                "10",
+                "active_ai_users, copilot_adoption, dau_mau_intensity",
+                "Daily"
+              ],
+              [
+                "Infrastructure & Reliability",
+                "9",
+                "api_success_rate, p95_latency, hallucination_rate",
+                "Daily"
+              ],
+              [
+                "Governance & Compliance",
+                "8",
+                "policy_compliance_rate, governance_maturity_score",
+                "Daily"
+              ],
+              [
+                "Project Portfolio",
+                "7",
+                "projects_in_production,",
+                "Daily"
+              ]
+            ],
+            "full_table": [
+              "| Dimension                  | Metric Count | Key Signals                                      | Update Frequency |",
+              "|----------------------------|--------------|--------------------------------------------------|------------------|",
+              "| Financial Performance      | 9            | ai_revenue, ai_roi, cost_savings, ebitda_uplift  | Daily            |",
+              "| Adoption & Usage           | 10           | active_ai_users, copilot_adoption, dau_mau_intensity | Daily            |",
+              "| Infrastructure & Reliability | 9          | api_success_rate, p95_latency, hallucination_rate | Daily            |",
+              "| Governance & Compliance    | 8            | policy_compliance_rate, governance_maturity_score | Daily            |",
+              "| Project Portfolio          | 7            | projects_in_production,                          | Daily            |"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 3,
+          "content_length": 2873,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 4,
+        "text_content": "\n```\nFLUKE | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL\n\n|                     | stalled_projects |\n|---------------------|------------------|\n| Talent & Strategy   | 10               |\n|                     | ai_maturity_score, talent_readiness_score |\n|                     | Daily            |\n| Spend & Cost        | 7                |\n|                     | total_ai_spend, cloud_spend, cost_per_outcome |\n|                     | Daily            |\n\nFluke Corporation — AI Analytics Division | Prepared: June 2026\n```\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 2,
+            "end_index": 12,
+            "headers": [
+              "FLUKE",
+              "AI Performance & Intelligence Report 2023-2026",
+              "CONFIDENTIAL"
+            ],
+            "row_count": 7,
+            "column_count": 3,
+            "data": [
+              [
+                "stalled_projects"
+              ],
+              [
+                "Talent & Strategy",
+                "10"
+              ],
+              [
+                "ai_maturity_score, talent_readiness_score"
+              ],
+              [
+                "Daily"
+              ],
+              [
+                "Spend & Cost",
+                "7"
+              ],
+              [
+                "total_ai_spend, cloud_spend, cost_per_outcome"
+              ],
+              [
+                "Daily"
+              ]
+            ],
+            "full_table": [
+              "FLUKE | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL",
+              "|                     | stalled_projects |",
+              "|---------------------|------------------|",
+              "| Talent & Strategy   | 10               |",
+              "|                     | ai_maturity_score, talent_readiness_score |",
+              "|                     | Daily            |",
+              "| Spend & Cost        | 7                |",
+              "|                     | total_ai_spend, cloud_spend, cost_per_outcome |",
+              "|                     | Daily            |"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 4,
+          "content_length": 543,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 5,
+        "text_content": "\n### 3. Financial Performance Analysis\n\n#### 3.1 AI Revenue & Spend Overview\n\nFluke's AI revenue trajectory over the 2023–2026 period demonstrates a clear ramp from early-stage cost centers to material revenue contributors. Based on the observed dataset distributions, AI revenue averaged $372,827 per observation period, with strong right-skew (median $352,054; P90 $694,914) indicating that a high-performing tail consistently outperforms the mid-distribution.\n\nThe full-year revenue distribution across the observation period showed significant monthly seasonality, with January recording a mean AI revenue of just $130,816 — likely reflecting post-holiday pipeline reset and budget re-approval cycles — while December climbed to $620,444, a 4.7x intra-year expansion.\n\n| Metric                  | 2023 (Actual) | 2024 (Actual) | 2025 (Actual) | 2026 YTD (Est.) |\n|-------------------------|---------------|---------------|---------------|-----------------|\n| Avg AI Revenue ($)      | $372,827      | $412,580      | $465,920      | $498,340        |\n| Avg Total AI Spend ($)  | $578,803      | $631,200      | $694,450      | $718,600        |\n| Avg AI ROI (%)          | 35.5%         | 41.2%         | 48.7%         | 53.1%           |\n| Median AI ROI (%)       | 33.5%         | 38.9%         | 45.3%         | 50.8%           |\n| P90 AI ROI (%)          | 86.6%         | 94.3%         | 101.2%        | 108.4%          |\n| AI Revenue / Spend Ratio| 0.64x         | 0.65x         | 0.67x         | 0.69x           |\n| Avg Cost Savings ($)    | $32,482       | $37,540       | $44,210       | $49,880         |\n| Avg EBITDA Uplift (%)   | 2.47%         | 2.89%         | 3.42%         | 3.91%           |\n\nNote: 2024, 2025, and 2026 YTD figures include the actual observed dataset values with year-over-year growth projections of 10.7%, 10.2%, and 6.9% respectively, consistent with the enterprise AI maturation curve for industrial technology firms.\n\n#### 3.2 ROI Distribution & Statistical Breakdown\n\nThe AI ROI metric exhibits a near-normal distribution with positive skew (mean 35.5%, standard deviation 35.5%), suggesting high variability in AI deployment outcomes — consistent with early-to-mid stage enterprise AI programs where individual project outcomes vary substantially by team maturity and use-case complexity.\n\n| Percentile | AI ROI (%) | Interpretation                              |\n|------------|------------|---------------------------------------------|\n| Minimum    | -20.0%     | Loss-generating pilots; likely early PoC stage with high overhead |\n| P10        | -4.2%      | Sub-scale deployments; pre-ROI              |\n\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 9,
+            "end_index": 19,
+            "headers": [
+              "Metric",
+              "2023 (Actual)",
+              "2024 (Actual)",
+              "2025 (Actual)",
+              "2026 YTD (Est.)"
+            ],
+            "row_count": 8,
+            "column_count": 5,
+            "data": [
+              [
+                "Avg AI Revenue ($)",
+                "$372,827",
+                "$412,580",
+                "$465,920",
+                "$498,340"
+              ],
+              [
+                "Avg Total AI Spend ($)",
+                "$578,803",
+                "$631,200",
+                "$694,450",
+                "$718,600"
+              ],
+              [
+                "Avg AI ROI (%)",
+                "35.5%",
+                "41.2%",
+                "48.7%",
+                "53.1%"
+              ],
+              [
+                "Median AI ROI (%)",
+                "33.5%",
+                "38.9%",
+                "45.3%",
+                "50.8%"
+              ],
+              [
+                "P90 AI ROI (%)",
+                "86.6%",
+                "94.3%",
+                "101.2%",
+                "108.4%"
+              ],
+              [
+                "AI Revenue / Spend Ratio",
+                "0.64x",
+                "0.65x",
+                "0.67x",
+                "0.69x"
+              ],
+              [
+                "Avg Cost Savings ($)",
+                "$32,482",
+                "$37,540",
+                "$44,210",
+                "$49,880"
+              ],
+              [
+                "Avg EBITDA Uplift (%)",
+                "2.47%",
+                "2.89%",
+                "3.42%",
+                "3.91%"
+              ]
+            ],
+            "full_table": [
+              "| Metric                  | 2023 (Actual) | 2024 (Actual) | 2025 (Actual) | 2026 YTD (Est.) |",
+              "|-------------------------|---------------|---------------|---------------|-----------------|",
+              "| Avg AI Revenue ($)      | $372,827      | $412,580      | $465,920      | $498,340        |",
+              "| Avg Total AI Spend ($)  | $578,803      | $631,200      | $694,450      | $718,600        |",
+              "| Avg AI ROI (%)          | 35.5%         | 41.2%         | 48.7%         | 53.1%           |",
+              "| Median AI ROI (%)       | 33.5%         | 38.9%         | 45.3%         | 50.8%           |",
+              "| P90 AI ROI (%)          | 86.6%         | 94.3%         | 101.2%        | 108.4%          |",
+              "| AI Revenue / Spend Ratio| 0.64x         | 0.65x         | 0.67x         | 0.69x           |",
+              "| Avg Cost Savings ($)    | $32,482       | $37,540       | $44,210       | $49,880         |",
+              "| Avg EBITDA Uplift (%)   | 2.47%         | 2.89%         | 3.42%         | 3.91%           |"
+            ]
+          },
+          {
+            "position": 26,
+            "end_index": 31,
+            "headers": [
+              "Percentile",
+              "AI ROI (%)",
+              "Interpretation"
+            ],
+            "row_count": 2,
+            "column_count": 3,
+            "data": [
+              [
+                "Minimum",
+                "-20.0%",
+                "Loss-generating pilots; likely early PoC stage with high overhead"
+              ],
+              [
+                "P10",
+                "-4.2%",
+                "Sub-scale deployments; pre-ROI"
+              ]
+            ],
+            "full_table": [
+              "| Percentile | AI ROI (%) | Interpretation                              |",
+              "|------------|------------|---------------------------------------------|",
+              "| Minimum    | -20.0%     | Loss-generating pilots; likely early PoC stage with high overhead |",
+              "| P10        | -4.2%      | Sub-scale deployments; pre-ROI              |"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 5,
+          "content_length": 2653,
+          "file_type": ".docx",
+          "has_visual_content": true,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 6,
+        "text_content": "\n```\nFLUKE | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL\n\n|                      | threshold zone                                                                 | |\n|----------------------|--------------------------------------------------------------------------------|---|\n| P25 (Q1)             | 7.7%                                                                           | Emerging value; basic automation and API integration initiatives |\n| P50 (Median)         | 33.5%                                                                          | Core mid-market performance; established AI use cases            |\n| P75 (Q3)             | 59.8%                                                                          | High-performing deployments; typically AI-native workflows       |\n| P90                  | 86.6%                                                                          | Top-decile outcomes; fully integrated AI-first operations        |\n| P95                  | 98.6%                                                                          | Elite performers; AI embedded across full customer journey       |\n| Maximum              | 128.3%                                                                         | Best single-period performance; typically driven by large deal closures |\n\nStrategic insight: The interquartile range (IQR) of 52.1 percentage points (Q1: 7.7% → Q3: 59.8%) is unusually wide for a mature enterprise metric. This signals that Fluke's AI program has not yet converged on a standard operational model, and that the gap between laggard and leader business units represents a substantial optimization opportunity. Elevating the bottom quartile to median performance would yield an estimated $18.2M in incremental annual AI value across the portfolio.\n\n3.3 Correlates of High ROI\n\nPearson correlation analysis across all 60 variables reveals the following strongest positive correlates of AI ROI (all statistically significant at p < 0.001):\n\n| Variable                  | Correlation with AI ROI | Interpretation                                                      |\n|---------------------------|-------------------------|---------------------------------------------------------------------|\n| api_success_rate          | +0.608                  | Higher API reliability directly amplifies revenue-generating workflows |\n| critical_incident_count   | +0.598                  | Counterintuitive: high-ROI periods involve more incidents managed   |\n| budget_adherence          | +0.589                  | Disciplined spend control correlates with better ROI outcomes       |\n| ebitda_uplift             | +0.584                  | AI ROI translates meaningfully to bottom-line performance           |\n| error_rate                | +0.583                  | Higher error detection is associated with more active AI use        |\n| policy_compliance_rate    | +0.572                  | Governed deployments consistently outperform ungoverned ones        |\n| cost_savings              | +0.568                  | Cost reduction remains a primary ROI driver alongside revenue       |\n| ai_maturity_score         | +0.510                  | Maturity is a prerequisite for sustained high returns               |\n| strategic_alignment_score | +0.504                  | Top-down strategic alignment                                        |\n\nFluke Corporation — AI Analytics Division | Prepared: June 2026\n```\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 2,
+            "end_index": 12,
+            "headers": [
+              "FLUKE",
+              "AI Performance & Intelligence Report 2023-2026",
+              "CONFIDENTIAL"
+            ],
+            "row_count": 7,
+            "column_count": 3,
+            "data": [
+              [
+                "threshold zone"
+              ],
+              [
+                "P25 (Q1)",
+                "7.7%",
+                "Emerging value; basic automation and API integration initiatives"
+              ],
+              [
+                "P50 (Median)",
+                "33.5%",
+                "Core mid-market performance; established AI use cases"
+              ],
+              [
+                "P75 (Q3)",
+                "59.8%",
+                "High-performing deployments; typically AI-native workflows"
+              ],
+              [
+                "P90",
+                "86.6%",
+                "Top-decile outcomes; fully integrated AI-first operations"
+              ],
+              [
+                "P95",
+                "98.6%",
+                "Elite performers; AI embedded across full customer journey"
+              ],
+              [
+                "Maximum",
+                "128.3%",
+                "Best single-period performance; typically driven by large deal closures"
+              ]
+            ],
+            "full_table": [
+              "FLUKE | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL",
+              "|                      | threshold zone                                                                 | |",
+              "|----------------------|--------------------------------------------------------------------------------|---|",
+              "| P25 (Q1)             | 7.7%                                                                           | Emerging value; basic automation and API integration initiatives |",
+              "| P50 (Median)         | 33.5%                                                                          | Core mid-market performance; established AI use cases            |",
+              "| P75 (Q3)             | 59.8%                                                                          | High-performing deployments; typically AI-native workflows       |",
+              "| P90                  | 86.6%                                                                          | Top-decile outcomes; fully integrated AI-first operations        |",
+              "| P95                  | 98.6%                                                                          | Elite performers; AI embedded across full customer journey       |",
+              "| Maximum              | 128.3%                                                                         | Best single-period performance; typically driven by large deal closures |"
+            ]
+          },
+          {
+            "position": 19,
+            "end_index": 30,
+            "headers": [
+              "Variable",
+              "Correlation with AI ROI",
+              "Interpretation"
+            ],
+            "row_count": 9,
+            "column_count": 3,
+            "data": [
+              [
+                "api_success_rate",
+                "+0.608",
+                "Higher API reliability directly amplifies revenue-generating workflows"
+              ],
+              [
+                "critical_incident_count",
+                "+0.598",
+                "Counterintuitive: high-ROI periods involve more incidents managed"
+              ],
+              [
+                "budget_adherence",
+                "+0.589",
+                "Disciplined spend control correlates with better ROI outcomes"
+              ],
+              [
+                "ebitda_uplift",
+                "+0.584",
+                "AI ROI translates meaningfully to bottom-line performance"
+              ],
+              [
+                "error_rate",
+                "+0.583",
+                "Higher error detection is associated with more active AI use"
+              ],
+              [
+                "policy_compliance_rate",
+                "+0.572",
+                "Governed deployments consistently outperform ungoverned ones"
+              ],
+              [
+                "cost_savings",
+                "+0.568",
+                "Cost reduction remains a primary ROI driver alongside revenue"
+              ],
+              [
+                "ai_maturity_score",
+                "+0.510",
+                "Maturity is a prerequisite for sustained high returns"
+              ],
+              [
+                "strategic_alignment_score",
+                "+0.504",
+                "Top-down strategic alignment"
+              ]
+            ],
+            "full_table": [
+              "| Variable                  | Correlation with AI ROI | Interpretation                                                      |",
+              "|---------------------------|-------------------------|---------------------------------------------------------------------|",
+              "| api_success_rate          | +0.608                  | Higher API reliability directly amplifies revenue-generating workflows |",
+              "| critical_incident_count   | +0.598                  | Counterintuitive: high-ROI periods involve more incidents managed   |",
+              "| budget_adherence          | +0.589                  | Disciplined spend control correlates with better ROI outcomes       |",
+              "| ebitda_uplift             | +0.584                  | AI ROI translates meaningfully to bottom-line performance           |",
+              "| error_rate                | +0.583                  | Higher error detection is associated with more active AI use        |",
+              "| policy_compliance_rate    | +0.572                  | Governed deployments consistently outperform ungoverned ones        |",
+              "| cost_savings              | +0.568                  | Cost reduction remains a primary ROI driver alongside revenue       |",
+              "| ai_maturity_score         | +0.510                  | Maturity is a prerequisite for sustained high returns               |",
+              "| strategic_alignment_score | +0.504                  | Top-down strategic alignment                                        |"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 6,
+          "content_length": 3476,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 7,
+        "text_content": "\nFLUKE | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL\n\n| availability_uptime | +0.504 | amplifies AI investment returns |\n|---------------------|--------|---------------------------------|\n|                     |        | Platform reliability is foundational to ROI realization |\n\nThe unexpected positive correlation between critical_incident_count and ai_roi warrants further investigation. The most likely explanation is that high-activity AI deployments — which generate more revenue — also trigger more monitored incidents due to higher traffic volume, rather than reflecting quality degradation. This is consistent with the observation that high-ROI periods also show higher api_success_rate (+0.608), which would be contradictory if incident counts represented failures.\n\nFluke Corporation — AI Analytics Division | Prepared: June 2026\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 1,
+            "end_index": 6,
+            "headers": [
+              "FLUKE",
+              "AI Performance & Intelligence Report 2023-2026",
+              "CONFIDENTIAL"
+            ],
+            "row_count": 2,
+            "column_count": 3,
+            "data": [
+              [
+                "availability_uptime",
+                "+0.504",
+                "amplifies AI investment returns"
+              ],
+              [
+                "Platform reliability is foundational to ROI realization"
+              ]
+            ],
+            "full_table": [
+              "FLUKE | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL",
+              "| availability_uptime | +0.504 | amplifies AI investment returns |",
+              "|---------------------|--------|---------------------------------|",
+              "|                     |        | Platform reliability is foundational to ROI realization |"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 7,
+          "content_length": 859,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 8,
+        "text_content": "\n# 4. AI Adoption & Usage Analysis\n\n## 4.1 Active User Growth\n\nActive AI user count is the primary adoption leading indicator at Fluke and tracks the number of internal and external users engaging with AI-powered workflows, tools, or interfaces on a given day. The distribution shows strong intra-year seasonality with a pronounced year-end surge — a pattern consistent with enterprise rollout rhythms where Q4 budget deployments and year-end productivity initiatives drive adoption spikes.\n\n| Period            | Mean Active AI Users | Median | Peak (Max) | YoY Growth |\n|-------------------|----------------------|--------|------------|------------|\n| Q1 2023           | 393                  | 380    | 702        | Baseline   |\n| Q2 2023           | 739                  | 760    | 1,089      | +88%       |\n| Q3 2023           | 1,029                | 1,022  | 1,648      | +39%       |\n| Q4 2023           | 1,519                | 1,502  | 2,248      | +48%       |\n| Full Year 2023    | 916                  | 904    | 2,248      | Baseline   |\n| Full Year 2024 (Est.) | 1,148            | 1,122  | 2,580      | +25.3%     |\n| Full Year 2025 (Est.) | 1,340            | 1,298  | 3,010      | +16.7%     |\n| Full Year 2026 YTD (Est.) | 1,490        | 1,450  | 3,280      | +11.2%     |\n\nThe deceleration in growth rate from 88% (H1 2023) to an estimated 11% (2026) is a healthy signal — it reflects a maturing installed base rather than declining interest. Early-phase adoption is always logarithmic in enterprise contexts; the critical question is whether the user base is deepening engagement (rising DAU/MAU intensity) rather than purely growing headcount.\n\n## 4.2 Engagement Depth: DAU/MAU Intensity\n\nDAU/MAU intensity — the ratio of daily active users to monthly active users — averaged 0.14 across the full dataset period (median 0.13), with a range of 0.10 to 0.31. This places Fluke's AI engagement in the 'regular use' tier (consumer app benchmarks: 0.10–0.15 = light use; 0.15–0.25 = moderate; 0.25+ = high engagement).\n\nPower user ratio — defined as users engaging with AI tools 5+ times per day — averaged 2.7% of the active user base. This is low relative to best-in-class enterprise AI deployments (typically 8–12%), suggesting that Fluke's AI tools are being used as periodic assistants rather than deeply embedded workflow tools. This represents a significant opportunity: converting 2% more users to power-user status would drive an estimated 15–20% increase in productivity-linked AI ROI.\n\n----\n\n*Fluke Corporation — AI Analytics Division | Prepared: June 2026*\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 7,
+            "end_index": 17,
+            "headers": [
+              "Period",
+              "Mean Active AI Users",
+              "Median",
+              "Peak (Max)",
+              "YoY Growth"
+            ],
+            "row_count": 8,
+            "column_count": 5,
+            "data": [
+              [
+                "Q1 2023",
+                "393",
+                "380",
+                "702",
+                "Baseline"
+              ],
+              [
+                "Q2 2023",
+                "739",
+                "760",
+                "1,089",
+                "+88%"
+              ],
+              [
+                "Q3 2023",
+                "1,029",
+                "1,022",
+                "1,648",
+                "+39%"
+              ],
+              [
+                "Q4 2023",
+                "1,519",
+                "1,502",
+                "2,248",
+                "+48%"
+              ],
+              [
+                "Full Year 2023",
+                "916",
+                "904",
+                "2,248",
+                "Baseline"
+              ],
+              [
+                "Full Year 2024 (Est.)",
+                "1,148",
+                "1,122",
+                "2,580",
+                "+25.3%"
+              ],
+              [
+                "Full Year 2025 (Est.)",
+                "1,340",
+                "1,298",
+                "3,010",
+                "+16.7%"
+              ],
+              [
+                "Full Year 2026 YTD (Est.)",
+                "1,490",
+                "1,450",
+                "3,280",
+                "+11.2%"
+              ]
+            ],
+            "full_table": [
+              "| Period            | Mean Active AI Users | Median | Peak (Max) | YoY Growth |",
+              "|-------------------|----------------------|--------|------------|------------|",
+              "| Q1 2023           | 393                  | 380    | 702        | Baseline   |",
+              "| Q2 2023           | 739                  | 760    | 1,089      | +88%       |",
+              "| Q3 2023           | 1,029                | 1,022  | 1,648      | +39%       |",
+              "| Q4 2023           | 1,519                | 1,502  | 2,248      | +48%       |",
+              "| Full Year 2023    | 916                  | 904    | 2,248      | Baseline   |",
+              "| Full Year 2024 (Est.) | 1,148            | 1,122  | 2,580      | +25.3%     |",
+              "| Full Year 2025 (Est.) | 1,340            | 1,298  | 3,010      | +16.7%     |",
+              "| Full Year 2026 YTD (Est.) | 1,490        | 1,450  | 3,280      | +11.2%     |"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 8,
+          "content_length": 2586,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 9,
+        "text_content": "\n### 4.3 Copilot & Custom Agent Adoption\n\n| Adoption Metric                  | Mean  | Median | P75  | P90  |\n|----------------------------------|-------|--------|------|------|\n| Copilot Adoption (%)             | 7.7%  | 7.5%   | 11.2%| 14.2%|\n| Custom Agent Adoption (%)        | 2.5%  | 2.3%   | 4.3% | 5.9% |\n| Embedded Analytics Adoption (%)  | 4.9%  | 4.6%   | 7.3% | 9.7% |\n| Production Deployment Ratio (%)  | 16.6% | 15.7%  | 23.1%| 31.8%|\n| Adoption YoY Growth (%)          | 12.2% | 11.8%  | 16.8%| 21.4%|\n\nCopilot adoption at 7.7% mean is below the enterprise median of 11–14% for similar-scale industrial technology firms in 2024. The spread between mean and P90 (14.2%) indicates that pockets of Fluke's business have achieved strong Copilot penetration — likely engineering, IT, and sales operations — while manufacturing and field service divisions lag. A targeted Copilot enablement program for these segments could realistically lift the overall adoption rate by 4–6 percentage points within two quarters.\n\nCustom agent adoption at 2.5% mean represents the most nascent but highest-potential capability. Organizations that achieve >5% custom agent adoption typically report 2.1x higher AI ROI and 34% greater cross-functional productivity gains. The data shows a positive trajectory: the top quartile (P75: 4.3%) already approaches this threshold, suggesting that the knowledge and infrastructure to scale custom agents exists within Fluke — it is primarily a deployment and change management challenge.\n\n----\n\n*Fluke Corporation — AI Analytics Division | Prepared: June 2026*\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 3,
+            "end_index": 10,
+            "headers": [
+              "Adoption Metric",
+              "Mean",
+              "Median",
+              "P75",
+              "P90"
+            ],
+            "row_count": 5,
+            "column_count": 5,
+            "data": [
+              [
+                "Copilot Adoption (%)",
+                "7.7%",
+                "7.5%",
+                "11.2%",
+                "14.2%"
+              ],
+              [
+                "Custom Agent Adoption (%)",
+                "2.5%",
+                "2.3%",
+                "4.3%",
+                "5.9%"
+              ],
+              [
+                "Embedded Analytics Adoption (%)",
+                "4.9%",
+                "4.6%",
+                "7.3%",
+                "9.7%"
+              ],
+              [
+                "Production Deployment Ratio (%)",
+                "16.6%",
+                "15.7%",
+                "23.1%",
+                "31.8%"
+              ],
+              [
+                "Adoption YoY Growth (%)",
+                "12.2%",
+                "11.8%",
+                "16.8%",
+                "21.4%"
+              ]
+            ],
+            "full_table": [
+              "| Adoption Metric                  | Mean  | Median | P75  | P90  |",
+              "|----------------------------------|-------|--------|------|------|",
+              "| Copilot Adoption (%)             | 7.7%  | 7.5%   | 11.2%| 14.2%|",
+              "| Custom Agent Adoption (%)        | 2.5%  | 2.3%   | 4.3% | 5.9% |",
+              "| Embedded Analytics Adoption (%)  | 4.9%  | 4.6%   | 7.3% | 9.7% |",
+              "| Production Deployment Ratio (%)  | 16.6% | 15.7%  | 23.1%| 31.8%|",
+              "| Adoption YoY Growth (%)          | 12.2% | 11.8%  | 16.8%| 21.4%|"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 9,
+          "content_length": 1596,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 10,
+        "text_content": "\n5. Infrastructure & System Reliability\n\n### 5.1 Platform Reliability Overview\n\nAI system reliability is foundational to ROI — the correlation analysis in Section 3 confirms that `api_success_rate` and `availability_uptime` are among the strongest predictors of positive AI returns. Fluke's infrastructure performance is broadly solid, though specific metrics reveal targeted improvement opportunities.\n\n| Reliability Metric       | Mean  | Median | Std Dev | Best (P95) | Worst (P5) |\n|--------------------------|-------|--------|---------|------------|------------|\n| API Success Rate (%)     | 87.6% | 87.5%  | 1.68%   | 90.6%      | 85.3%      |\n| Availability / Uptime (%)| 95.9% | 95.9%  | 0.56%   | 96.8%      | 95.1%      |\n| Error Rate (%)           | 2.11% | 2.05%  | 1.32%   | 0.32%      | 4.68%      |\n| Hallucination Rate (%)   | 2.99% | 2.85%  | 1.95%   | 0.62%      | 6.84%      |\n| Fallback Rate (%)        | 1.62% | 1.42%  | 1.34%   | 0.10%      | 4.23%      |\n| p95 Latency (ms)         | 513.7ms| 502ms | 257.9ms | 163ms      | 1,042ms    |\n| MTTR (hours)             | 7.1h  | 7.1h   | 3.85h   | 2.1h       | 15.2h      |\n| Human Review Coverage (%)| 15.9% | 15.1%  | 6.87%   | 28.3%      | 7.2%       |\n\n### 5.2 Error & Hallucination Rate Analysis\n\nError rate averaged 2.11% (median 2.05%) with a standard deviation of 1.32%, indicating moderate variability. The tight distribution (P5 to P95 spanning 0.32% to 4.68%) suggests systemic rather than random causation — error spikes are attributable to identifiable events such as model updates, data pipeline issues, or traffic surges rather than baseline instability.\n\nHallucination rate at 2.99% mean is a material concern for a test and measurement context, where accuracy is a core product value proposition. Industry benchmarks for safety-critical industrial AI applications target hallucination rates below 1.5%. Fluke's current mean of 3.0% is approximately 2x the target threshold, and the P90 value of 6.1% suggests that worst-case days present significant accuracy risk. Recommended actions:\n\n- Implement retrieval-augmented generation (RAG) for all product specification and technical documentation queries — projected to reduce hallucination rate by 40–60% for these query types.\n- Expand human review coverage from the current 15.9% mean toward 25–30% for high-stakes outputs (safety data, compliance reports, field service recommendations).\n- Introduce ensemble voting or confidence-threshold filtering for AI responses in customer-facing applications, with automatic fallback for low-confidence outputs.\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 7,
+            "end_index": 17,
+            "headers": [
+              "Reliability Metric",
+              "Mean",
+              "Median",
+              "Std Dev",
+              "Best (P95)",
+              "Worst (P5)"
+            ],
+            "row_count": 8,
+            "column_count": 6,
+            "data": [
+              [
+                "API Success Rate (%)",
+                "87.6%",
+                "87.5%",
+                "1.68%",
+                "90.6%",
+                "85.3%"
+              ],
+              [
+                "Availability / Uptime (%)",
+                "95.9%",
+                "95.9%",
+                "0.56%",
+                "96.8%",
+                "95.1%"
+              ],
+              [
+                "Error Rate (%)",
+                "2.11%",
+                "2.05%",
+                "1.32%",
+                "0.32%",
+                "4.68%"
+              ],
+              [
+                "Hallucination Rate (%)",
+                "2.99%",
+                "2.85%",
+                "1.95%",
+                "0.62%",
+                "6.84%"
+              ],
+              [
+                "Fallback Rate (%)",
+                "1.62%",
+                "1.42%",
+                "1.34%",
+                "0.10%",
+                "4.23%"
+              ],
+              [
+                "p95 Latency (ms)",
+                "513.7ms",
+                "502ms",
+                "257.9ms",
+                "163ms",
+                "1,042ms"
+              ],
+              [
+                "MTTR (hours)",
+                "7.1h",
+                "7.1h",
+                "3.85h",
+                "2.1h",
+                "15.2h"
+              ],
+              [
+                "Human Review Coverage (%)",
+                "15.9%",
+                "15.1%",
+                "6.87%",
+                "28.3%",
+                "7.2%"
+              ]
+            ],
+            "full_table": [
+              "| Reliability Metric       | Mean  | Median | Std Dev | Best (P95) | Worst (P5) |",
+              "|--------------------------|-------|--------|---------|------------|------------|",
+              "| API Success Rate (%)     | 87.6% | 87.5%  | 1.68%   | 90.6%      | 85.3%      |",
+              "| Availability / Uptime (%)| 95.9% | 95.9%  | 0.56%   | 96.8%      | 95.1%      |",
+              "| Error Rate (%)           | 2.11% | 2.05%  | 1.32%   | 0.32%      | 4.68%      |",
+              "| Hallucination Rate (%)   | 2.99% | 2.85%  | 1.95%   | 0.62%      | 6.84%      |",
+              "| Fallback Rate (%)        | 1.62% | 1.42%  | 1.34%   | 0.10%      | 4.23%      |",
+              "| p95 Latency (ms)         | 513.7ms| 502ms | 257.9ms | 163ms      | 1,042ms    |",
+              "| MTTR (hours)             | 7.1h  | 7.1h   | 3.85h   | 2.1h       | 15.2h      |",
+              "| Human Review Coverage (%)| 15.9% | 15.1%  | 6.87%   | 28.3%      | 7.2%       |"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 10,
+          "content_length": 2588,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 11,
+        "text_content": "\n5.3 Latency & Throughput\n\np95 latency of 513.7ms (median 502ms) is within acceptable range for asynchronous enterprise workflows but exceeds best-practice targets (<300ms) for interactive, real-time AI applications such as field technician support tools and live customer service agents. The high standard deviation (257.9ms) indicates inconsistent performance — likely reflecting traffic load variation and API endpoint distribution.\n\nThe improvement trajectory from 2023 to 2026 is encouraging: estimated mean p95 latency declined from 513ms (2023 baseline) to approximately 348ms (2026 YTD), a 32% improvement attributable to model optimization, edge caching, and CDN expansion. The 2026 target of <300ms is achievable within 6–9 months with focused engineering effort.\n\n| Year        | Mean p95 Latency (ms) | Median MTTR (h) | Uptime (%) | API Success Rate (%) |\n|-------------|-----------------------|-----------------|------------|----------------------|\n| 2023        | 513.7                 | 7.10            | 95.87%     | 87.59%               |\n| 2024        | 468.2                 | 6.43            | 96.12%     | 88.34%               |\n| 2025        | 408.5                 | 5.87            | 96.44%     | 89.10%               |\n| 2026 YTD (Est.) | 348.1             | 5.21            | 96.78%     | 89.81%               |\n\nFluke Corporation — AI Analytics Division | Prepared: June 2026\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 7,
+            "end_index": 13,
+            "headers": [
+              "Year",
+              "Mean p95 Latency (ms)",
+              "Median MTTR (h)",
+              "Uptime (%)",
+              "API Success Rate (%)"
+            ],
+            "row_count": 4,
+            "column_count": 5,
+            "data": [
+              [
+                "2023",
+                "513.7",
+                "7.10",
+                "95.87%",
+                "87.59%"
+              ],
+              [
+                "2024",
+                "468.2",
+                "6.43",
+                "96.12%",
+                "88.34%"
+              ],
+              [
+                "2025",
+                "408.5",
+                "5.87",
+                "96.44%",
+                "89.10%"
+              ],
+              [
+                "2026 YTD (Est.)",
+                "348.1",
+                "5.21",
+                "96.78%",
+                "89.81%"
+              ]
+            ],
+            "full_table": [
+              "| Year        | Mean p95 Latency (ms) | Median MTTR (h) | Uptime (%) | API Success Rate (%) |",
+              "|-------------|-----------------------|-----------------|------------|----------------------|",
+              "| 2023        | 513.7                 | 7.10            | 95.87%     | 87.59%               |",
+              "| 2024        | 468.2                 | 6.43            | 96.12%     | 88.34%               |",
+              "| 2025        | 408.5                 | 5.87            | 96.44%     | 89.10%               |",
+              "| 2026 YTD (Est.) | 348.1             | 5.21            | 96.78%     | 89.81%               |"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 11,
+          "content_length": 1404,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 12,
+        "text_content": "\n# 6. AI Governance & Compliance\n\n## 6.1 Governance Maturity Trajectory\n\nAI governance at Fluke has evolved significantly over the reporting period. The governance maturity score — a composite of policy documentation, audit readiness, escalation process maturity, model monitoring coverage, and stakeholder accountability — averaged 23.4 in 2023 and is estimated at 34.1 by 2026. This represents a 46% improvement over four years, but falls short of the 40+ threshold typically associated with 'systematically governed' AI programs by major enterprise risk frameworks (NIST AI RMF, ISO 42001).\n\n| Governance Metric          | 2023 Mean | 2024 Mean | 2025 Mean | 2026 YTD |\n|----------------------------|-----------|-----------|-----------|----------|\n| Governance Maturity Score  | 23.38     | 26.4      | 30.2      | 34.1     |\n| Policy Compliance Rate (%) | 75.29%    | 77.4%     | 79.8%     | 82.4%    |\n| Data Privacy Compliance (%)| 81.3%     | 83.6%     | 85.9%     | 88.1%    |\n| Regulatory Readiness (%)   | 22.6%     | 26.8%     | 31.4%     | 37.2%    |\n| Vendor Compliance (%)      | 61.4%     | 64.2%     | 67.8%     | 71.3%    |\n| AI Governance Score        | 23.3      | 25.9      | 28.7      | 32.1     |\n| AI Incident Rate (%)       | 1.48%     | 1.31%     | 1.14%     | 0.98%    |\n\n## 6.2 Compliance Risk Assessment\n\nThree compliance metrics warrant immediate attention based on current trajectory analysis:\n\n- **Regulatory Readiness (2026 YTD: 37.2%)**: This metric — measuring Fluke's preparedness for external AI audits, regulatory inquiries, and emerging AI-specific legislation — remains below the 50% threshold that internal risk standards require for commercial AI deployments. Given the EU AI Act's staged implementation timeline and increasing regulatory attention to AI in industrial safety contexts, this gap represents an escalating material risk.\n\n- **Vendor Compliance (2026 YTD: 71.3%)**: Third-party AI vendors and API providers used within Fluke's AI stack are not uniformly meeting contractual compliance obligations. At 71.3%, nearly three in ten vendor interactions involve some form of compliance gap — whether in data handling, SLA performance, or security attestation. A structured vendor governance program with quarterly review cycles is recommended.\n\n- **AI Incident Rate (2026 YTD: 0.98%)**: While the declining trend (1.48% in 2023 → 0.98% in 2026) is positive, incidents that do occur are increasingly complex. The shift from high-frequency, low-severity incidents to lower-frequency, higher-severity events is a common pattern as AI systems mature.\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 7,
+            "end_index": 16,
+            "headers": [
+              "Governance Metric",
+              "2023 Mean",
+              "2024 Mean",
+              "2025 Mean",
+              "2026 YTD"
+            ],
+            "row_count": 7,
+            "column_count": 5,
+            "data": [
+              [
+                "Governance Maturity Score",
+                "23.38",
+                "26.4",
+                "30.2",
+                "34.1"
+              ],
+              [
+                "Policy Compliance Rate (%)",
+                "75.29%",
+                "77.4%",
+                "79.8%",
+                "82.4%"
+              ],
+              [
+                "Data Privacy Compliance (%)",
+                "81.3%",
+                "83.6%",
+                "85.9%",
+                "88.1%"
+              ],
+              [
+                "Regulatory Readiness (%)",
+                "22.6%",
+                "26.8%",
+                "31.4%",
+                "37.2%"
+              ],
+              [
+                "Vendor Compliance (%)",
+                "61.4%",
+                "64.2%",
+                "67.8%",
+                "71.3%"
+              ],
+              [
+                "AI Governance Score",
+                "23.3",
+                "25.9",
+                "28.7",
+                "32.1"
+              ],
+              [
+                "AI Incident Rate (%)",
+                "1.48%",
+                "1.31%",
+                "1.14%",
+                "0.98%"
+              ]
+            ],
+            "full_table": [
+              "| Governance Metric          | 2023 Mean | 2024 Mean | 2025 Mean | 2026 YTD |",
+              "|----------------------------|-----------|-----------|-----------|----------|",
+              "| Governance Maturity Score  | 23.38     | 26.4      | 30.2      | 34.1     |",
+              "| Policy Compliance Rate (%) | 75.29%    | 77.4%     | 79.8%     | 82.4%    |",
+              "| Data Privacy Compliance (%)| 81.3%     | 83.6%     | 85.9%     | 88.1%    |",
+              "| Regulatory Readiness (%)   | 22.6%     | 26.8%     | 31.4%     | 37.2%    |",
+              "| Vendor Compliance (%)      | 61.4%     | 64.2%     | 67.8%     | 71.3%    |",
+              "| AI Governance Score        | 23.3      | 25.9      | 28.7      | 32.1     |",
+              "| AI Incident Rate (%)       | 1.48%     | 1.31%     | 1.14%     | 0.98%    |"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 12,
+          "content_length": 2595,
+          "file_type": ".docx",
+          "has_visual_content": true,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 13,
+        "text_content": "\nFluke | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL\n\nFluke should ensure that incident response playbooks are updated to address the full severity spectrum, including AI-specific scenarios such as model drift, data poisoning, and adversarial input handling.\n\n----\n\nFluke Corporation — AI Analytics Division | Prepared: June 2026\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 1,
+            "end_index": 2,
+            "headers": [
+              "Fluke",
+              "AI Performance & Intelligence Report 2023-2026",
+              "CONFIDENTIAL"
+            ],
+            "row_count": 0,
+            "column_count": 3,
+            "data": [],
+            "full_table": [
+              "Fluke | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 13,
+          "content_length": 348,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 14,
+        "text_content": "\n# 7. AI Project Portfolio Analysis\n\n## 7.1 Portfolio Scale & Composition\n\nFluke's AI project portfolio averaged 30.6 total projects per observation period (median 30), spanning a range from 5 to 67. The portfolio composition reveals the classic 'funnel problem' of enterprise AI: many projects are initiated but few reach full production.\n\n| Portfolio Metric     | Mean | Median | Min | Max | Std Dev |\n|----------------------|------|--------|-----|-----|---------|\n| Total AI Projects    | 30.6 | 30     | 5   | 67  | 15.8    |\n| Projects in Production | 17.1 | 17     | 0   | 45  | 11.2    |\n| Projects in PoC      | 5.3  | 5      | 0   | 17  | 3.6     |\n| Stalled Projects     | 2.5  | 2      | 0   | 8   | 1.9     |\n| % AI in Production   | 16.6%| 15.7%  | 0%  | 47.9%| 10.9%   |\n| Production Ratio     | 0.55 | 0.53   | 0.00| 1.00| 0.28    |\n\nThe average production ratio of 0.55 means that roughly half of all AI projects in the portfolio have reached production — a figure that appears healthy on the surface but masks two important dynamics. First, the denominator includes recently initiated projects that have not yet had time to reach production. Second, the 16.6% figure for 'percent AI in production' (which measures the proportion of actual AI capability deployed relative to planned capability) indicates that even projects in production have not fully deployed their AI components.\n\n## 7.2 The Stalled Project Problem\n\nStalled projects — those that have neither progressed to production nor been formally terminated — averaged 2.5 per observation period (8.6% of the total portfolio). Industry data suggests that stalled AI projects cost between 1.5x and 3x the cost of completed projects due to sunk costs, opportunity cost, and organizational drag from maintaining zombie initiatives.\n\nAt Fluke's observed average AI spend of $578,803 per period, stalled projects are estimated to consume 12–18% of total AI budget without generating returns — an estimated annual waste of $69,000–$104,000 per observation period, or $17.5M–$26.3M annualized at full portfolio scale.\n\nThe drivers of project stalling at Fluke, based on cross-variable analysis, are:\n- Low talent readiness score (below 18): Projects in periods where talent readiness was in the bottom quartile stalled at 2.8x the average rate.\n- Budget variance above –22%: Periods of aggressive budget overrun correlated with 1.9x higher stall rates.\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 7,
+            "end_index": 15,
+            "headers": [
+              "Portfolio Metric",
+              "Mean",
+              "Median",
+              "Min",
+              "Max",
+              "Std Dev"
+            ],
+            "row_count": 6,
+            "column_count": 6,
+            "data": [
+              [
+                "Total AI Projects",
+                "30.6",
+                "30",
+                "5",
+                "67",
+                "15.8"
+              ],
+              [
+                "Projects in Production",
+                "17.1",
+                "17",
+                "0",
+                "45",
+                "11.2"
+              ],
+              [
+                "Projects in PoC",
+                "5.3",
+                "5",
+                "0",
+                "17",
+                "3.6"
+              ],
+              [
+                "Stalled Projects",
+                "2.5",
+                "2",
+                "0",
+                "8",
+                "1.9"
+              ],
+              [
+                "% AI in Production",
+                "16.6%",
+                "15.7%",
+                "0%",
+                "47.9%",
+                "10.9%"
+              ],
+              [
+                "Production Ratio",
+                "0.55",
+                "0.53",
+                "0.00",
+                "1.00",
+                "0.28"
+              ]
+            ],
+            "full_table": [
+              "| Portfolio Metric     | Mean | Median | Min | Max | Std Dev |",
+              "|----------------------|------|--------|-----|-----|---------|",
+              "| Total AI Projects    | 30.6 | 30     | 5   | 67  | 15.8    |",
+              "| Projects in Production | 17.1 | 17     | 0   | 45  | 11.2    |",
+              "| Projects in PoC      | 5.3  | 5      | 0   | 17  | 3.6     |",
+              "| Stalled Projects     | 2.5  | 2      | 0   | 8   | 1.9     |",
+              "| % AI in Production   | 16.6%| 15.7%  | 0%  | 47.9%| 10.9%   |",
+              "| Production Ratio     | 0.55 | 0.53   | 0.00| 1.00| 0.28    |"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 14,
+          "content_length": 2421,
+          "file_type": ".docx",
+          "has_visual_content": true,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 15,
+        "text_content": "\n- AI maturity score below 15: Early-maturity environments lack the governance and technical scaffolding to sustain project momentum.\n- Strategic alignment score below 15: Projects without clear executive sponsorship and business unit alignment are 3.1x more likely to stall.\n\n### 7.3 Production Deployment Velocity\n\nProjects in PoC averaged 5.3 at any given time — a healthy pipeline suggesting ongoing innovation. The PoC-to-production graduation rate, estimated from the ratio of production projects to total projects over time, averaged approximately 56% — meaning that roughly one in two PoCs eventually reaches production. This is above the industrial sector median of 44% but below leading technology firms (68–72%).\n\nMonthly aggregates reveal that production project counts peak in October–December (consistent with Q4 budget deployment patterns) and dip in January–February, creating a 'January trough' that delays value realization for projects that complete testing in H2 but await Q1 production approval cycles.\n\n----\n\nFluke Corporation — AI Analytics Division | Prepared: June 2026\n",
+        "images": [],
+        "tables": [],
+        "metadata": {
+          "page_number": 15,
+          "content_length": 1095,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 16,
+        "text_content": "\n# 8. Talent, Maturity & Strategic Alignment\n\n## 8.1 AI Maturity Score Analysis\n\nFluke's AI maturity score — a composite of technical capability, organizational readiness, process integration, and value realization — averaged 23.5 (scale of 10–100) with a standard deviation of 8.9. The wide distribution (P5: 12.1 → P95: 37.9) reflects significant heterogeneity across business units, with early-stage adopters in manufacturing and field operations coexisting with mature deployments in engineering and commercial operations.\n\n| AI Maturity Band | Score Range | Approx. % of Observations | Typical Profile                                      |\n|------------------|-------------|---------------------------|------------------------------------------------------|\n| Nascent          | 10–15       | 18%                       | Ad hoc AI use; no formal program; single PoC         |\n| Developing       | 15–22       | 31%                       | Structured pilots; basic governance; limited production |\n| Established      | 22–32       | 34%                       | Multiple production deployments; growing user base   |\n| Advanced         | 32–40       | 13%                       | AI embedded in core workflows; measurable ROI        |\n| Leading          | 40+         | 4%                        | AI-native processes; continuous learning loops; governance mature |\n\nThe 34% share in the 'Established' band represents Fluke's core operational mode — sufficient to generate ROI but not yet at the threshold where AI becomes a sustainable competitive advantage. The 4% 'Leading' cohort is critical: these high-maturity periods/units likely represent Fluke's engineering and product intelligence teams, where AI is generating 3–5x the ROI of the Established cohort.\n\n## 8.2 Talent Readiness & Technical Maturity\n\nTalent readiness score (mean 23.5, std 8.2) and technical maturity score (mean 24.3, std 9.0) are highly correlated with each other (r = 0.82) and both strongly correlated with AI ROI (r ≈ 0.51), confirming that the human capability dimension is as important as the technical infrastructure dimension in driving AI returns.\n\n| Maturity Metric               | 2023 Mean | 2024 (Est.) | 2025 (Est.) | 2026 YTD (Est.) |\n|-------------------------------|-----------|-------------|-------------|-----------------|\n| AI Maturity Score (0–100)     | 23.5      | 27.1        | 30.8        | 33.9            |\n| Talent Readiness Score (0–100)| 23.5      | 27.3        | 31.2        | 34.6            |\n| Technical Maturity            | 24.3      | 28.1        | 32.0        | 35.5            |\n\n*Fluke Corporation — AI Analytics Division | Prepared: June 2026*\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 7,
+            "end_index": 14,
+            "headers": [
+              "AI Maturity Band",
+              "Score Range",
+              "Approx. % of Observations",
+              "Typical Profile"
+            ],
+            "row_count": 5,
+            "column_count": 4,
+            "data": [
+              [
+                "Nascent",
+                "10–15",
+                "18%",
+                "Ad hoc AI use; no formal program; single PoC"
+              ],
+              [
+                "Developing",
+                "15–22",
+                "31%",
+                "Structured pilots; basic governance; limited production"
+              ],
+              [
+                "Established",
+                "22–32",
+                "34%",
+                "Multiple production deployments; growing user base"
+              ],
+              [
+                "Advanced",
+                "32–40",
+                "13%",
+                "AI embedded in core workflows; measurable ROI"
+              ],
+              [
+                "Leading",
+                "40+",
+                "4%",
+                "AI-native processes; continuous learning loops; governance mature"
+              ]
+            ],
+            "full_table": [
+              "| AI Maturity Band | Score Range | Approx. % of Observations | Typical Profile                                      |",
+              "|------------------|-------------|---------------------------|------------------------------------------------------|",
+              "| Nascent          | 10–15       | 18%                       | Ad hoc AI use; no formal program; single PoC         |",
+              "| Developing       | 15–22       | 31%                       | Structured pilots; basic governance; limited production |",
+              "| Established      | 22–32       | 34%                       | Multiple production deployments; growing user base   |",
+              "| Advanced         | 32–40       | 13%                       | AI embedded in core workflows; measurable ROI        |",
+              "| Leading          | 40+         | 4%                        | AI-native processes; continuous learning loops; governance mature |"
+            ]
+          },
+          {
+            "position": 21,
+            "end_index": 26,
+            "headers": [
+              "Maturity Metric",
+              "2023 Mean",
+              "2024 (Est.)",
+              "2025 (Est.)",
+              "2026 YTD (Est.)"
+            ],
+            "row_count": 3,
+            "column_count": 5,
+            "data": [
+              [
+                "AI Maturity Score (0–100)",
+                "23.5",
+                "27.1",
+                "30.8",
+                "33.9"
+              ],
+              [
+                "Talent Readiness Score (0–100)",
+                "23.5",
+                "27.3",
+                "31.2",
+                "34.6"
+              ],
+              [
+                "Technical Maturity",
+                "24.3",
+                "28.1",
+                "32.0",
+                "35.5"
+              ]
+            ],
+            "full_table": [
+              "| Maturity Metric               | 2023 Mean | 2024 (Est.) | 2025 (Est.) | 2026 YTD (Est.) |",
+              "|-------------------------------|-----------|-------------|-------------|-----------------|",
+              "| AI Maturity Score (0–100)     | 23.5      | 27.1        | 30.8        | 33.9            |",
+              "| Talent Readiness Score (0–100)| 23.5      | 27.3        | 31.2        | 34.6            |",
+              "| Technical Maturity            | 24.3      | 28.1        | 32.0        | 35.5            |"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 16,
+          "content_length": 2666,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 17,
+        "text_content": "\n```\nFLUKE | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL\n\n| Score (0–100)                  |       |       |       |       |\n|-------------------------------|-------|-------|-------|-------|\n| Strategic Alignment Score (0–100) | 24.3  | 28.4  | 32.6  | 36.2  |\n| Company Maturity Rank (1–20)  | 10.3  | 9.1   | 7.8   | 6.4   |\n| Industry Benchmark Ratio      | 0.55  | 0.59  | 0.63  | 0.67  |\n| Top Quartile Position (%)     | 3.2%  | 4.1%  | 5.8%  | 7.2%  |\n\n### 8.3 Strategic Alignment & Budget Discipline\n\nStrategic alignment score averaged 24.3 (median 24.1) and is the second-highest correlate of AI ROI after API success rate in the non-technical domain. Periods of high strategic alignment — where AI initiatives are explicitly linked to corporate objectives, executive sponsorship is active, and cross-functional coordination is strong — generate an estimated 28% higher AI ROI than low-alignment periods.\n\nBudget adherence (mean 70.9%, median 70.4%) reflects the proportion of the period where AI spend remained within approved budgetary bounds. The mean budget variance of –22.4% (negative indicating underspend) signals that Fluke's AI teams are consistently conservative in their spending — a pattern that may reflect procurement bottlenecks, project delays, or overly cautious budget planning rather than genuine cost discipline. Left uncorrected, chronic underspend can reduce AI programme velocity and create a false signal of budget surplus that leads to budget cuts in subsequent planning cycles.\n\nFluke Corporation — AI Analytics Division | Prepared: June 2026\n```\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 2,
+            "end_index": 10,
+            "headers": [
+              "FLUKE",
+              "AI Performance & Intelligence Report 2023-2026",
+              "CONFIDENTIAL"
+            ],
+            "row_count": 5,
+            "column_count": 3,
+            "data": [
+              [
+                "Score (0–100)"
+              ],
+              [
+                "Strategic Alignment Score (0–100)",
+                "24.3",
+                "28.4",
+                "32.6",
+                "36.2"
+              ],
+              [
+                "Company Maturity Rank (1–20)",
+                "10.3",
+                "9.1",
+                "7.8",
+                "6.4"
+              ],
+              [
+                "Industry Benchmark Ratio",
+                "0.55",
+                "0.59",
+                "0.63",
+                "0.67"
+              ],
+              [
+                "Top Quartile Position (%)",
+                "3.2%",
+                "4.1%",
+                "5.8%",
+                "7.2%"
+              ]
+            ],
+            "full_table": [
+              "FLUKE | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL",
+              "| Score (0–100)                  |       |       |       |       |",
+              "|-------------------------------|-------|-------|-------|-------|",
+              "| Strategic Alignment Score (0–100) | 24.3  | 28.4  | 32.6  | 36.2  |",
+              "| Company Maturity Rank (1–20)  | 10.3  | 9.1   | 7.8   | 6.4   |",
+              "| Industry Benchmark Ratio      | 0.55  | 0.59  | 0.63  | 0.67  |",
+              "| Top Quartile Position (%)     | 3.2%  | 4.1%  | 5.8%  | 7.2%  |"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 17,
+          "content_length": 1601,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 18,
+        "text_content": "\n# 9. Spend, Cost Efficiency & ROI Attribution\n\n## 9.1 Total AI Spend Distribution\n\nTotal AI spend showed substantial variability across the observation period, consistent with project-driven spend patterns in enterprise AI. The mean of $578,803 (median $547,410) against a standard deviation of $333,513 indicates that roughly one-third of observation periods see spend deviating by more than $333K from the mean — driven by large-batch model training runs, infrastructure expansions, and major vendor contract renewals.\n\n| Spend Category         | Mean ($) | Median ($) | P75 ($) | P90 ($) | Share of Total |\n|------------------------|----------|------------|---------|---------|----------------|\n| Total AI Spend         | $578,803 | $547,410   | $806,592| $1,047,190 | 100%           |\n| Cloud Spend            | $95,212  | $90,424    | $129,840| $161,842  | 16.4%          |\n| API Licensing Spend    | $21,384  | $17,890    | $27,640 | $35,210   | 3.7%           |\n| Forecasted AI Spend    | $85,340  | $74,120    | $112,460| $145,890  | 14.7%          |\n| Spend by Model Family  | $21,089  | $17,240    | $27,320 | $34,780   | 3.6%           |\n\n## 9.2 Cost Efficiency Metrics\n\nCost per outcome — the fully-loaded cost per unit of AI-generated value delivered — averaged $36.14 (median $20.00, P75 $42.80, P90 $68.40). The high standard deviation and right skew indicate that a minority of high-cost, low-yield initiatives are pulling the mean up significantly. Focusing cost optimization efforts on observations where cost_per_outcome exceeds $50 — which represents approximately 22% of observation periods — could yield 15–20% overall efficiency improvement.\n\nProductivity gain averaged 7.69% (median 7.55%) with a P90 of 14.24%. Cross-sell uplift averaged 6.61% (P75 15.93%), indicating that AI-assisted customer interactions are generating meaningful incremental revenue per customer engagement. The payback period averaged 5.6 months (median 5.2), which is below the enterprise AI sector average of 7–9 months, suggesting that Fluke's use case selection and deployment model is relatively capital-efficient.\n\n| Efficiency Metric      | Mean  | Median | P75   | P90   | Target (2027) |\n|------------------------|-------|--------|-------|-------|---------------|\n| Cost per Outcome ($)   | $36.14| $20.00 | $42.80| $68.40| $18.00        |\n| Productivity Gain (%)  | 7.69% | 7.55%  | 11.11%| 14.24%| 12.00%        |\n| Cross-Sell Uplift (%)  | 6.61% | 6.47%  | 15.93%| —     | 9.00%         |\n\n*Fluke Corporation — AI Analytics Division | Prepared: June 2026*\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 7,
+            "end_index": 14,
+            "headers": [
+              "Spend Category",
+              "Mean ($)",
+              "Median ($)",
+              "P75 ($)",
+              "P90 ($)",
+              "Share of Total"
+            ],
+            "row_count": 5,
+            "column_count": 6,
+            "data": [
+              [
+                "Total AI Spend",
+                "$578,803",
+                "$547,410",
+                "$806,592",
+                "$1,047,190",
+                "100%"
+              ],
+              [
+                "Cloud Spend",
+                "$95,212",
+                "$90,424",
+                "$129,840",
+                "$161,842",
+                "16.4%"
+              ],
+              [
+                "API Licensing Spend",
+                "$21,384",
+                "$17,890",
+                "$27,640",
+                "$35,210",
+                "3.7%"
+              ],
+              [
+                "Forecasted AI Spend",
+                "$85,340",
+                "$74,120",
+                "$112,460",
+                "$145,890",
+                "14.7%"
+              ],
+              [
+                "Spend by Model Family",
+                "$21,089",
+                "$17,240",
+                "$27,320",
+                "$34,780",
+                "3.6%"
+              ]
+            ],
+            "full_table": [
+              "| Spend Category         | Mean ($) | Median ($) | P75 ($) | P90 ($) | Share of Total |",
+              "|------------------------|----------|------------|---------|---------|----------------|",
+              "| Total AI Spend         | $578,803 | $547,410   | $806,592| $1,047,190 | 100%           |",
+              "| Cloud Spend            | $95,212  | $90,424    | $129,840| $161,842  | 16.4%          |",
+              "| API Licensing Spend    | $21,384  | $17,890    | $27,640 | $35,210   | 3.7%           |",
+              "| Forecasted AI Spend    | $85,340  | $74,120    | $112,460| $145,890  | 14.7%          |",
+              "| Spend by Model Family  | $21,089  | $17,240    | $27,320 | $34,780   | 3.6%           |"
+            ]
+          },
+          {
+            "position": 21,
+            "end_index": 26,
+            "headers": [
+              "Efficiency Metric",
+              "Mean",
+              "Median",
+              "P75",
+              "P90",
+              "Target (2027)"
+            ],
+            "row_count": 3,
+            "column_count": 6,
+            "data": [
+              [
+                "Cost per Outcome ($)",
+                "$36.14",
+                "$20.00",
+                "$42.80",
+                "$68.40",
+                "$18.00"
+              ],
+              [
+                "Productivity Gain (%)",
+                "7.69%",
+                "7.55%",
+                "11.11%",
+                "14.24%",
+                "12.00%"
+              ],
+              [
+                "Cross-Sell Uplift (%)",
+                "6.61%",
+                "6.47%",
+                "15.93%",
+                "—",
+                "9.00%"
+              ]
+            ],
+            "full_table": [
+              "| Efficiency Metric      | Mean  | Median | P75   | P90   | Target (2027) |",
+              "|------------------------|-------|--------|-------|-------|---------------|",
+              "| Cost per Outcome ($)   | $36.14| $20.00 | $42.80| $68.40| $18.00        |",
+              "| Productivity Gain (%)  | 7.69% | 7.55%  | 11.11%| 14.24%| 12.00%        |",
+              "| Cross-Sell Uplift (%)  | 6.61% | 6.47%  | 15.93%| —     | 9.00%         |"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 18,
+          "content_length": 2566,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 19,
+        "text_content": "\n```\nFLUKE | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL\n\n| Payback Period (months) | 5.6    | 5.2    | 7.4     | 9.2     | 4.5    |\n|-------------------------|--------|--------|---------|---------|--------|\n| AI-Assisted Revenue ($) | $51,890| $40,156| $—      | $—      | $75,000|\n| Direct AI Revenue ($)   | $74,250| $49,260| $112,040| $178,420| $95,000|\n\nFluke Corporation — AI Analytics Division | Prepared: June 2026\n```\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 2,
+            "end_index": 8,
+            "headers": [
+              "FLUKE",
+              "AI Performance & Intelligence Report 2023-2026",
+              "CONFIDENTIAL"
+            ],
+            "row_count": 3,
+            "column_count": 3,
+            "data": [
+              [
+                "Payback Period (months)",
+                "5.6",
+                "5.2",
+                "7.4",
+                "9.2",
+                "4.5"
+              ],
+              [
+                "AI-Assisted Revenue ($)",
+                "$51,890",
+                "$40,156",
+                "$—",
+                "$—",
+                "$75,000"
+              ],
+              [
+                "Direct AI Revenue ($)",
+                "$74,250",
+                "$49,260",
+                "$112,040",
+                "$178,420",
+                "$95,000"
+              ]
+            ],
+            "full_table": [
+              "FLUKE | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL",
+              "| Payback Period (months) | 5.6    | 5.2    | 7.4     | 9.2     | 4.5    |",
+              "|-------------------------|--------|--------|---------|---------|--------|",
+              "| AI-Assisted Revenue ($) | $51,890| $40,156| $—      | $—      | $75,000|",
+              "| Direct AI Revenue ($)   | $74,250| $49,260| $112,040| $178,420| $95,000|"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 19,
+          "content_length": 445,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 20,
+        "text_content": "\n# 10. Competitive Positioning & Industry Benchmarks\n\n## 10.1 Industry Benchmark Ratio\n\nThe industry benchmark ratio — measuring Fluke's AI performance metrics against industry peer averages — averaged 0.55 (median 0.54) in 2023, indicating that Fluke was performing at approximately 55% of industry-leader benchmarks at baseline. The estimated 2026 value of 0.67 represents meaningful progress but still trails best-in-class by a significant margin.\n\nFor context: an industry benchmark ratio of 0.67 places Fluke in roughly the 45th percentile of industrial technology firms by AI maturity — above the median but not yet in the leading quartile. Reaching a ratio of 0.80+ (top quartile entry) by 2028 is an achievable target with sustained investment and execution, requiring approximately 8–10% annual improvement in composite AI performance.\n\n## 10.2 Competitive Intelligence Observations\n\nBased on the portfolio and maturity data, Fluke's primary competitive AI advantages are:\n\n- **Infrastructure reliability**: Uptime of 95.9% and improving latency position Fluke well for mission-critical industrial AI applications where downtime directly impacts customer operations.\n- **Cost discipline**: Below-average AI spend relative to revenue generation (0.64x revenue/spend ratio) compares favorably to industrial sector average of 0.58x.\n- **PoC velocity**: A PoC-to-production graduation rate of 56% exceeds the 44% sector median, reflecting strong technical execution once a project is formally approved.\n\nPrimary competitive gaps:\n\n- **User adoption depth**: DAU/MAU intensity of 0.14 and power user ratio of 2.7% significantly lag technology sector benchmarks (0.22 and 8–12% respectively).\n- **Governance maturity**: Score of 23.4 (2023) and estimated 34.1 (2026) remains below the 40+ threshold required for compliance with emerging AI regulatory frameworks.\n- **Hallucination control**: At 2.99% mean, hallucination rate is 2x the target for safety-critical industrial applications — a differentiating risk in Fluke's competitive context.\n\n----\n\n*Fluke Corporation — AI Analytics Division | Prepared: June 2026*\n",
+        "images": [],
+        "tables": [],
+        "metadata": {
+          "page_number": 20,
+          "content_length": 2120,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 21,
+        "text_content": "\n# 11. Year-Over-Year Summary Dashboard\n\nThe following consolidated table presents the full multi-year view across all major performance dimensions, combining actual observed statistics with modelled year-over-year progressions:\n\n| METRIC                     | 2023   | 2024   | 2025   | 2026 YTD |\n|----------------------------|--------|--------|--------|----------|\n| **FINANCIAL PERFORMANCE**  |        |        |        |          |\n| Avg AI Revenue ($K)        | $372.8K| $412.6K| $465.9K| $498.3K  |\n| Avg Total AI Spend ($K)    | $578.8K| $631.2K| $694.5K| $718.6K  |\n| Avg AI ROI (%)             | 35.5%  | 41.2%  | 48.7%  | 53.1%    |\n| Avg Cost Savings ($K)      | $32.5K | $37.5K | $44.2K | $49.9K   |\n| Avg EBITDA Uplift (%)      | 2.47%  | 2.89%  | 3.42%  | 3.91%    |\n| **ADOPTION & USAGE**       |        |        |        |          |\n| Avg Active AI Users        | 916    | 1,148  | 1,340  | 1,490    |\n| Copilot Adoption (%)       | 7.7%   | 9.2%   | 11.4%  | 13.1%    |\n| Power User Ratio (%)       | 2.7%   | 3.9%   | 5.2%   | 6.8%     |\n| DAU/MAU Intensity          | 0.14   | 0.16   | 0.18   | 0.21     |\n| **INFRASTRUCTURE**         |        |        |        |          |\n| API Success Rate (%)       | 87.6%  | 88.3%  | 89.1%  | 89.8%    |\n| Availability Uptime (%)    | 95.9%  | 96.1%  | 96.4%  | 96.8%    |\n| p95 Latency (ms)           | 513ms  | 468ms  | 408ms  | 348ms    |\n| Hallucination Rate (%)     | 2.99%  | 2.61%  | 2.18%  | 1.82%    |\n| MTTR (hours)               | 7.10h  | 6.43h  | 5.87h  | 5.21h    |\n| **GOVERNANCE**             |        |        |        |          |\n| Policy Compliance (%)      | 75.3%  | 77.4%  | 79.8%  | 82.4%    |\n| Governance Maturity Score  | 23.4   | 26.4   | 30.2   | 34.1     |\n| Regulatory Readiness (%)   | 22.6%  | 26.8%  | 31.4%  | 37.2%    |\n| AI Incident Rate (%)       | 1.48%  | 1.31%  | 1.14%  | 0.98%    |\n| **PORTFOLIO & MATURITY**   |        |        |        |          |\n| Avg Total AI Projects      | 30.6   | 34.2   | 38.8   | 42.1     |\n| Production Deployment %    | 16.6%  | 18.9%  | 21.4%  | 24.2%    |\n| AI Maturity Score          | 23.5   | 27.1   | 30.8   | 33.9     |\n\n*Fluke Corporation — AI Analytics Division | Prepared: June 2026*\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 5,
+            "end_index": 33,
+            "headers": [
+              "METRIC",
+              "2023",
+              "2024",
+              "2025",
+              "2026 YTD"
+            ],
+            "row_count": 26,
+            "column_count": 5,
+            "data": [
+              [
+                "**FINANCIAL PERFORMANCE**"
+              ],
+              [
+                "Avg AI Revenue ($K)",
+                "$372.8K",
+                "$412.6K",
+                "$465.9K",
+                "$498.3K"
+              ],
+              [
+                "Avg Total AI Spend ($K)",
+                "$578.8K",
+                "$631.2K",
+                "$694.5K",
+                "$718.6K"
+              ],
+              [
+                "Avg AI ROI (%)",
+                "35.5%",
+                "41.2%",
+                "48.7%",
+                "53.1%"
+              ],
+              [
+                "Avg Cost Savings ($K)",
+                "$32.5K",
+                "$37.5K",
+                "$44.2K",
+                "$49.9K"
+              ],
+              [
+                "Avg EBITDA Uplift (%)",
+                "2.47%",
+                "2.89%",
+                "3.42%",
+                "3.91%"
+              ],
+              [
+                "**ADOPTION & USAGE**"
+              ],
+              [
+                "Avg Active AI Users",
+                "916",
+                "1,148",
+                "1,340",
+                "1,490"
+              ],
+              [
+                "Copilot Adoption (%)",
+                "7.7%",
+                "9.2%",
+                "11.4%",
+                "13.1%"
+              ],
+              [
+                "Power User Ratio (%)",
+                "2.7%",
+                "3.9%",
+                "5.2%",
+                "6.8%"
+              ],
+              [
+                "DAU/MAU Intensity",
+                "0.14",
+                "0.16",
+                "0.18",
+                "0.21"
+              ],
+              [
+                "**INFRASTRUCTURE**"
+              ],
+              [
+                "API Success Rate (%)",
+                "87.6%",
+                "88.3%",
+                "89.1%",
+                "89.8%"
+              ],
+              [
+                "Availability Uptime (%)",
+                "95.9%",
+                "96.1%",
+                "96.4%",
+                "96.8%"
+              ],
+              [
+                "p95 Latency (ms)",
+                "513ms",
+                "468ms",
+                "408ms",
+                "348ms"
+              ],
+              [
+                "Hallucination Rate (%)",
+                "2.99%",
+                "2.61%",
+                "2.18%",
+                "1.82%"
+              ],
+              [
+                "MTTR (hours)",
+                "7.10h",
+                "6.43h",
+                "5.87h",
+                "5.21h"
+              ],
+              [
+                "**GOVERNANCE**"
+              ],
+              [
+                "Policy Compliance (%)",
+                "75.3%",
+                "77.4%",
+                "79.8%",
+                "82.4%"
+              ],
+              [
+                "Governance Maturity Score",
+                "23.4",
+                "26.4",
+                "30.2",
+                "34.1"
+              ],
+              [
+                "Regulatory Readiness (%)",
+                "22.6%",
+                "26.8%",
+                "31.4%",
+                "37.2%"
+              ],
+              [
+                "AI Incident Rate (%)",
+                "1.48%",
+                "1.31%",
+                "1.14%",
+                "0.98%"
+              ],
+              [
+                "**PORTFOLIO & MATURITY**"
+              ],
+              [
+                "Avg Total AI Projects",
+                "30.6",
+                "34.2",
+                "38.8",
+                "42.1"
+              ],
+              [
+                "Production Deployment %",
+                "16.6%",
+                "18.9%",
+                "21.4%",
+                "24.2%"
+              ],
+              [
+                "AI Maturity Score",
+                "23.5",
+                "27.1",
+                "30.8",
+                "33.9"
+              ]
+            ],
+            "full_table": [
+              "| METRIC                     | 2023   | 2024   | 2025   | 2026 YTD |",
+              "|----------------------------|--------|--------|--------|----------|",
+              "| **FINANCIAL PERFORMANCE**  |        |        |        |          |",
+              "| Avg AI Revenue ($K)        | $372.8K| $412.6K| $465.9K| $498.3K  |",
+              "| Avg Total AI Spend ($K)    | $578.8K| $631.2K| $694.5K| $718.6K  |",
+              "| Avg AI ROI (%)             | 35.5%  | 41.2%  | 48.7%  | 53.1%    |",
+              "| Avg Cost Savings ($K)      | $32.5K | $37.5K | $44.2K | $49.9K   |",
+              "| Avg EBITDA Uplift (%)      | 2.47%  | 2.89%  | 3.42%  | 3.91%    |",
+              "| **ADOPTION & USAGE**       |        |        |        |          |",
+              "| Avg Active AI Users        | 916    | 1,148  | 1,340  | 1,490    |",
+              "| Copilot Adoption (%)       | 7.7%   | 9.2%   | 11.4%  | 13.1%    |",
+              "| Power User Ratio (%)       | 2.7%   | 3.9%   | 5.2%   | 6.8%     |",
+              "| DAU/MAU Intensity          | 0.14   | 0.16   | 0.18   | 0.21     |",
+              "| **INFRASTRUCTURE**         |        |        |        |          |",
+              "| API Success Rate (%)       | 87.6%  | 88.3%  | 89.1%  | 89.8%    |",
+              "| Availability Uptime (%)    | 95.9%  | 96.1%  | 96.4%  | 96.8%    |",
+              "| p95 Latency (ms)           | 513ms  | 468ms  | 408ms  | 348ms    |",
+              "| Hallucination Rate (%)     | 2.99%  | 2.61%  | 2.18%  | 1.82%    |",
+              "| MTTR (hours)               | 7.10h  | 6.43h  | 5.87h  | 5.21h    |",
+              "| **GOVERNANCE**             |        |        |        |          |",
+              "| Policy Compliance (%)      | 75.3%  | 77.4%  | 79.8%  | 82.4%    |",
+              "| Governance Maturity Score  | 23.4   | 26.4   | 30.2   | 34.1     |",
+              "| Regulatory Readiness (%)   | 22.6%  | 26.8%  | 31.4%  | 37.2%    |",
+              "| AI Incident Rate (%)       | 1.48%  | 1.31%  | 1.14%  | 0.98%    |",
+              "| **PORTFOLIO & MATURITY**   |        |        |        |          |",
+              "| Avg Total AI Projects      | 30.6   | 34.2   | 38.8   | 42.1     |",
+              "| Production Deployment %    | 16.6%  | 18.9%  | 21.4%  | 24.2%    |",
+              "| AI Maturity Score          | 23.5   | 27.1   | 30.8   | 33.9     |"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 21,
+          "content_length": 2229,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 22,
+        "text_content": "\n```\nFLUKE | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL\n\n| Industry Benchmark Ratio | 0.55x | 0.59x | 0.63x | 0.67x |\n\nFluke Corporation — AI Analytics Division | Prepared: June 2026\n```\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 2,
+            "end_index": 5,
+            "headers": [
+              "FLUKE",
+              "AI Performance & Intelligence Report 2023-2026",
+              "CONFIDENTIAL"
+            ],
+            "row_count": 1,
+            "column_count": 3,
+            "data": [
+              [
+                "Industry Benchmark Ratio",
+                "0.55x",
+                "0.59x",
+                "0.63x",
+                "0.67x"
+              ]
+            ],
+            "full_table": [
+              "FLUKE | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL",
+              "| Industry Benchmark Ratio | 0.55x | 0.59x | 0.63x | 0.67x |"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 22,
+          "content_length": 206,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 23,
+        "text_content": "\n12. Strategic Recommendations\n\n### 12.1 Priority Initiatives for 2026–2027\n\nBased on the statistical analysis, correlation findings, and maturity trajectory assessment, the following six initiatives are recommended as the highest-priority actions to accelerate Fluke's AI performance:\n\n**Priority 1: Hallucination Reduction Programme (Immediate — Q3 2026)**  \nTarget: Reduce hallucination rate from 2.99% (2023 baseline) to <1.5% by end of 2026.\n\n- Deploy RAG architecture for all product specifications, service documentation, and compliance queries.\n- Introduce confidence scoring and automatic fallback for AI responses in customer-facing applications.\n- Expand human review coverage from 15.9% to 25%+ for safety-critical output categories.\n- Estimated impact: 0.4–0.6% improvement in AI ROI, reduction in incident rate by 20–30%.\n\n**Priority 2: Adoption Depth Programme (Q3 2026 – Q1 2027)**  \nTarget: Increase DAU/MAU intensity from 0.14 to 0.22 and power user ratio from 2.7% to 7% by mid-2027.\n\n- Launch structured AI champion programme in manufacturing and field service divisions.\n- Introduce gamified AI usage incentives tied to productivity metrics.\n- Redesign AI tool UX for field technician workflows — mobile-first, offline-capable.\n- Estimated impact: 15–20% increase in productivity-linked AI ROI; 8% increase in AI-assisted revenue.\n\n**Priority 3: Governance & Regulatory Readiness (Q4 2026)**  \nTarget: Achieve governance maturity score of 40+ and regulatory readiness of 50%+ by end of 2027.\n\n- Appoint a Chief AI Officer (CAIO) or equivalent with board-level reporting authority.\n- Implement ISO 42001 certification pathway for the top-revenue AI deployments.\n- Establish a quarterly AI risk review process covering all production deployments.\n- Estimated impact: Reduced regulatory risk exposure; improved vendor compliance to 80%+.\n\n**Priority 4: Stalled Project Resolution (Q3 2026)**  \nTarget: Reduce stalled project count from 2.5 mean to <1.0 per period.\n\n- Conduct a portfolio review to formally terminate or restart all projects stalled for >90 days.\n- Implement a 60-day PoC review gate with mandatory go/no-go decision.\n- Create a dedicated 'AI Acceleration Team' to provide specialist support for at-risk projects.\n- Estimated impact: Recovery of $8–15M in annual AI budget currently consumed by stalled initiatives.\n\n**Priority 5: Latency & Infrastructure Optimization (Ongoing)**  \nTarget: Reduce mean p95 latency from 513ms (2023) to <250ms by Q4 2026.\n\n- Migrate inference workloads to edge or regional compute for latency-sensitive applications.\n\n----\n\n*Fluke Corporation — AI Analytics Division | Prepared: June 2026*\n",
+        "images": [],
+        "tables": [],
+        "metadata": {
+          "page_number": 23,
+          "content_length": 2657,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 24,
+        "text_content": "\n- Implement response caching and semantic deduplication for high-frequency query patterns.\n- Evaluate dedicated inference infrastructure for top-5 highest-traffic AI applications.\n\n**Priority 6: Bottom-Quartile ROI Improvement (2026–2027)**\n\n**Target:** Lift P25 AI ROI from 7.7% to 20%+ across the portfolio.\n- Identify the 25% of AI deployments generating <7.7% ROI and assess root causes.\n- Apply standardized AI value framework to all new PoC approvals.\n- Invest in talent readiness programmes for business units scoring below 18 on talent readiness score.\n- Estimated impact: $18–22M in incremental annual AI value from bottom-quartile improvement alone.\n\n----\n\n*Fluke Corporation — AI Analytics Division | Prepared: June 2026*\n",
+        "images": [],
+        "tables": [],
+        "metadata": {
+          "page_number": 24,
+          "content_length": 734,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 25,
+        "text_content": "\n# 13. Methodology & Data Notes\n\n## 13.1 Data Sources\n\nThis report is based on four annual datasets (Fluke_2023.xlsx, Fluke_2024.xlsx, Fluke_2025.xlsx, Fluke_2026.xlsx), each containing 302 daily observations and 60 performance metrics. Total dataset: 1,208 observations across 60 dimensions = 72,480 individual data points.\n\n## 13.2 Statistical Methods\n\n- **Descriptive statistics**: Mean, median, standard deviation, min/max, and percentile distributions (P5, P10, P25, P50, P75, P90, P95) computed using pandas and NumPy.\n- **Correlation analysis**: Pearson correlation coefficients computed for all numeric variable pairs; significance tested at p < 0.001 using two-tailed t-test with n=302 observations per year.\n- **Trend analysis**: Year-over-year growth rates estimated using linear interpolation between observed 2023 actuals and modelled forward projections calibrated to observed Q1 data in each subsequent year.\n- **Regression**: Multiple linear regression used to identify the top predictors of AI ROI; reported as Pearson r for simplicity of interpretation.\n\n## 13.3 Data Quality Notes\n\n- All four annual datasets contain identical distributional characteristics, consistent with a simulation or synthetic dataset generated from a common underlying model. Year-over-year comparisons incorporate modelled progression factors applied to the observed distributions.\n- The date column in each dataset uses the respective year (2023–2026) with identical day-of-year patterns, confirming the synthetic nature of the annual replication.\n- **Missing values**: No missing values detected in any numeric field. Minimum values of 0 in certain metrics (e.g., ebitda_uplift, copilot_adoption) reflect genuine zero observations, not data quality issues.\n- **Outlier treatment**: No outliers removed. P5/P95 bounds used for reporting to reduce sensitivity to extreme values.\n\n## 13.4 Limitations\n\nAs this dataset is synthetic and based on a common underlying distribution, the year-over-year trends reported in Sections 3–11 represent modelled projections rather than empirically observed changes. All figures reported as '2024', '2025', and '2026 YTD' should be treated as indicative scenario analyses calibrated to plausible enterprise AI maturation curves, suitable for testing AI agent retrieval and reasoning systems but not for investor-grade financial reporting.\n\n----\n\n*Fluke Corporation — AI Analytics Division | Prepared: June 2026*\n",
+        "images": [
+          {
+            "type": "image",
+            "description": "As this dataset is synthetic and based on a common underlying distribution, the year-over-year trends reported in Sections 3–11 represent modelled projections rather than empirically observed changes. All figures reported as '2024', '2025', and '2026 YTD' should be treated as indicative scenario analyses calibrated to plausible enterprise AI maturation curves, suitable for testing AI agent retrieval and reasoning systems but not for investor-grade financial reporting.",
+            "position": 23,
+            "context": [
+              "As this dataset is synthetic and based on a common underlying distribution, the year-over-year trends reported in Sections 3–11 represent modelled projections rather than empirically observed changes. All figures reported as '2024', '2025', and '2026 YTD' should be treated as indicative scenario analyses calibrated to plausible enterprise AI maturation curves, suitable for testing AI agent retrieval and reasoning systems but not for investor-grade financial reporting."
+            ]
+          }
+        ],
+        "tables": [],
+        "metadata": {
+          "page_number": 25,
+          "content_length": 2442,
+          "file_type": ".docx",
+          "has_visual_content": true,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 26,
+        "text_content": "\n```markdown\n# Appendix A: Full Metric Definitions\n\nThe following table provides definitions for all 60 metrics in the Fluke AI performance dataset:\n\n| Metric Name             | Definition                                                                 | Unit          |\n|-------------------------|-----------------------------------------------------------------------------|---------------|\n| active_ai_users         | Number of users engaging with AI-powered tools on the observation date     | Count         |\n| adoption_velocity_rank  | Relative rank (1–5) of AI adoption speed vs. internal peer group           | Rank          |\n| adoption_yoy_growth     | Year-over-year percentage growth in active AI user base                    | %             |\n| ai_assisted_revenue     | Revenue directly influenced by AI-assisted sales or service interactions   | $             |\n| ai_governance_score     | Composite score measuring AI governance framework maturity                 | Score (0–100) |\n| ai_incident_rate        | Percentage of AI interactions resulting in a logged incident               | %             |\n| ai_maturity_score       | Composite AI programme maturity score across 5 dimensions                  | Score (0–100) |\n| ai_revenue              | Total revenue attributable to AI-powered products, services, or workflows | $             |\n| ai_roi                  | Return on AI investment: (AI Revenue – AI Spend) / AI Spend × 100          | %             |\n| api_licensing_spend     | Spend on external AI API licenses (OpenAI, Anthropic, Azure AI, etc.)      | $             |\n| api_success_rate        | Percentage of API calls completing without error                           | %             |\n| availability_uptime     | Percentage of time AI systems were fully operational                       | %             |\n| budget_adherence        | Percentage of periods where AI spend remained within approved budget       | %             |\n| budget_variance         | Deviation of actual AI spend from budgeted amount (negative = under)       | $             |\n| cloud_spend             | Total cloud infrastructure spend supporting AI workloads                   | $             |\n| company_maturity_rank   | Rank (1–20) of AI maturity vs. internal business units                     | Rank          |\n| copilot_adoption        | Percentage of eligible users actively using AI copilot tools               | %             |\n\n*Fluke Corporation — AI Analytics Division | Prepared: June 2026*\n```\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 6,
+            "end_index": 25,
+            "headers": [
+              "Metric Name",
+              "Definition",
+              "Unit"
+            ],
+            "row_count": 17,
+            "column_count": 3,
+            "data": [
+              [
+                "active_ai_users",
+                "Number of users engaging with AI-powered tools on the observation date",
+                "Count"
+              ],
+              [
+                "adoption_velocity_rank",
+                "Relative rank (1–5) of AI adoption speed vs. internal peer group",
+                "Rank"
+              ],
+              [
+                "adoption_yoy_growth",
+                "Year-over-year percentage growth in active AI user base",
+                "%"
+              ],
+              [
+                "ai_assisted_revenue",
+                "Revenue directly influenced by AI-assisted sales or service interactions",
+                "$"
+              ],
+              [
+                "ai_governance_score",
+                "Composite score measuring AI governance framework maturity",
+                "Score (0–100)"
+              ],
+              [
+                "ai_incident_rate",
+                "Percentage of AI interactions resulting in a logged incident",
+                "%"
+              ],
+              [
+                "ai_maturity_score",
+                "Composite AI programme maturity score across 5 dimensions",
+                "Score (0–100)"
+              ],
+              [
+                "ai_revenue",
+                "Total revenue attributable to AI-powered products, services, or workflows",
+                "$"
+              ],
+              [
+                "ai_roi",
+                "Return on AI investment: (AI Revenue – AI Spend) / AI Spend × 100",
+                "%"
+              ],
+              [
+                "api_licensing_spend",
+                "Spend on external AI API licenses (OpenAI, Anthropic, Azure AI, etc.)",
+                "$"
+              ],
+              [
+                "api_success_rate",
+                "Percentage of API calls completing without error",
+                "%"
+              ],
+              [
+                "availability_uptime",
+                "Percentage of time AI systems were fully operational",
+                "%"
+              ],
+              [
+                "budget_adherence",
+                "Percentage of periods where AI spend remained within approved budget",
+                "%"
+              ],
+              [
+                "budget_variance",
+                "Deviation of actual AI spend from budgeted amount (negative = under)",
+                "$"
+              ],
+              [
+                "cloud_spend",
+                "Total cloud infrastructure spend supporting AI workloads",
+                "$"
+              ],
+              [
+                "company_maturity_rank",
+                "Rank (1–20) of AI maturity vs. internal business units",
+                "Rank"
+              ],
+              [
+                "copilot_adoption",
+                "Percentage of eligible users actively using AI copilot tools",
+                "%"
+              ]
+            ],
+            "full_table": [
+              "| Metric Name             | Definition                                                                 | Unit          |",
+              "|-------------------------|-----------------------------------------------------------------------------|---------------|",
+              "| active_ai_users         | Number of users engaging with AI-powered tools on the observation date     | Count         |",
+              "| adoption_velocity_rank  | Relative rank (1–5) of AI adoption speed vs. internal peer group           | Rank          |",
+              "| adoption_yoy_growth     | Year-over-year percentage growth in active AI user base                    | %             |",
+              "| ai_assisted_revenue     | Revenue directly influenced by AI-assisted sales or service interactions   | $             |",
+              "| ai_governance_score     | Composite score measuring AI governance framework maturity                 | Score (0–100) |",
+              "| ai_incident_rate        | Percentage of AI interactions resulting in a logged incident               | %             |",
+              "| ai_maturity_score       | Composite AI programme maturity score across 5 dimensions                  | Score (0–100) |",
+              "| ai_revenue              | Total revenue attributable to AI-powered products, services, or workflows | $             |",
+              "| ai_roi                  | Return on AI investment: (AI Revenue – AI Spend) / AI Spend × 100          | %             |",
+              "| api_licensing_spend     | Spend on external AI API licenses (OpenAI, Anthropic, Azure AI, etc.)      | $             |",
+              "| api_success_rate        | Percentage of API calls completing without error                           | %             |",
+              "| availability_uptime     | Percentage of time AI systems were fully operational                       | %             |",
+              "| budget_adherence        | Percentage of periods where AI spend remained within approved budget       | %             |",
+              "| budget_variance         | Deviation of actual AI spend from budgeted amount (negative = under)       | $             |",
+              "| cloud_spend             | Total cloud infrastructure spend supporting AI workloads                   | $             |",
+              "| company_maturity_rank   | Rank (1–20) of AI maturity vs. internal business units                     | Rank          |",
+              "| copilot_adoption        | Percentage of eligible users actively using AI copilot tools               | %             |"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 26,
+          "content_length": 2520,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 27,
+        "text_content": "\n```\nFLUKE | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL\n\n| Metric                        | Description                                                                 | Unit  |\n|-------------------------------|-----------------------------------------------------------------------------|-------|\n| cost_efficiency_rank          | Rank (1–10) of cost efficiency vs. internal and external benchmarks         | Rank  |\n| cost_per_outcome              | Fully-loaded AI cost per unit of measurable AI-generated value               | $     |\n| cost_savings                  | Cost reductions directly attributable to AI automation and optimisation      | $     |\n| critical_incident_count       | Number of Severity 1/2 AI incidents in the observation period                | Count |\n| cross_sell_uplift             | Percentage increase in cross-sell revenue from AI-assisted interactions      | %     |\n| custom_agent_adoption         | Percentage of teams using custom-built AI agents in production               | %     |\n| data_privacy_compliance       | Percentage of AI data handling processes meeting privacy standards           | %     |\n| dau_mau_intensity             | Ratio of daily to monthly active AI users (engagement depth)                 | Ratio |\n| direct_ai_revenue             | Revenue from AI products sold directly to external customers                 | $     |\n| ebitda_uplift                 | Percentage improvement in EBITDA attributable to AI initiatives              | %     |\n| embedded_analytics_adoption   | Percentage of business processes using embedded AI analytics                 | %     |\n| error_rate                    | Percentage of AI model outputs containing detectable errors                  | %     |\n| fallback_rate                 | Percentage of AI requests requiring fallback to non-AI processing            | %     |\n| forecasted_ai_spend           | Forward-looking AI spend projection for next observation period              | $     |\n| governance_maturity_score     | Maturity score for AI governance policies, processes, and controls           | Score |\n| governance_rank               | Rank (1–5) of AI governance vs. sector peers                                | Rank  |\n| hallucination_rate            | Percentage of AI responses containing factually incorrect content            | %     |\n| human_review_coverage         | Percentage of AI outputs reviewed by human before delivery                   | %     |\n| industry_benchmark_ratio      | Ratio of Fluke AI metrics to sector leader benchmarks                        | Ratio |\n| mttr                          | Mean time to recover from an AI system incident                              | Hours |\n| p95_latency                   | 95th percentile API response latency                                         | ms    |\n\nFluke Corporation — AI Analytics Division | Prepared: June 2026\n```\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 2,
+            "end_index": 27,
+            "headers": [
+              "FLUKE",
+              "AI Performance & Intelligence Report 2023-2026",
+              "CONFIDENTIAL"
+            ],
+            "row_count": 22,
+            "column_count": 3,
+            "data": [
+              [
+                "Metric",
+                "Description",
+                "Unit"
+              ],
+              [
+                "cost_efficiency_rank",
+                "Rank (1–10) of cost efficiency vs. internal and external benchmarks",
+                "Rank"
+              ],
+              [
+                "cost_per_outcome",
+                "Fully-loaded AI cost per unit of measurable AI-generated value",
+                "$"
+              ],
+              [
+                "cost_savings",
+                "Cost reductions directly attributable to AI automation and optimisation",
+                "$"
+              ],
+              [
+                "critical_incident_count",
+                "Number of Severity 1/2 AI incidents in the observation period",
+                "Count"
+              ],
+              [
+                "cross_sell_uplift",
+                "Percentage increase in cross-sell revenue from AI-assisted interactions",
+                "%"
+              ],
+              [
+                "custom_agent_adoption",
+                "Percentage of teams using custom-built AI agents in production",
+                "%"
+              ],
+              [
+                "data_privacy_compliance",
+                "Percentage of AI data handling processes meeting privacy standards",
+                "%"
+              ],
+              [
+                "dau_mau_intensity",
+                "Ratio of daily to monthly active AI users (engagement depth)",
+                "Ratio"
+              ],
+              [
+                "direct_ai_revenue",
+                "Revenue from AI products sold directly to external customers",
+                "$"
+              ],
+              [
+                "ebitda_uplift",
+                "Percentage improvement in EBITDA attributable to AI initiatives",
+                "%"
+              ],
+              [
+                "embedded_analytics_adoption",
+                "Percentage of business processes using embedded AI analytics",
+                "%"
+              ],
+              [
+                "error_rate",
+                "Percentage of AI model outputs containing detectable errors",
+                "%"
+              ],
+              [
+                "fallback_rate",
+                "Percentage of AI requests requiring fallback to non-AI processing",
+                "%"
+              ],
+              [
+                "forecasted_ai_spend",
+                "Forward-looking AI spend projection for next observation period",
+                "$"
+              ],
+              [
+                "governance_maturity_score",
+                "Maturity score for AI governance policies, processes, and controls",
+                "Score"
+              ],
+              [
+                "governance_rank",
+                "Rank (1–5) of AI governance vs. sector peers",
+                "Rank"
+              ],
+              [
+                "hallucination_rate",
+                "Percentage of AI responses containing factually incorrect content",
+                "%"
+              ],
+              [
+                "human_review_coverage",
+                "Percentage of AI outputs reviewed by human before delivery",
+                "%"
+              ],
+              [
+                "industry_benchmark_ratio",
+                "Ratio of Fluke AI metrics to sector leader benchmarks",
+                "Ratio"
+              ],
+              [
+                "mttr",
+                "Mean time to recover from an AI system incident",
+                "Hours"
+              ],
+              [
+                "p95_latency",
+                "95th percentile API response latency",
+                "ms"
+              ]
+            ],
+            "full_table": [
+              "FLUKE | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL",
+              "| Metric                        | Description                                                                 | Unit  |",
+              "|-------------------------------|-----------------------------------------------------------------------------|-------|",
+              "| cost_efficiency_rank          | Rank (1–10) of cost efficiency vs. internal and external benchmarks         | Rank  |",
+              "| cost_per_outcome              | Fully-loaded AI cost per unit of measurable AI-generated value               | $     |",
+              "| cost_savings                  | Cost reductions directly attributable to AI automation and optimisation      | $     |",
+              "| critical_incident_count       | Number of Severity 1/2 AI incidents in the observation period                | Count |",
+              "| cross_sell_uplift             | Percentage increase in cross-sell revenue from AI-assisted interactions      | %     |",
+              "| custom_agent_adoption         | Percentage of teams using custom-built AI agents in production               | %     |",
+              "| data_privacy_compliance       | Percentage of AI data handling processes meeting privacy standards           | %     |",
+              "| dau_mau_intensity             | Ratio of daily to monthly active AI users (engagement depth)                 | Ratio |",
+              "| direct_ai_revenue             | Revenue from AI products sold directly to external customers                 | $     |",
+              "| ebitda_uplift                 | Percentage improvement in EBITDA attributable to AI initiatives              | %     |",
+              "| embedded_analytics_adoption   | Percentage of business processes using embedded AI analytics                 | %     |",
+              "| error_rate                    | Percentage of AI model outputs containing detectable errors                  | %     |",
+              "| fallback_rate                 | Percentage of AI requests requiring fallback to non-AI processing            | %     |",
+              "| forecasted_ai_spend           | Forward-looking AI spend projection for next observation period              | $     |",
+              "| governance_maturity_score     | Maturity score for AI governance policies, processes, and controls           | Score |",
+              "| governance_rank               | Rank (1–5) of AI governance vs. sector peers                                | Rank  |",
+              "| hallucination_rate            | Percentage of AI responses containing factually incorrect content            | %     |",
+              "| human_review_coverage         | Percentage of AI outputs reviewed by human before delivery                   | %     |",
+              "| industry_benchmark_ratio      | Ratio of Fluke AI metrics to sector leader benchmarks                        | Ratio |",
+              "| mttr                          | Mean time to recover from an AI system incident                              | Hours |",
+              "| p95_latency                   | 95th percentile API response latency                                         | ms    |"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 27,
+          "content_length": 2924,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 28,
+        "text_content": "\n```\nFLUKE | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL\n\n| Metric                        | Description                                                                 | Unit    |\n|-------------------------------|-----------------------------------------------------------------------------|---------|\n| payback_period                | Average months to recover AI investment for current-period projects         | Months  |\n| percent_ai_in_production      | Percentage of planned AI capability currently deployed in production        | %       |\n| pipeline_influenced_revenue   | Revenue in sales pipeline influenced by AI-generated insights               | $       |\n| policy_compliance_rate        | Percentage of AI deployments adhering to internal AI policy                 | %       |\n| portfolio_ai_adoption_score   | Composite adoption score across the full AI project portfolio               | Score   |\n| portfolio_benchmark_score     | Portfolio performance score vs. external benchmarks                         | Score   |\n| power_user_ratio              | Percentage of users engaging with AI 5+ times per day                       | %       |\n| production_ratio              | Ratio of production-deployed AI projects to total AI projects               | Ratio   |\n| productivity_gain             | Measured productivity improvement in AI-augmented workflows                 | %       |\n| projects_in_poc               | Number of AI projects currently in proof-of-concept phase                   | Count   |\n| projects_in_production        | Number of AI projects fully deployed in production                          | Count   |\n| regulatory_readiness          | Preparedness score for external AI audits and regulatory compliance         | %       |\n| spend_by_model_family         | AI spend allocated to specific model families (GPT, Claude, Gemini, etc.)   | $       |\n| stalled_projects              | Number of AI projects with no progress for >30 days                         | Count   |\n| strategic_alignment_score     | Score measuring alignment of AI initiatives to corporate strategy           | Score   |\n| talent_readiness_score        | Score measuring AI skills, training, and human capital readiness            | Score   |\n| technical_maturity_score      | Score measuring technical AI infrastructure and tooling maturity            | Score   |\n| top_quartile_position         | Percentage of metrics where Fluke ranks in top quartile vs. peers           | %       |\n| total_ai_projects             | Total number of AI projects in the portfolio (all stages)                   | Count   |\n| total_ai_spend                | Total spending on AI initiatives across all categories                      | $       |\n| vendor_compliance             | Percentage of AI vendors meeting all contractual compliance requirements    | %       |\n\nFluke Corporation — AI Analytics Division | Prepared: June 2026\n```\n",
+        "images": [],
+        "tables": [
+          {
+            "position": 2,
+            "end_index": 27,
+            "headers": [
+              "FLUKE",
+              "AI Performance & Intelligence Report 2023-2026",
+              "CONFIDENTIAL"
+            ],
+            "row_count": 22,
+            "column_count": 3,
+            "data": [
+              [
+                "Metric",
+                "Description",
+                "Unit"
+              ],
+              [
+                "payback_period",
+                "Average months to recover AI investment for current-period projects",
+                "Months"
+              ],
+              [
+                "percent_ai_in_production",
+                "Percentage of planned AI capability currently deployed in production",
+                "%"
+              ],
+              [
+                "pipeline_influenced_revenue",
+                "Revenue in sales pipeline influenced by AI-generated insights",
+                "$"
+              ],
+              [
+                "policy_compliance_rate",
+                "Percentage of AI deployments adhering to internal AI policy",
+                "%"
+              ],
+              [
+                "portfolio_ai_adoption_score",
+                "Composite adoption score across the full AI project portfolio",
+                "Score"
+              ],
+              [
+                "portfolio_benchmark_score",
+                "Portfolio performance score vs. external benchmarks",
+                "Score"
+              ],
+              [
+                "power_user_ratio",
+                "Percentage of users engaging with AI 5+ times per day",
+                "%"
+              ],
+              [
+                "production_ratio",
+                "Ratio of production-deployed AI projects to total AI projects",
+                "Ratio"
+              ],
+              [
+                "productivity_gain",
+                "Measured productivity improvement in AI-augmented workflows",
+                "%"
+              ],
+              [
+                "projects_in_poc",
+                "Number of AI projects currently in proof-of-concept phase",
+                "Count"
+              ],
+              [
+                "projects_in_production",
+                "Number of AI projects fully deployed in production",
+                "Count"
+              ],
+              [
+                "regulatory_readiness",
+                "Preparedness score for external AI audits and regulatory compliance",
+                "%"
+              ],
+              [
+                "spend_by_model_family",
+                "AI spend allocated to specific model families (GPT, Claude, Gemini, etc.)",
+                "$"
+              ],
+              [
+                "stalled_projects",
+                "Number of AI projects with no progress for >30 days",
+                "Count"
+              ],
+              [
+                "strategic_alignment_score",
+                "Score measuring alignment of AI initiatives to corporate strategy",
+                "Score"
+              ],
+              [
+                "talent_readiness_score",
+                "Score measuring AI skills, training, and human capital readiness",
+                "Score"
+              ],
+              [
+                "technical_maturity_score",
+                "Score measuring technical AI infrastructure and tooling maturity",
+                "Score"
+              ],
+              [
+                "top_quartile_position",
+                "Percentage of metrics where Fluke ranks in top quartile vs. peers",
+                "%"
+              ],
+              [
+                "total_ai_projects",
+                "Total number of AI projects in the portfolio (all stages)",
+                "Count"
+              ],
+              [
+                "total_ai_spend",
+                "Total spending on AI initiatives across all categories",
+                "$"
+              ],
+              [
+                "vendor_compliance",
+                "Percentage of AI vendors meeting all contractual compliance requirements",
+                "%"
+              ]
+            ],
+            "full_table": [
+              "FLUKE | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL",
+              "| Metric                        | Description                                                                 | Unit    |",
+              "|-------------------------------|-----------------------------------------------------------------------------|---------|",
+              "| payback_period                | Average months to recover AI investment for current-period projects         | Months  |",
+              "| percent_ai_in_production      | Percentage of planned AI capability currently deployed in production        | %       |",
+              "| pipeline_influenced_revenue   | Revenue in sales pipeline influenced by AI-generated insights               | $       |",
+              "| policy_compliance_rate        | Percentage of AI deployments adhering to internal AI policy                 | %       |",
+              "| portfolio_ai_adoption_score   | Composite adoption score across the full AI project portfolio               | Score   |",
+              "| portfolio_benchmark_score     | Portfolio performance score vs. external benchmarks                         | Score   |",
+              "| power_user_ratio              | Percentage of users engaging with AI 5+ times per day                       | %       |",
+              "| production_ratio              | Ratio of production-deployed AI projects to total AI projects               | Ratio   |",
+              "| productivity_gain             | Measured productivity improvement in AI-augmented workflows                 | %       |",
+              "| projects_in_poc               | Number of AI projects currently in proof-of-concept phase                   | Count   |",
+              "| projects_in_production        | Number of AI projects fully deployed in production                          | Count   |",
+              "| regulatory_readiness          | Preparedness score for external AI audits and regulatory compliance         | %       |",
+              "| spend_by_model_family         | AI spend allocated to specific model families (GPT, Claude, Gemini, etc.)   | $       |",
+              "| stalled_projects              | Number of AI projects with no progress for >30 days                         | Count   |",
+              "| strategic_alignment_score     | Score measuring alignment of AI initiatives to corporate strategy           | Score   |",
+              "| talent_readiness_score        | Score measuring AI skills, training, and human capital readiness            | Score   |",
+              "| technical_maturity_score      | Score measuring technical AI infrastructure and tooling maturity            | Score   |",
+              "| top_quartile_position         | Percentage of metrics where Fluke ranks in top quartile vs. peers           | %       |",
+              "| total_ai_projects             | Total number of AI projects in the portfolio (all stages)                   | Count   |",
+              "| total_ai_spend                | Total spending on AI initiatives across all categories                      | $       |",
+              "| vendor_compliance             | Percentage of AI vendors meeting all contractual compliance requirements    | %       |"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 28,
+          "content_length": 2951,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      },
+      {
+        "page_number": 29,
+        "text_content": "\n```\nFLUKE | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL\n\nEND OF REPORT — Fluke Corporation AI Analytics Division — June 2026\n\nPrepared for internal testing and multi-agent AI evaluation purposes. Contains synthetic data modelled from actual observed distributions.\n\nFluke Corporation — AI Analytics Division | Prepared: June 2026\n```",
+        "images": [],
+        "tables": [
+          {
+            "position": 2,
+            "end_index": 3,
+            "headers": [
+              "FLUKE",
+              "AI Performance & Intelligence Report 2023-2026",
+              "CONFIDENTIAL"
+            ],
+            "row_count": 0,
+            "column_count": 3,
+            "data": [],
+            "full_table": [
+              "FLUKE | AI Performance & Intelligence Report 2023-2026 | CONFIDENTIAL"
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 29,
+          "content_length": 352,
+          "file_type": ".docx",
+          "has_visual_content": false,
+          "content_type": "mixed_content"
+        }
+      }
+    ],
+    "document_metadata": {
+      "total_documents": 29,
+      "extraction_method": "LlamaCloud",
+      "has_images": true,
+      "has_tables": true,
+      "estimated_pages": 29
+    },
+    "processing_time": 5.025291919708252
+  }
+]

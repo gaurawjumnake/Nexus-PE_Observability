@@ -170,7 +170,7 @@ def build_where(
     filters: list[dict[str, Any]] = [{"company_id": company_id}]
     if document_ids:
         filters.append({"document_id": {"$in": document_ids}})
-    if period:
+    elif period:
         filters.append({"period": period})
     if len(filters) == 1:
         return filters[0]
