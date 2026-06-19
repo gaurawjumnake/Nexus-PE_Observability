@@ -8,6 +8,7 @@ read-only FinancialTextToSQLChatbot helper.
 """
 
 import asyncio
+import concurrent.futures
 import json
 import os
 import re
@@ -53,6 +54,14 @@ class AgenticAskResponse(BaseModel):
     sql: Optional[dict[str, Any]] = None
 
 
+class AgenticToolAskResponse(BaseModel):
+    """Response from the tool-based agentic orchestrator (/ask/agentic)."""
+
+    answer: str
+    tools_used: list[str] = Field(default_factory=list)
+    iterations_hint: Optional[str] = None
+
+
 def get_crewai_llm():
     from crewai import LLM
 
@@ -76,6 +85,17 @@ def parse_json_object(text: Any) -> dict[str, Any]:
         if not match:
             raise
         return json.loads(match.group(0))
+
+
+def _run_async_in_thread(coro) -> Any:
+    """Run an async coroutine in a dedicated worker thread with its own event loop.
+
+    CrewAI tool callbacks are synchronous, but our underlying helpers
+    (run_rag_query, FinancialTextToSQLChatbot.ask) are async. Spawning a
+    fresh thread avoids conflicts with FastAPI's running event loop.
+    """
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+        return pool.submit(asyncio.run, coro).result()
 
 
 def heuristic_route(question: str, has_documents: bool) -> RoutePlan:
@@ -298,6 +318,276 @@ async def synthesize_answer(
     answer = str(getattr(result, "raw", result)).strip()
     log.log_info(f"Synthesis completed, chars={len(answer)}")
     return answer
+
+
+# ---------------------------------------------------------------------------
+# Tool-based agentic orchestration  (/ask/agentic)
+# ---------------------------------------------------------------------------
+
+
+def make_rag_sql_tools(request: AgenticAskRequest):
+    """Build per-request CrewAI tool closures.
+
+    All request context (company_id, period, db_path …) is captured in the
+    closure so the agent only needs to pass a *question* string to each tool.
+    The SQL bot is initialised once here to avoid re-building the schema
+    context on every tool call.
+
+    Returns:
+        tools       – list of crewai Tool objects ready for an Agent
+        tools_used  – a shared mutable list that tools append their name to
+    """
+    from crewai.tools import tool  # local import keeps top-level clean
+
+    tools_used: list[str] = []
+
+    # Pre-initialise SQL chatbot (builds schema context once per request).
+    try:
+        sql_bot = FinancialTextToSQLChatbot(
+            db_path=Path(request.sql_db_path) if request.sql_db_path else None,
+            row_limit=request.sql_row_limit,
+            verbose=request.verbose,
+        )
+        sql_available = True
+    except FileNotFoundError as exc:
+        sql_bot = None
+        sql_available = False
+        log.log_warning(f"SQL bot init failed (tool will report unavailable): {exc}")
+
+    # ── RAG tool ────────────────────────────────────────────────────────────
+    if request.company_id:
+        @tool("rag_search")
+        def rag_search(question: str) -> str:
+            """Search financial reports and uploaded documents stored in ChromaDB.
+
+            Use this tool for ANY question whose answer may live inside uploaded
+            documents or reports, including:
+            - Structure, schema, or layout of a dataset or document
+            - Descriptions of data fields, columns, tables, or metrics
+            - Qualitative context: why something happened, strategy, risk factors
+            - Summaries, narrative explanations, and evidence from reports
+            - Any factual question when specific document_ids have been provided
+
+            When document_ids are supplied by the user, ALWAYS call this tool
+            first — the user has explicitly scoped the question to those documents.
+
+            Args:
+                question: The specific question to answer from the documents.
+            """
+            tools_used.append("rag")
+            log.log_info(f"[rag_search tool] question={question!r}")
+            try:
+                result = _run_async_in_thread(
+                    run_rag_query(
+                        ChatQueryRequest(
+                            question=question,
+                            company_id=request.company_id,
+                            period=request.period,
+                            document_ids=request.document_ids,
+                            top_k=request.top_k,
+                        )
+                    )
+                )
+                citations_text = ""
+                if result.citations:
+                    citations_text = "\n\nSources:\n" + "\n".join(
+                        f"- [{c.document_id}] chunk {c.chunk_id}: {c.excerpt[:200]}…"
+                        for c in result.citations[:4]
+                    )
+                return f"{result.answer}{citations_text}"
+            except Exception as exc:
+                log.log_warning(f"[rag_search tool] failed: {exc}")
+                return f"RAG search failed: {exc}"
+
+        rag_tool: Optional[Any] = rag_search
+    else:
+        rag_tool = None
+
+    # ── SQL tool ─────────────────────────────────────────────────────────────
+    @tool("sql_query")
+    def sql_query(question: str) -> str:
+        """Query structured financial and operational metrics from the SQLite database.
+
+        Use this tool for quantitative questions: totals, averages, rankings,
+        trends, counts, time-series comparisons, and any question that needs
+        exact numbers from the structured data store.
+
+        Args:
+            question: The specific question to answer from the database.
+        """
+        tools_used.append("sql")
+        log.log_info(f"[sql_query tool] question={question!r}")
+        if not sql_available:
+            return "SQL database is unavailable for this request."
+        try:
+            result = _run_async_in_thread(sql_bot.ask(question))  # type: ignore[union-attr]
+            answer = result.get("answer", "")
+            row_count = result.get("row_count", 0)
+            output = f"{answer}\n\n[{row_count} row(s) returned from database]"
+            if request.show_sql:
+                output += f"\n\nSQL executed:\n```sql\n{result.get('sql', '')}\n```"
+            return output
+        except Exception as exc:
+            log.log_warning(f"[sql_query tool] failed: {exc}")
+            return f"SQL query failed: {exc}"
+
+    active_tools = [t for t in [rag_tool, sql_query] if t is not None]
+    return active_tools, tools_used
+
+
+async def run_tool_based_agentic_query(request: AgenticAskRequest) -> AgenticToolAskResponse:
+    """Run the tool-based agentic orchestrator.
+
+    A single master agent is given both the RAG and SQL tools and is allowed
+    up to ``max_iter=5`` reasoning iterations so it can:
+    - call one tool and refine with another,
+    - issue follow-up tool calls with narrower questions,
+    - synthesise a combined answer from multiple results.
+    """
+    from crewai import Agent, Crew, Process, Task
+
+    log.log_info("Building tool-based agentic crew")
+    available_tools, tools_used = make_rag_sql_tools(request)
+
+    tool_names = [t.name for t in available_tools]
+    log.log_info(f"Tools registered for agent: {tool_names}")
+
+    # Build a readable context string that the agent can use when calling tools.
+    context_lines: list[str] = []
+    if request.company_id:
+        context_lines.append(f"Company ID: {request.company_id}")
+    if request.period:
+        context_lines.append(f"Period filter: {request.period}")
+    if request.document_ids:
+        context_lines.append(f"Document IDs (user-pinned): {', '.join(request.document_ids)}")
+    context_info = "\n".join(context_lines) if context_lines else "No specific company/period scope provided."
+
+    # Signal whether the user has explicitly scoped to specific documents.
+    has_pinned_docs = bool(request.document_ids)
+    doc_priority_note = (
+        "IMPORTANT: The user has pinned specific document_ids. "
+        "Call rag_search first for this request regardless of question type."
+        if has_pinned_docs
+        else ""
+    )
+
+    rag_note = (
+        "- rag_search  → ChromaDB: any document content including structure, fields, "
+        "descriptions, qualitative context, narrative, evidence, summaries."
+        if request.company_id
+        else "- rag_search  → NOT available (no company_id supplied)."
+    )
+    tool_guide = f"{rag_note}\n- sql_query   → SQLite: structured metrics, numbers, trends, rankings."
+
+    orchestrator_agent = Agent(
+        role="Nexus Analytics Orchestrator",
+        goal=(
+            "Answer the user's analytics question completely and accurately by "
+            "intelligently combining structured database metrics and document evidence."
+        ),
+        backstory=(
+            "You are the senior analytics orchestrator for the Nexus PE Observability "
+            "platform. You have two data sources at your disposal: a ChromaDB vector "
+            "store containing uploaded financial reports (qualitative, narrative content) "
+            "and a SQLite database containing structured financial metrics. "
+            "You decide which source(s) to query, can issue multiple tool calls with "
+            "progressively refined questions, and always ground your final answer "
+            "entirely in tool results — never inventing data."
+        ),
+        llm=get_crewai_llm(),
+        tools=available_tools,
+        verbose=request.verbose,
+        allow_delegation=False,
+        max_iter=5,
+    )
+
+    orchestrator_task = Task(
+        description=(
+            "Answer the user question below using the available tools.\n\n"
+            "User question: {question}\n\n"
+            "Request context:\n{context_info}\n\n"
+            "{doc_priority_note}\n\n"
+            "Tool guide:\n{tool_guide}\n\n"
+            "Strategy (apply in order):\n"
+            "1. If document_ids are pinned by the user → call rag_search FIRST with the user's question.\n"
+            "2. For questions about document structure, data fields, dataset layout, or column descriptions\n"
+            "   → use rag_search (this information lives in the uploaded reports).\n"
+            "3. For qualitative questions (why, explain, summarise, context, strategy, risk) → use rag_search.\n"
+            "4. For quantitative questions (totals, averages, trends, counts, rankings) → use sql_query.\n"
+            "5. For mixed questions → call BOTH tools, possibly with refined follow-up questions.\n"
+            "6. If a tool result is incomplete or ambiguous, issue a follow-up tool call with a more\n"
+            "   specific question before writing your final answer.\n"
+            "7. FALLBACK: If you are unsure which tool to use and rag_search is available, call it —\n"
+            "   never return an answer without calling at least one tool.\n"
+            "8. Synthesise all tool results into one clear, cohesive markdown answer.\n"
+            "9. Clearly attribute numeric facts to the SQL tool and narrative insights to the RAG tool.\n"
+            "10. If a data source returned nothing useful, say so explicitly."
+        ),
+        expected_output=(
+            "A comprehensive, well-structured markdown answer that directly addresses "
+            "the user's question, grounded entirely in the tool results obtained."
+        ),
+        agent=orchestrator_agent,
+    )
+
+    crew = Crew(
+        agents=[orchestrator_agent],
+        tasks=[orchestrator_task],
+        process=Process.sequential,
+        verbose=request.verbose,
+    )
+
+    result = await crew.kickoff_async(
+        inputs={
+            "question": request.question,
+            "context_info": context_info,
+            "tool_guide": tool_guide,
+            "doc_priority_note": doc_priority_note,
+        }
+    )
+
+    answer = str(getattr(result, "raw", result)).strip()
+    # Deduplicate tool names while preserving call order.
+    unique_tools = list(dict.fromkeys(tools_used))
+    log.log_info(
+        f"Tool-based agentic query completed: tools_used={unique_tools}, "
+        f"total_tool_calls={len(tools_used)}, answer_chars={len(answer)}"
+    )
+
+    return AgenticToolAskResponse(
+        answer=answer,
+        tools_used=unique_tools,
+        iterations_hint=f"{len(tools_used)} tool call(s): {tools_used}",
+    )
+
+
+@router.post("/ask/agentic", response_model=AgenticToolAskResponse)
+async def ask_agentic_tools(request: AgenticAskRequest):
+    """Tool-based agentic endpoint.
+
+    Unlike the router-based ``/ask`` endpoint, here a single master agent
+    iterates over the RAG and SQL tools until it builds a complete answer.
+    This handles queries that need both data sources or require follow-up
+    reasoning without you having to predict the route upfront.
+    """
+    try:
+        log.log_info(f"Tool-based agentic ask started: {request.model_dump()}")
+        return await run_tool_based_agentic_query(request)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    except Exception as exc:
+        log.log_error(
+            f"Tool-based agentic orchestrator failed: {type(exc).__name__}: {exc}"
+        )
+        raise HTTPException(
+            status_code=500,
+            detail=f"Tool-based agentic orchestrator failed: {exc}",
+        )
+
+
+# ---------------------------------------------------------------------------
+# Original router-based endpoint (kept for backwards compatibility)
+# ---------------------------------------------------------------------------
 
 
 @router.post("/ask", response_model=AgenticAskResponse)
