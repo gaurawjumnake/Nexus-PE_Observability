@@ -1,0 +1,6 @@
+## Page 24
+- Implement response caching and semantic deduplication for high-frequency query patterns.
+- Evaluate dedicated inference infrastructure for top-5 highest-traffic AI applications.
+**Priority 6: Bottom-Quartile ROI Improvement (2026–2027)**
+**Target:** Lift P25 AI ROI from 7.7% to 20%+ across the portfolio.
+- Identify the 25% of AI deployments generating <7.7% ROI and assess root cause
