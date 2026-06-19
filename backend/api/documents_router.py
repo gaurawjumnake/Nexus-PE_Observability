@@ -1,12 +1,9 @@
 """
 Document Parser Router
 =======================
-Handles document upload + parsing using LlamaCloudDocumentParser directly
-(extract_all_text -> clean -> markdown), then persists the document
-record + chunks via the kpi_extractor DB layer.
-
-Scope ends here: parse -> store. KPI extraction/calculation is handled
-entirely by the KPI router.
+Routes uploaded files by type:
+- CSV/XLS/XLSX financial/statistical files are saved to nexus.db financial_data.
+- PDF/DOC/DOCX/TXT/MD narrative files are parsed into chunks for RAG.
 """
 import re
 import shutil
@@ -15,6 +12,11 @@ from pathlib import Path
 
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 
+from backend.db.document_parser.data_ingestion import (
+    ingest_financial_upload,
+    is_rag_file,
+    is_tabular_file,
+)
 from backend.document_parser.llama_parsing import LlamaCloudDocumentParser
 from backend.kpi_extractor.app.core.chunking import chunk_markdown
 import backend.db.db_client as db
@@ -22,6 +24,7 @@ from backend.utilites.app_logger import Logger
 
 log = Logger()
 router = APIRouter(prefix="/documents", tags=["documents"])
+
 
 def clean_text(text: str) -> str:
     """Collapse repeated whitespace/newlines from raw parser output."""
@@ -32,20 +35,14 @@ def clean_text(text: str) -> str:
     return text.strip()
 
 
-@router.post("/upload")
-async def upload_document(
-    file: UploadFile = File(...),
-    company_id: str = Form(...),
-    period: str = Form(...),
-):
-    """
-    Upload + parse a document via LlamaCloudDocumentParser, clean the
-    output, and persist it as a document record + chunks.
-
-    Returns document_id. Extraction/KPI calculation is a separate step
-    triggered via the KPI router.
-    """
-    suffix = Path(file.filename).suffix #type:ignore
+def process_uploaded_document(
+    file: UploadFile,
+    company_id: str,
+    period: str,
+) -> dict:
+    """Parse, persist, and chunk one narrative uploaded document."""
+    filename = file.filename or "uploaded_document"
+    suffix = Path(filename).suffix
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
         shutil.copyfileobj(file.file, tmp)
         tmp_path = Path(tmp.name)
@@ -56,18 +53,23 @@ async def upload_document(
         parser = LlamaCloudDocumentParser()
         raw_text = parser.extract_all_text(modified_name=base_name, file_path=str(tmp_path))
     except Exception as e:
-        tmp_path.unlink(missing_ok=True)
-        raise HTTPException(status_code=500, detail=f"Parsing failed: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Parsing failed for {filename}: {e}",
+        )
     finally:
         tmp_path.unlink(missing_ok=True)
 
     markdown_text = clean_text(raw_text)
 
     if not markdown_text:
-        raise HTTPException(status_code=422, detail="Parsing failed - empty content")
+        raise HTTPException(
+            status_code=422,
+            detail=f"Parsing failed for {filename} - empty content",
+        )
 
-    # Persist document + chunks (kpi_extractor DB)
-    document_id = db.save_document(company_id, file.filename) #type:ignore
+    document_id = db.save_document(company_id, filename)
+    db.set_document_type(document_id, "narrative")
     chunks = chunk_markdown(markdown_text, document_id)
     db.save_chunks(chunks)
 
@@ -75,10 +77,38 @@ async def upload_document(
         "document_id": document_id,
         "company_id": company_id,
         "period": period,
-        "file_name": file.filename,
+        "file_name": filename,
         "status": "parsed",
+        "destination": "nexus_db.document_chunks",
+        "document_type": "narrative",
         "chunks_saved": len(chunks),
     }
+
+
+@router.post("/upload")
+async def upload_document(
+    file: UploadFile = File(...),
+    company_id: str = Form(...),
+    period: str = Form(...),
+):
+    """
+    Upload one document. Tabular files are saved to financial_data; narrative
+    files are parsed and chunked for RAG.
+    """
+    if is_tabular_file(file.filename):
+        document = ingest_financial_upload(file, company_id, period)
+    elif is_rag_file(file.filename):
+        document = process_uploaded_document(file, company_id, period)
+    else:
+        raise HTTPException(
+            status_code=415,
+            detail=(
+                f"Unsupported file type for {file.filename}. "
+                "Supported: csv, xls, xlsx, pdf, doc, docx, txt, md."
+            ),
+        )
+
+    return document
 
 
 @router.get("/{document_id}")
