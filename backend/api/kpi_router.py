@@ -1,11 +1,3 @@
-"""
-KPI Router
-==========
-Stages 3-11: reads persisted chunks/facts from the DB, runs fact
-extraction, calculates KPIs, and generates insights. Uses the shared
-llm/registry singletons from app.state - never instantiates a new
-RegistryMCPClient per request.
-"""
 from typing import Optional
 
 from fastapi import APIRouter, Request, HTTPException
@@ -16,7 +8,7 @@ from backend.kpi_extractor.extractor_pipeline import (
     calculate_kpis,
     get_insights,
 )
-import backend.kpi_extractor.app.db.db_client as db
+import backend.db.db_client as db
 
 router = APIRouter(prefix="/kpis", tags=["kpis"])
 
@@ -77,11 +69,19 @@ async def calculate(request: Request, body: CalculateKPIRequest):
 
 
 @router.get("/{company_id}/{period}")
-async def list_kpis(company_id: str, period: str):
+async def list_kpis_company_wise(company_id: str, period: str):
     kpis = db.get_kpis_for_company(company_id, period)
     if not kpis:
         raise HTTPException(status_code=404, detail="No KPIs found for company/period")
     return {"company_id": company_id, "period": period, "kpis": kpis}
+
+
+@router.get("/")
+async def list_all_kpis():
+    kpis = db.get_kpis()
+    if not kpis:
+        raise HTTPException(status_code=404, detail="No KPIs found")
+    return {"kpis": kpis}
 
 
 @router.post("/insights")

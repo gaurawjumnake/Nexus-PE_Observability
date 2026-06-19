@@ -1,16 +1,23 @@
 """
 Agentic RAG + text-to-SQL orchestrator.
 
-The orchestrator uses a CrewAI router agent to decide whether a user question
-needs document RAG, SQLite text-to-SQL, or both. Execution remains controlled:
-RAG is grounded in Chroma results, and SQL execution is delegated to the
-read-only FinancialTextToSQLChatbot helper.
+Architecture (v2 — deterministic routing):
+    1. classify_intent()  — scores the question for SQL vs RAG signals using
+       keyword analysis, data-availability checks, and document-type awareness.
+    2. Explicit dispatch   — calls run_sql / run_rag directly (no CrewAI tool
+       selection).
+    3. Synthesis            — when both sources are used, a CrewAI agent merges
+       the two result sets into one cohesive answer.
+
+This eliminates the non-deterministic "let the LLM pick the tool" pattern that
+was causing incorrect routing (e.g. choosing RAG for quantitative queries).
 """
 
 import asyncio
 import json
 import os
 import re
+import sqlite3
 from pathlib import Path
 from typing import Any, Literal, Optional
 
@@ -22,18 +29,25 @@ from backend.chatbot.text_to_sql_chatbot import FinancialTextToSQLChatbot
 from backend.utilites.app_logger import Logger
 
 log = Logger()
-router = APIRouter(prefix="/analytics", tags=["analytics"])
 
 RouteName = Literal["rag", "sql", "both"]
-DEFAULT_MODEL = os.getenv("NEXUS_ORCHESTRATOR_MODEL", os.getenv("GEMINI_MODEL", "gemini/gemini-2.5-flash"))
+DEFAULT_MODEL = os.getenv(
+    "NEXUS_ORCHESTRATOR_MODEL",
+    os.getenv("GEMINI_MODEL", "gemini/gemini-2.5-flash"),
+)
+
+
+# ---------------------------------------------------------------------------
+# Request / response models
+# ---------------------------------------------------------------------------
 
 
 class AgenticAskRequest(BaseModel):
     question: str = Field(..., min_length=1)
     company_id: Optional[str] = None
+    period: Optional[str] = None
     document_ids: Optional[list[str]] = None
     top_k: int = Field(default=8, ge=1, le=20)
-    sql_db_path: Optional[str] = None
     sql_row_limit: int = Field(default=100, ge=1, le=1000)
     show_sql: bool = False
     verbose: bool = False
@@ -52,13 +66,31 @@ class AgenticAskResponse(BaseModel):
     sql: Optional[dict[str, Any]] = None
 
 
+class AgenticToolAskResponse(BaseModel):
+    """Response from the deterministic agentic orchestrator (/ask/agentic)."""
+
+    answer: str
+    tools_used: list[str] = Field(default_factory=list)
+    route_plan: Optional[RoutePlan] = None
+    sql_query_executed: Optional[str] = None
+    iterations_hint: Optional[str] = None
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+
 def get_crewai_llm():
     from crewai import LLM
 
     api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if not api_key:
-        raise ValueError("Missing GEMINI_API_KEY or GOOGLE_API_KEY for CrewAI Gemini LLM")
+        raise ValueError(
+            "Missing GEMINI_API_KEY or GOOGLE_API_KEY for CrewAI Gemini LLM"
+        )
 
+    log.log_info(f"Creating CrewAI orchestrator LLM with model={DEFAULT_MODEL}")
     return LLM(model=DEFAULT_MODEL, api_key=api_key, temperature=0)
 
 
@@ -76,161 +108,384 @@ def parse_json_object(text: Any) -> dict[str, Any]:
         return json.loads(match.group(0))
 
 
-def heuristic_route(question: str, has_documents: bool) -> RoutePlan:
-    q = question.lower()
-    rag_terms = {
-        "why",
-        "explain",
-        "reason",
-        "driver",
-        "drivers",
-        "document",
-        "report",
-        "source",
-        "evidence",
-        "summarize",
-        "summarise",
-        "context",
-    }
-    sql_terms = {
-        "average",
-        "sum",
-        "total",
-        "highest",
-        "lowest",
-        "top",
-        "trend",
-        "compare",
-        "count",
-        "roi",
-        "revenue",
-        "spend",
-        "users",
-        "rate",
-        "score",
-        "year",
-        "month",
-        "quarter",
-    }
-
-    wants_rag = has_documents and any(term in q for term in rag_terms)
-    wants_sql = any(term in q for term in sql_terms)
-    if wants_rag and wants_sql:
-        return RoutePlan(route="both", confidence=0.65, reasoning="Question asks for metrics and explanation/evidence.")
-    if wants_sql:
-        return RoutePlan(route="sql", confidence=0.6, reasoning="Question appears to ask for structured numeric data.")
-    if has_documents:
-        return RoutePlan(route="rag", confidence=0.6, reasoning="Question can be answered from indexed documents.")
-    return RoutePlan(route="sql", confidence=0.4, reasoning="No document scope was provided, so SQL is the available route.")
+# ---------------------------------------------------------------------------
+# Data-availability helpers
+# ---------------------------------------------------------------------------
 
 
-def choose_route(request: AgenticAskRequest) -> RoutePlan:
-    from crewai import Agent, Crew, Process, Task
+def _resolve_nexus_db() -> Optional[Path]:
+    """Return the path to the nexus.db / financial_data.db used by the SQL bot."""
+    from backend.chatbot.text_to_sql_chatbot import resolve_db_path
 
-    fallback = heuristic_route(request.question, bool(request.document_ids and request.company_id))
-    route_agent = Agent(
-        role="RAG SQL Routing Analyst",
-        goal="Select the best tool route for a user analytics question.",
-        backstory=(
-            "You decide whether a question needs document retrieval, structured "
-            "database analytics, or both. You return strict JSON only."
-        ),
-        llm=get_crewai_llm(),
-        verbose=request.verbose,
-        allow_delegation=False,
-    )
-    route_task = Task(
-        description=(
-            "Decide the route for this query.\n\n"
-            "Question: {question}\n"
-            "Company id provided: {has_company}\n"
-            "Document ids provided: {has_documents}\n"
-            "SQL database available: true\n\n"
-            "Route meanings:\n"
-            "- rag: use document retrieval when the user asks why, explain, "
-            "summarize, evidence, document details, or qualitative context.\n"
-            "- sql: use text-to-SQL when the user asks for metrics, totals, "
-            "averages, rankings, comparisons, trends, filters, dates, or table data.\n"
-            "- both: use both when the user needs numeric results plus explanation "
-            "or evidence from documents.\n\n"
-            "Return JSON only: {\"route\":\"rag|sql|both\","
-            "\"confidence\":0.0,\"reasoning\":\"short reason\"}"
-        ),
-        expected_output='JSON only with route, confidence, and reasoning.',
-        agent=route_agent,
-    )
     try:
-        result = Crew(
-            agents=[route_agent],
-            tasks=[route_task],
-            process=Process.sequential,
-            verbose=request.verbose,
-        ).kickoff(
-            inputs={
-                "question": request.question,
-                "has_company": bool(request.company_id),
-                "has_documents": bool(request.document_ids),
-            }
-        )
-        payload = parse_json_object(result)
-        route = str(payload.get("route", fallback.route)).lower()
-        if route not in {"rag", "sql", "both"}:
-            return fallback
-        if route in {"rag", "both"} and not request.company_id:
-            return RoutePlan(route="sql", confidence=0.5, reasoning="RAG needs company_id; falling back to SQL.")
-        if route in {"rag", "both"} and not request.document_ids:
-            return RoutePlan(route="sql", confidence=0.5, reasoning="RAG needs document_ids; falling back to SQL.")
-        return RoutePlan(
-            route=route,
-            confidence=float(payload.get("confidence", fallback.confidence)),
-            reasoning=str(payload.get("reasoning", fallback.reasoning)),
-        )
+        db_path = resolve_db_path(None)
+        return db_path if db_path.exists() else None
+    except Exception:
+        return None
+
+
+def check_sql_data_availability(company_id: str) -> dict[str, Any]:
+    """Quick probe to see whether the SQL database has rows for *company_id*.
+
+    Returns a dict with:
+        available   – bool
+        row_count   – int
+        columns     – list[str]  (of the financial_data table)
+        years       – list[int]  (distinct financial_year values)
+    """
+    db_path = _resolve_nexus_db()
+    if not db_path:
+        return {"available": False, "row_count": 0, "columns": [], "years": []}
+
+    try:
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+
+        # Check if financial_data table exists
+        tables = conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='financial_data'"
+        ).fetchall()
+        if not tables:
+            conn.close()
+            return {"available": False, "row_count": 0, "columns": [], "years": []}
+
+        # Get columns
+        cols = conn.execute("PRAGMA table_info(financial_data)").fetchall()
+        column_names = [c["name"] for c in cols]
+
+        # Count rows for this company (fuzzy match on company_name)
+        row_count = conn.execute(
+            "SELECT COUNT(*) AS cnt FROM financial_data "
+            "WHERE LOWER(company_name) LIKE ?",
+            (f"%{company_id.lower()}%",),
+        ).fetchone()["cnt"]
+
+        # Get distinct years
+        years_rows = conn.execute(
+            "SELECT DISTINCT financial_year FROM financial_data "
+            "WHERE LOWER(company_name) LIKE ? AND financial_year IS NOT NULL "
+            "ORDER BY financial_year",
+            (f"%{company_id.lower()}%",),
+        ).fetchall()
+        years = [r["financial_year"] for r in years_rows]
+
+        conn.close()
+        return {
+            "available": row_count > 0,
+            "row_count": row_count,
+            "columns": column_names,
+            "years": years,
+        }
     except Exception as exc:
-        log.log_warning(f"Routing agent failed, using heuristic route: {exc}")
-        return fallback
+        log.log_warning(f"SQL availability check failed: {exc}")
+        return {"available": False, "row_count": 0, "columns": [], "years": []}
+
+
+def get_uploaded_document_types(company_id: str) -> dict[str, int]:
+    """Check the documents table to see what document types exist for a company.
+
+    Returns e.g. {"financial": 4, "narrative": 1}
+    """
+    try:
+        import backend.db.db_client as db
+
+        with db.get_cursor() as cur:
+            from sqlalchemy import text
+
+            rows = cur.execute(
+                text(
+                    "SELECT document_type, COUNT(*) AS cnt "
+                    "FROM documents WHERE company_id = :cid "
+                    "GROUP BY document_type"
+                ),
+                {"cid": company_id},
+            ).fetchall()
+            return {str(r.document_type or "unknown"): r.cnt for r in rows}
+    except Exception as exc:
+        log.log_warning(f"Document type lookup failed: {exc}")
+        return {}
+
+
+# ---------------------------------------------------------------------------
+# Intent classifier — the core routing logic
+# ---------------------------------------------------------------------------
+
+# Keywords that signal a SQL / quantitative question
+SQL_KEYWORDS = {
+    # Aggregations
+    "average", "avg", "mean", "sum", "total", "count",
+    "minimum", "min", "maximum", "max",
+    # Rankings & comparisons
+    "highest", "lowest", "top", "bottom", "rank", "ranking",
+    "compare", "comparison", "versus", "vs",
+    # Trends & time
+    "trend", "growth", "decline", "change", "increase", "decrease",
+    "year", "years", "month", "quarter", "annual", "yearly", "monthly",
+    "yoy", "y-o-y", "qoq", "q-o-q",
+    "2020", "2021", "2022", "2023", "2024", "2025", "2026",
+    # Financial metrics
+    "roi", "revenue", "spend", "spending", "cost", "savings",
+    "ebitda", "margin", "profit", "loss", "budget",
+    "percentage", "percent", "%",
+    "rate", "ratio", "score", "index",
+    # Data operations
+    "how much", "how many", "what was", "what is", "what are",
+    "calculate", "computed",
+    "filter", "group by", "breakdown",
+    "users", "adoption", "headcount",
+}
+
+# Keywords that signal a RAG / qualitative question
+RAG_KEYWORDS = {
+    "why", "explain", "reason", "reasons", "cause", "causes",
+    "driver", "drivers", "factor", "factors",
+    "strategy", "strategic", "initiative", "initiatives",
+    "risk", "risks", "challenge", "challenges", "opportunity",
+    "summarize", "summarise", "summary", "overview", "describe",
+    "context", "background", "detail", "details",
+    "document", "report", "source", "evidence", "finding",
+    "recommend", "recommendation", "suggestion",
+    "narrative", "qualitative", "insight", "insights",
+    "what happened", "what led to", "what caused",
+}
+
+
+def classify_intent(request: AgenticAskRequest) -> RoutePlan:
+    """Deterministic intent classifier with keyword scoring + data awareness.
+
+    Scoring rules:
+        1. Tokenize the question and count matches against SQL_KEYWORDS and
+           RAG_KEYWORDS.
+        2. Apply bonus/penalty modifiers based on data availability.
+        3. If the question asks for specific numeric values, years, or
+           aggregations → heavy SQL bias.
+        4. If document_ids are pinned AND the question is qualitative → RAG.
+        5. If both scores are close (within 0.15) → route to "both".
+    """
+    q = request.question.lower()
+    words = set(re.findall(r"[a-z0-9%\-]+", q))
+    # Also check multi-word phrases
+    bigrams = set()
+    word_list = re.findall(r"[a-z0-9%\-]+", q)
+    for i in range(len(word_list) - 1):
+        bigrams.add(f"{word_list[i]} {word_list[i+1]}")
+
+    all_tokens = words | bigrams
+
+    sql_score = 0.0
+    rag_score = 0.0
+    sql_matches = []
+    rag_matches = []
+
+    for kw in SQL_KEYWORDS:
+        if kw in all_tokens or kw in q:
+            weight = 1.5 if kw in {
+                "average", "avg", "sum", "total", "roi", "percentage",
+                "percent", "%", "trend", "compare", "how much", "how many",
+            } else 1.0
+            sql_score += weight
+            sql_matches.append(kw)
+
+    for kw in RAG_KEYWORDS:
+        if kw in all_tokens or kw in q:
+            weight = 1.5 if kw in {
+                "why", "explain", "summarize", "summarise", "reason",
+                "driver", "strategy", "what caused", "what led to",
+            } else 1.0
+            rag_score += weight
+            rag_matches.append(kw)
+
+    # Regex boosters for strong SQL signals
+    # Year range patterns like "2023 and 2026", "2023-2026", "in 2023"
+    if re.search(r"\b20\d{2}\b", q):
+        sql_score += 1.0
+    if re.search(r"\b20\d{2}\s*(and|to|-|–)\s*20\d{2}\b", q):
+        sql_score += 2.0  # Strong signal: comparing across years
+    # Percentage / numeric ask
+    if re.search(r"\b\d+(\.\d+)?%", q) or "percentage" in q or "%" in q:
+        sql_score += 1.5
+    # Aggregation function phrases
+    if re.search(r"\b(average|avg|total|sum|count|mean)\b", q):
+        sql_score += 1.5
+
+    # Check data availability
+    has_company = bool(request.company_id)
+    has_documents = bool(request.document_ids)
+
+    sql_info = {"available": False, "row_count": 0, "columns": [], "years": []}
+    doc_types: dict[str, int] = {}
+
+    if has_company:
+        sql_info = check_sql_data_availability(request.company_id)  # type: ignore
+        doc_types = get_uploaded_document_types(request.company_id)  # type: ignore
+
+    # Data availability modifiers
+    if sql_info["available"]:
+        sql_score += 2.0  # Significant boost: we have SQL data for this company
+        log.log_info(
+            f"SQL data found for {request.company_id}: "
+            f"{sql_info['row_count']} rows, years={sql_info['years']}"
+        )
+    else:
+        sql_score *= 0.3  # Heavy penalty: no SQL data available
+        log.log_info(f"No SQL data found for {request.company_id}")
+
+    if has_company and not has_documents:
+        # No specific documents pinned — RAG is less targeted
+        rag_score *= 0.8
+
+    if doc_types.get("narrative", 0) > 0:
+        rag_score += 1.0  # We have narrative documents for RAG
+    elif not has_company:
+        rag_score *= 0.2  # No company context → RAG is unlikely to help
+
+    # Financial document types boost SQL further
+    if doc_types.get("financial", 0) > 0 and sql_info["available"]:
+        sql_score += 1.0
+
+    # Normalize scores
+    total = sql_score + rag_score
+    if total == 0:
+        # No signal at all — default based on data availability
+        if sql_info["available"]:
+            return RoutePlan(
+                route="sql",
+                confidence=0.5,
+                reasoning="No clear signal from question; SQL data is available.",
+            )
+        if has_company:
+            return RoutePlan(
+                route="rag",
+                confidence=0.5,
+                reasoning="No clear signal from question; defaulting to RAG.",
+            )
+        return RoutePlan(
+            route="sql",
+            confidence=0.3,
+            reasoning="No clear signal and no company context; trying SQL.",
+        )
+
+    sql_ratio = sql_score / total
+    rag_ratio = rag_score / total
+
+    log.log_info(
+        f"Intent scores: sql={sql_score:.1f} ({sql_matches}), "
+        f"rag={rag_score:.1f} ({rag_matches}), "
+        f"sql_ratio={sql_ratio:.2f}, rag_ratio={rag_ratio:.2f}"
+    )
+
+    # Decision thresholds
+    BOTH_THRESHOLD = 0.15  # If the gap is within this, use both
+
+    if abs(sql_ratio - rag_ratio) <= BOTH_THRESHOLD and has_company:
+        return RoutePlan(
+            route="both",
+            confidence=0.6,
+            reasoning=(
+                f"Question has both quantitative ({sql_matches[:3]}) and "
+                f"qualitative ({rag_matches[:3]}) signals. Using both tools."
+            ),
+        )
+
+    if sql_ratio > rag_ratio:
+        confidence = min(0.95, 0.5 + sql_ratio * 0.5)
+        return RoutePlan(
+            route="sql",
+            confidence=confidence,
+            reasoning=(
+                f"Quantitative signals dominate: {sql_matches[:5]}. "
+                f"SQL data {'available' if sql_info['available'] else 'unavailable'} "
+                f"({sql_info['row_count']} rows)."
+            ),
+        )
+    else:
+        if not has_company:
+            # Can't do RAG without company_id — fall back to SQL
+            return RoutePlan(
+                route="sql",
+                confidence=0.4,
+                reasoning="RAG signals found but no company_id provided; falling back to SQL.",
+            )
+        confidence = min(0.95, 0.5 + rag_ratio * 0.5)
+        return RoutePlan(
+            route="rag",
+            confidence=confidence,
+            reasoning=(
+                f"Qualitative signals dominate: {rag_matches[:5]}. "
+                f"Narrative documents: {doc_types.get('narrative', 0)}."
+            ),
+        )
+
+
+# ---------------------------------------------------------------------------
+# Tool execution
+# ---------------------------------------------------------------------------
 
 
 async def run_sql(request: AgenticAskRequest) -> dict[str, Any]:
-    def _ask() -> dict[str, Any]:
-        bot = FinancialTextToSQLChatbot(
-            db_path=Path(request.sql_db_path) if request.sql_db_path else None,
-            row_limit=request.sql_row_limit,
-            verbose=request.verbose,
-        )
-        return bot.ask(request.question)
+    log.log_info(
+        f"Text-to-SQL execution started: row_limit={request.sql_row_limit}, "
+        f"show_sql={request.show_sql}"
+    )
+    bot = FinancialTextToSQLChatbot(
+        db_path=None,
+        row_limit=request.sql_row_limit,
+        verbose=request.verbose,
+    )
+    result = await bot.ask(request.question)
 
-    result = await asyncio.to_thread(_ask)
     if not request.show_sql:
         result = dict(result)
         result.pop("sql", None)
+    log.log_info(
+        f"Text-to-SQL execution completed: row_count={result.get('row_count')}"
+    )
     return result
 
 
 async def run_rag(request: AgenticAskRequest) -> ChatQueryResponse:
     if not request.company_id:
         raise ValueError("company_id is required for RAG")
+    log.log_info(
+        f"RAG execution started: company_id={request.company_id}, period={request.period}, "
+        f"document_ids={request.document_ids}, top_k={request.top_k}"
+    )
     return await run_rag_query(
         ChatQueryRequest(
             question=request.question,
             company_id=request.company_id,
+            period=request.period,
             document_ids=request.document_ids,
             top_k=request.top_k,
         )
     )
 
 
-def synthesize_answer(
+# ---------------------------------------------------------------------------
+# Synthesis (CrewAI is only used here — not for tool selection)
+# ---------------------------------------------------------------------------
+
+
+async def synthesize_answer(
     question: str,
     route_plan: RoutePlan,
     rag_result: Optional[ChatQueryResponse],
     sql_result: Optional[dict[str, Any]],
     verbose: bool,
 ) -> str:
+    """Produce a final answer.
+
+    For single-tool results the answer is returned directly.
+    For combined results a CrewAI synthesis agent merges both.
+    """
     if route_plan.route == "rag" and rag_result:
+        log.log_info("Returning direct RAG answer")
         return rag_result.answer
     if route_plan.route == "sql" and sql_result:
+        log.log_info("Returning direct SQL answer")
         return str(sql_result.get("answer", "")).strip()
 
+    # Both tools were used — synthesise
     from crewai import Agent, Crew, Process, Task
 
     synthesis_agent = Agent(
@@ -260,12 +515,12 @@ def synthesize_answer(
         expected_output="Concise markdown answer.",
         agent=synthesis_agent,
     )
-    result = Crew(
+    result = await Crew(
         agents=[synthesis_agent],
         tasks=[synthesis_task],
         process=Process.sequential,
         verbose=verbose,
-    ).kickoff(
+    ).kickoff_async(
         inputs={
             "question": question,
             "route_plan": route_plan.model_dump(),
@@ -273,37 +528,103 @@ def synthesize_answer(
             "rag_result": rag_result.model_dump() if rag_result else {},
         }
     )
-    return str(getattr(result, "raw", result)).strip()
+    answer = str(getattr(result, "raw", result)).strip()
+    log.log_info(f"Synthesis completed, chars={len(answer)}")
+    return answer
 
 
-@router.post("/ask", response_model=AgenticAskResponse)
-async def ask_agentic(request: AgenticAskRequest):
-    try:
-        route_plan = choose_route(request)
-        rag_result: Optional[ChatQueryResponse] = None
-        sql_result: Optional[dict[str, Any]] = None
+# ---------------------------------------------------------------------------
+# Tool-based agentic orchestration  (/ask/agentic)
+# ---------------------------------------------------------------------------
 
-        if route_plan.route in {"sql", "both"}:
+
+async def run_tool_based_agentic_query(
+    request: AgenticAskRequest,
+) -> AgenticToolAskResponse:
+    """Deterministic tool dispatch.
+
+    1. Classify the question's intent (SQL / RAG / both).
+    2. Execute the required tool(s) directly — no LLM tool selection.
+    3. Synthesise a combined answer when both tools are used.
+    """
+    log.log_info(
+        f"Deterministic agentic query started: question={request.question!r}, "
+        f"company_id={request.company_id}"
+    )
+
+    # ── Step 1: Classify intent ────────────────────────────────────────────
+    route_plan = classify_intent(request)
+    log.log_info(
+        f"Intent classification: route={route_plan.route}, "
+        f"confidence={route_plan.confidence:.2f}, "
+        f"reasoning={route_plan.reasoning}"
+    )
+
+    # ── Step 2: Execute tools ──────────────────────────────────────────────
+    tools_used: list[str] = []
+    rag_result: Optional[ChatQueryResponse] = None
+    sql_result: Optional[dict[str, Any]] = None
+
+    if route_plan.route in ("sql", "both"):
+        try:
             sql_result = await run_sql(request)
-        if route_plan.route in {"rag", "both"}:
+            tools_used.append("sql")
+        except Exception as exc:
+            log.log_warning(f"SQL tool failed: {exc}")
+            # If SQL fails and we were supposed to use both, try RAG alone
+            if route_plan.route == "both":
+                log.log_info("SQL failed; falling back to RAG-only")
+            else:
+                # SQL-only route failed — try RAG as fallback if possible
+                if request.company_id:
+                    log.log_info("SQL-only route failed; attempting RAG fallback")
+                    route_plan = RoutePlan(
+                        route="rag",
+                        confidence=0.4,
+                        reasoning=f"SQL failed ({exc}); falling back to RAG.",
+                    )
+                else:
+                    raise
+
+    if route_plan.route in ("rag", "both"):
+        try:
             rag_result = await run_rag(request)
+            tools_used.append("rag")
+        except Exception as exc:
+            log.log_warning(f"RAG tool failed: {exc}")
+            if route_plan.route == "both" and sql_result:
+                log.log_info("RAG failed but SQL succeeded; using SQL-only answer")
+            elif not sql_result:
+                raise
 
-        answer = synthesize_answer(
-            question=request.question,
-            route_plan=route_plan,
-            rag_result=rag_result,
-            sql_result=sql_result,
-            verbose=request.verbose,
-        )
+    # # Step 3: Synthesise answer --------------------------------------------
 
-        return AgenticAskResponse(
-            answer=answer,
-            route_plan=route_plan,
-            rag=rag_result.model_dump() if rag_result else None,
-            sql=sql_result,
-        )
-    except ValueError as exc:
-        raise HTTPException(status_code=422, detail=str(exc))
-    except Exception as exc:
-        log.log_error(f"Agentic orchestrator failed: {type(exc).__name__}: {exc}")
-        raise HTTPException(status_code=500, detail=f"Agentic orchestrator failed: {exc}")
+    if not sql_result and not rag_result:
+        raise ValueError("Both SQL and RAG tools failed to produce results.")
+
+    answer = await synthesize_answer(
+        question=request.question,
+        route_plan=route_plan,
+        rag_result=rag_result,
+        sql_result=sql_result,
+        verbose=request.verbose,
+    )
+
+    sql_query_str = None
+    if sql_result and request.show_sql:
+        sql_query_str = sql_result.get("sql")
+
+    log.log_info(
+        f"Deterministic agentic query completed: route={route_plan.route}, "
+        f"tools_used={tools_used}, answer_chars={len(answer)}"
+    )
+
+    return AgenticToolAskResponse(
+        answer=answer,
+        tools_used=tools_used,
+        route_plan=route_plan,
+        sql_query_executed=sql_query_str,
+        iterations_hint=f"Route: {route_plan.route} | Tools: {tools_used}",
+    )
+
+

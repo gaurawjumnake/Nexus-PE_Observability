@@ -12,7 +12,9 @@ log = Logger()
 from sqlalchemy import create_engine, text, inspect
 from sqlalchemy.orm import sessionmaker
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///backend/kpi_extractor/app/db/nexus.db")
+DB_DIR = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_DB_PATH = os.path.join(DB_DIR, "nexus.db")
+DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{DEFAULT_DB_PATH}")
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -23,13 +25,13 @@ def _init_db():
     required = {"documents", "document_chunks", "facts", "kpis"}
 
     if required.issubset(existing):
-        log.log_info("✅ Database exists with all required tables")
+        log.log_info("Database exists with all required tables")
         return
 
     missing = required - set(existing)
-    log.log_info(f"⚙️  Creating missing tables: {missing}")
+    log.log_info(f"Creating missing tables: {missing}")
 
-    with open("backend/kpi_extractor/app/db/nexus_schema.sql", "r") as f:
+    with open(os.path.join(DB_DIR, "nexus_schema.sql"), "r") as f:
         SCHEMA = f.read()
 
     with engine.connect() as conn:
@@ -38,15 +40,15 @@ def _init_db():
             if stmt:
                 conn.execute(text(stmt))
         conn.commit()
-    log.log_info("✅ Schema created successfully")
+    log.log_info("Schema created successfully")
 
 
 try:
     with engine.connect() as conn:
-        log.log_info("✅ Database connected successfully")
+        log.log_info("Database connected successfully")
     _init_db()
 except Exception as e:
-    log.log_error(f"❌ Database initialization failed: {e}")
+    log.log_error(f"Database initialization failed: {e}")
     raise
 
 
@@ -62,10 +64,8 @@ def get_cursor():
     finally:
         db.close()
 
+# Documents ---------------------------------------------------------
 
-# ------------------------------------------------------------------
-# Documents
-# ------------------------------------------------------------------
 def save_document(company_id: str, file_name: str) -> str:
     doc_id = str(uuid.uuid4())
     with get_cursor() as cur:
@@ -83,10 +83,8 @@ def set_document_type(document_id: str, document_type: str):
             {"document_type": document_type, "document_id": document_id},
         )
 
+# Chunks ------------------------------------------------------------------
 
-# ------------------------------------------------------------------
-# Chunks
-# ------------------------------------------------------------------
 def save_chunks(chunks: list[dict]):
     with get_cursor() as cur:
         for c in chunks:
@@ -113,9 +111,8 @@ def get_chunks(document_id: str) -> list[dict]:
         return [row._mapping for row in result.fetchall()] #type:ignore
 
 
-# ------------------------------------------------------------------
-# Facts
-# ------------------------------------------------------------------
+# Facts ------------------------------------------------------------------
+
 def save_fact(fact_id: str, company_id: str, value, confidence: float,
               source_document: str, source_chunk: str,
               source_type: str, period: str):
@@ -160,9 +157,8 @@ def get_facts_for_company(company_id: str, period: str) -> dict[str, any]: #type
         return {row.fact_id: json.loads(row.value) for row in result.fetchall()}
 
 
-# ------------------------------------------------------------------
-# KPIs
-# ------------------------------------------------------------------
+# KPIs ------------------------------------------------------------------
+
 def save_kpi(kpi_id: str, company_id: str, value: Optional[float],
              coverage: float, status: str, period: str):
     with get_cursor() as cur:
@@ -195,6 +191,13 @@ def get_kpis_for_company(company_id: str, period: str) -> list[dict]:
         result = cur.execute(
             text("SELECT * FROM kpis WHERE company_id=:company_id AND period=:period ORDER BY kpi_id"),
             {"company_id": company_id, "period": period},
+        )
+        return [dict(row._mapping) for row in result.fetchall()]
+    
+def get_kpis() -> list[dict]:
+    with get_cursor() as cur:
+        result = cur.execute(
+            text("SELECT * FROM kpis ORDER BY kpi_id"),
         )
         return [dict(row._mapping) for row in result.fetchall()]
 

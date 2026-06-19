@@ -17,7 +17,7 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 
 from backend.document_parser.llama_parsing import LlamaCloudDocumentParser
 from backend.kpi_extractor.app.core.chunking import chunk_markdown
-import backend.kpi_extractor.app.db.db_client as db
+import backend.db.db_client as db
 from backend.utilites.app_logger import Logger
 
 log = Logger()

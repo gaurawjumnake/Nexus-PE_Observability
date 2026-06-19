@@ -18,7 +18,7 @@ from backend.kpi_extractor.app.agents.fact_extraction_agent import FactExtractio
 from backend.kpi_extractor.app.agents.insight_agent import InsightAgent
 from backend.kpi_extractor.app.engine.fact_validation_engine import validate_extractions, resolve_source_conflicts
 from backend.kpi_extractor.app.engine.kpi_calculation_engine import KPICalculationEngine
-import backend.kpi_extractor.app.db.db_client as db
+import backend.db.db_client as db
 from backend.utilites.llm_models import llm
 from crewai import Agent, Task, Crew, Process
 
@@ -226,7 +226,6 @@ def get_insights(
 
     agent = InsightAgent(llm, registry)
     return agent.run(question, kpi_records, fact_records, coverage_records, kpi_ids)
-
 
 
 def build_crew(llm: Optional[BaseLLMClient] = None, registry: Optional[RegistryMCPClient] = None):
