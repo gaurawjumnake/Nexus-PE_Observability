@@ -93,7 +93,7 @@ def build_schema_context(db_path: Path) -> str:
     log.log_info(f"Building SQLite schema context for db_path={db_path}")
     with connect(db_path) as conn:
         table_rows = conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
+            "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('financial_data', 'kpis') ORDER BY name"
         ).fetchall()
 
         sections: list[str] = []

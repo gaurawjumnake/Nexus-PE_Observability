@@ -43,14 +43,8 @@ DEFAULT_MODEL = os.getenv(
 
 
 class AgenticAskRequest(BaseModel):
-    question: str = Field(..., min_length=1)
-    company_id: Optional[str] = None
-    period: Optional[str] = None
-    document_ids: Optional[list[str]] = None
-    top_k: int = Field(default=8, ge=1, le=20)
-    sql_row_limit: int = Field(default=100, ge=1, le=1000)
-    show_sql: bool = False
-    verbose: bool = False
+    message: str = Field(..., min_length=1)
+    contexts: Optional[list[str]] = Field(default_factory=list)
 
 
 class RoutePlan(BaseModel):
@@ -60,7 +54,7 @@ class RoutePlan(BaseModel):
 
 
 class AgenticAskResponse(BaseModel):
-    answer: str
+    response: str
     route_plan: RoutePlan
     rag: Optional[dict[str, Any]] = None
     sql: Optional[dict[str, Any]] = None
@@ -69,7 +63,7 @@ class AgenticAskResponse(BaseModel):
 class AgenticToolAskResponse(BaseModel):
     """Response from the deterministic agentic orchestrator (/ask/agentic)."""
 
-    answer: str
+    response: str
     tools_used: list[str] = Field(default_factory=list)
     route_plan: Optional[RoutePlan] = None
     sql_query_executed: Optional[str] = None
@@ -251,18 +245,8 @@ RAG_KEYWORDS = {
 
 
 def classify_intent(request: AgenticAskRequest) -> RoutePlan:
-    """Deterministic intent classifier with keyword scoring + data awareness.
-
-    Scoring rules:
-        1. Tokenize the question and count matches against SQL_KEYWORDS and
-           RAG_KEYWORDS.
-        2. Apply bonus/penalty modifiers based on data availability.
-        3. If the question asks for specific numeric values, years, or
-           aggregations → heavy SQL bias.
-        4. If document_ids are pinned AND the question is qualitative → RAG.
-        5. If both scores are close (within 0.15) → route to "both".
-    """
-    q = request.question.lower()
+    """Deterministic intent classifier with keyword scoring + data awareness."""
+    q = request.message.lower()
     words = set(re.findall(r"[a-z0-9%\-]+", q))
     # Also check multi-word phrases
     bigrams = set()
@@ -308,61 +292,14 @@ def classify_intent(request: AgenticAskRequest) -> RoutePlan:
     if re.search(r"\b(average|avg|total|sum|count|mean)\b", q):
         sql_score += 1.5
 
-    # Check data availability
-    has_company = bool(request.company_id)
-    has_documents = bool(request.document_ids)
-
-    sql_info = {"available": False, "row_count": 0, "columns": [], "years": []}
-    doc_types: dict[str, int] = {}
-
-    if has_company:
-        sql_info = check_sql_data_availability(request.company_id)  # type: ignore
-        doc_types = get_uploaded_document_types(request.company_id)  # type: ignore
-
-    # Data availability modifiers
-    if sql_info["available"]:
-        sql_score += 2.0  # Significant boost: we have SQL data for this company
-        log.log_info(
-            f"SQL data found for {request.company_id}: "
-            f"{sql_info['row_count']} rows, years={sql_info['years']}"
-        )
-    else:
-        sql_score *= 0.3  # Heavy penalty: no SQL data available
-        log.log_info(f"No SQL data found for {request.company_id}")
-
-    if has_company and not has_documents:
-        # No specific documents pinned — RAG is less targeted
-        rag_score *= 0.8
-
-    if doc_types.get("narrative", 0) > 0:
-        rag_score += 1.0  # We have narrative documents for RAG
-    elif not has_company:
-        rag_score *= 0.2  # No company context → RAG is unlikely to help
-
-    # Financial document types boost SQL further
-    if doc_types.get("financial", 0) > 0 and sql_info["available"]:
-        sql_score += 1.0
-
     # Normalize scores
     total = sql_score + rag_score
     if total == 0:
-        # No signal at all — default based on data availability
-        if sql_info["available"]:
-            return RoutePlan(
-                route="sql",
-                confidence=0.5,
-                reasoning="No clear signal from question; SQL data is available.",
-            )
-        if has_company:
-            return RoutePlan(
-                route="rag",
-                confidence=0.5,
-                reasoning="No clear signal from question; defaulting to RAG.",
-            )
+        # No signal at all
         return RoutePlan(
-            route="sql",
-            confidence=0.3,
-            reasoning="No clear signal and no company context; trying SQL.",
+            route="both",
+            confidence=0.5,
+            reasoning="No clear signal from question; defaulting to both.",
         )
 
     sql_ratio = sql_score / total
@@ -377,7 +314,7 @@ def classify_intent(request: AgenticAskRequest) -> RoutePlan:
     # Decision thresholds
     BOTH_THRESHOLD = 0.15  # If the gap is within this, use both
 
-    if abs(sql_ratio - rag_ratio) <= BOTH_THRESHOLD and has_company:
+    if abs(sql_ratio - rag_ratio) <= BOTH_THRESHOLD:
         return RoutePlan(
             route="both",
             confidence=0.6,
@@ -393,26 +330,16 @@ def classify_intent(request: AgenticAskRequest) -> RoutePlan:
             route="sql",
             confidence=confidence,
             reasoning=(
-                f"Quantitative signals dominate: {sql_matches[:5]}. "
-                f"SQL data {'available' if sql_info['available'] else 'unavailable'} "
-                f"({sql_info['row_count']} rows)."
+                f"Quantitative signals dominate: {sql_matches[:5]}."
             ),
         )
     else:
-        if not has_company:
-            # Can't do RAG without company_id — fall back to SQL
-            return RoutePlan(
-                route="sql",
-                confidence=0.4,
-                reasoning="RAG signals found but no company_id provided; falling back to SQL.",
-            )
         confidence = min(0.95, 0.5 + rag_ratio * 0.5)
         return RoutePlan(
             route="rag",
             confidence=confidence,
             reasoning=(
-                f"Qualitative signals dominate: {rag_matches[:5]}. "
-                f"Narrative documents: {doc_types.get('narrative', 0)}."
+                f"Qualitative signals dominate: {rag_matches[:5]}."
             ),
         )
 
@@ -423,20 +350,20 @@ def classify_intent(request: AgenticAskRequest) -> RoutePlan:
 
 
 async def run_sql(request: AgenticAskRequest) -> dict[str, Any]:
-    log.log_info(
-        f"Text-to-SQL execution started: row_limit={request.sql_row_limit}, "
-        f"show_sql={request.show_sql}"
-    )
+    log.log_info("Text-to-SQL execution started")
     bot = FinancialTextToSQLChatbot(
         db_path=None,
-        row_limit=request.sql_row_limit,
-        verbose=request.verbose,
+        row_limit=100,
+        verbose=False,
     )
-    result = await bot.ask(request.question)
-
-    if not request.show_sql:
-        result = dict(result)
-        result.pop("sql", None)
+    
+    question = request.message
+    if request.contexts:
+        question += f" (Context: {', '.join(request.contexts)})"
+        
+    result = await bot.ask(question)
+    result = dict(result)
+    result.pop("sql", None)
     log.log_info(
         f"Text-to-SQL execution completed: row_count={result.get('row_count')}"
     )
@@ -444,19 +371,16 @@ async def run_sql(request: AgenticAskRequest) -> dict[str, Any]:
 
 
 async def run_rag(request: AgenticAskRequest) -> ChatQueryResponse:
-    if not request.company_id:
-        raise ValueError("company_id is required for RAG")
-    log.log_info(
-        f"RAG execution started: company_id={request.company_id}, period={request.period}, "
-        f"document_ids={request.document_ids}, top_k={request.top_k}"
-    )
+    log.log_info("RAG execution started")
+    
+    question = request.message
+    if request.contexts:
+        question += f" (Context: {', '.join(request.contexts)})"
+        
     return await run_rag_query(
         ChatQueryRequest(
-            question=request.question,
-            company_id=request.company_id,
-            period=request.period,
-            document_ids=request.document_ids,
-            top_k=request.top_k,
+            message=question,
+            contexts=request.contexts
         )
     )
 
@@ -548,8 +472,7 @@ async def run_tool_based_agentic_query(
     3. Synthesise a combined answer when both tools are used.
     """
     log.log_info(
-        f"Deterministic agentic query started: question={request.question!r}, "
-        f"company_id={request.company_id}"
+        f"Deterministic agentic query started: message={request.message!r}"
     )
 
     # ── Step 1: Classify intent ────────────────────────────────────────────
@@ -576,15 +499,12 @@ async def run_tool_based_agentic_query(
                 log.log_info("SQL failed; falling back to RAG-only")
             else:
                 # SQL-only route failed — try RAG as fallback if possible
-                if request.company_id:
-                    log.log_info("SQL-only route failed; attempting RAG fallback")
-                    route_plan = RoutePlan(
-                        route="rag",
-                        confidence=0.4,
-                        reasoning=f"SQL failed ({exc}); falling back to RAG.",
-                    )
-                else:
-                    raise
+                log.log_info("SQL-only route failed; attempting RAG fallback")
+                route_plan = RoutePlan(
+                    route="rag",
+                    confidence=0.4,
+                    reasoning=f"SQL failed ({exc}); falling back to RAG.",
+                )
 
     if route_plan.route in ("rag", "both"):
         try:
@@ -602,17 +522,19 @@ async def run_tool_based_agentic_query(
     if not sql_result and not rag_result:
         raise ValueError("Both SQL and RAG tools failed to produce results.")
 
+    question = request.message
+    if request.contexts:
+        question += f" (Context: {', '.join(request.contexts)})"
+
     answer = await synthesize_answer(
-        question=request.question,
+        question=question,
         route_plan=route_plan,
         rag_result=rag_result,
         sql_result=sql_result,
-        verbose=request.verbose,
+        verbose=False,
     )
 
     sql_query_str = None
-    if sql_result and request.show_sql:
-        sql_query_str = sql_result.get("sql")
 
     log.log_info(
         f"Deterministic agentic query completed: route={route_plan.route}, "
@@ -620,7 +542,7 @@ async def run_tool_based_agentic_query(
     )
 
     return AgenticToolAskResponse(
-        answer=answer,
+        response=answer,
         tools_used=tools_used,
         route_plan=route_plan,
         sql_query_executed=sql_query_str,

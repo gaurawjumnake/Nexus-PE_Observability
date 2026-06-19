@@ -37,11 +37,8 @@ class IndexDocumentRequest(BaseModel):
 
 
 class ChatQueryRequest(BaseModel):
-    question: str = Field(..., min_length=1)
-    company_id: str
-    period: Optional[str] = None
-    document_ids: Optional[list[str]] = None
-    top_k: int = Field(default=8, ge=1, le=20)
+    message: str = Field(..., min_length=1)
+    contexts: Optional[list[str]] = Field(default_factory=list)
 
 
 class Citation(BaseModel):
@@ -178,16 +175,12 @@ def build_where(
 
 def retrieve_context(request: ChatQueryRequest) -> RetrievedContext:
     log.log_info(
-        f"RAG retrieval started: company_id={request.company_id}, "
-        f"period={request.period}, document_ids={request.document_ids}, top_k={request.top_k}"
+        f"RAG retrieval started: message={request.message}"
     )
     collection = get_collection()
-    where_filter = build_where(request.company_id, request.document_ids, request.period)
-    log.log_info(f"Chroma where filter: {where_filter}")
     results = collection.query(
-        query_texts=[request.question],
-        n_results=request.top_k,
-        where=where_filter,
+        query_texts=[request.message],
+        n_results=8,
     )
 
     documents = results.get("documents", [[]])[0]
@@ -275,9 +268,9 @@ async def answer_with_rag(question: str, context: RetrievedContext) -> str:
 
 
 async def run_rag_query(request: ChatQueryRequest) -> ChatQueryResponse:
-    log.log_info(f"RAG query started: question={request.question}")
+    log.log_info(f"RAG query started: message={request.message}")
     context = await asyncio.to_thread(retrieve_context, request)
-    answer = await answer_with_rag(request.question, context)
+    answer = await answer_with_rag(request.message, context)
     log.log_info(f"RAG query completed with {len(context.citations)} citation(s)")
     return ChatQueryResponse(answer=answer, citations=context.citations)
 

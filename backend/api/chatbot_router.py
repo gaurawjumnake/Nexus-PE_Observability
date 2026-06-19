@@ -46,7 +46,7 @@ async def query_chat(request: ChatQueryRequest):
 # # Orchastrator ----------------------------------------
 
 
-@router.post("/ask/agentic", response_model=AgenticToolAskResponse)
+@router.post("", response_model=AgenticToolAskResponse)
 async def ask_agentic_tools(request: AgenticAskRequest):
     """Deterministic agentic endpoint.
 
@@ -94,16 +94,20 @@ async def ask_agentic(request: AgenticAskRequest):
             log.log_info("Route includes RAG; invoking document retrieval")
             rag_result = await run_rag(request)
 
+        question = request.message
+        if request.contexts:
+            question += f" (Context: {', '.join(request.contexts)})"
+
         answer = await synthesize_answer(
-            question=request.question,
+            question=question,
             route_plan=route_plan,
             rag_result=rag_result,
             sql_result=sql_result,
-            verbose=request.verbose,
+            verbose=False,
         )
 
         response = AgenticAskResponse(
-            answer=answer,
+            response=answer,
             route_plan=route_plan,
             rag=rag_result.model_dump() if rag_result else None,
             sql=sql_result,
