@@ -25,11 +25,11 @@ import json
 import re
 from typing import Optional
 from backend.utilites.llm_models import BaseLLMClient
-from backend.kpi_extractor.app.mcp.client import RegistryMCPClient
+from backend.kpi_extractor.app.registry.registry_service import RegistryService
 
 
 class BaseAgent:
-    def __init__(self, llm: BaseLLMClient, registry: RegistryMCPClient):
+    def __init__(self, llm: BaseLLMClient, registry: RegistryService):
         self.llm = llm
         self.registry = registry
 

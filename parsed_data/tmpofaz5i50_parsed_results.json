@@ -1,0 +1,85 @@
+[
+  {
+    "filename": "tmpofaz5i50.md",
+    "file_type": ".md",
+    "total_pages": 1,
+    "pages": [
+      {
+        "page_number": 1,
+        "text_content": "",
+        "images": [],
+        "tables": [
+          {
+            "headers": [
+              "Metric",
+              "Value"
+            ],
+            "row_count": 2,
+            "column_count": 2,
+            "data": [
+              [
+                "Pre-AI opex baseline (opex before AI)",
+                "$42.0M"
+              ],
+              [
+                "Current opex (post-AI operating expense)",
+                "$38.8M"
+              ]
+            ]
+          },
+          {
+            "headers": [
+              "Metric",
+              "Value"
+            ],
+            "row_count": 2,
+            "column_count": 2,
+            "data": [
+              [
+                "SLA pre-AI (baseline service level)",
+                "78.0%"
+              ],
+              [
+                "SLA post-AI (current service level)",
+                "96.0%"
+              ]
+            ]
+          },
+          {
+            "headers": [
+              "Metric",
+              "Value"
+            ],
+            "row_count": 2,
+            "column_count": 2,
+            "data": [
+              [
+                "Output pre-AI per FTE (baseline productivity per employee)",
+                "120.0 units/FTE"
+              ],
+              [
+                "Output post-AI per FTE (current productivity per employee)",
+                "169.2 units/FTE"
+              ]
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 1,
+          "content_length": 0,
+          "file_type": ".md",
+          "has_visual_content": true,
+          "content_type": "mixed_content"
+        }
+      }
+    ],
+    "document_metadata": {
+      "total_documents": 1,
+      "extraction_method": "Docling",
+      "has_images": false,
+      "has_tables": true,
+      "estimated_pages": 1
+    },
+    "processing_time": 0.08545565605163574
+  }
+]

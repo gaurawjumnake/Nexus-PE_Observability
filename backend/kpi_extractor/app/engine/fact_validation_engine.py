@@ -15,20 +15,21 @@ Responsibilities:
 Input:
     extractions: raw output from FactExtractionAgent.run()
     document_type: classified type of the source document
-    registry: RegistryMCPClient (to fetch fact context)
+    registry: RegistryService (to fetch fact context)
 
 Output:
     validated: list of dicts ready for Postgres fact_store save
 """
 
+import math
 from typing import Optional
-from backend.kpi_extractor.app.mcp.client import RegistryMCPClient
+from backend.kpi_extractor.app.registry.registry_service import RegistryService
 
 
 def validate_extractions(
     extractions: list[dict],
     document_type: str,
-    registry: RegistryMCPClient,
+    registry: RegistryService,
 ) -> list[dict]:
     """
     Main entry point. Returns only validated, normalized extractions.
@@ -44,7 +45,7 @@ def validate_extractions(
 
 def resolve_source_conflicts(
     validated: list[dict],
-    registry: RegistryMCPClient,
+    registry: RegistryService,
 ) -> list[dict]:
     """
     When the same fact_id appears more than once (extracted from
@@ -68,9 +69,22 @@ def resolve_source_conflicts(
 # ------------------------------------------------------------------
 # Internal
 # ------------------------------------------------------------------
-def _validate_one(ext: dict, fact_ctx: dict, document_type: str) -> Optional[dict]:
+def _validate_one(ext: dict, fact_ctx: Optional[dict], document_type: str) -> Optional[dict]:
     value = ext["value"]
     confidence = ext["confidence"]
+
+    # No fact schema (e.g. column is a KPI ID stored directly) — pass through
+    # numeric values as-is; non-numeric are skipped.
+    if fact_ctx is None:
+        try:
+            import math
+            v = float(value)
+            if math.isnan(v):
+                return None
+            return {**ext, "value": v, "source_type": document_type}
+        except (TypeError, ValueError):
+            return None
+
     rules = fact_ctx.get("validation_rules") or {}
     conf_rules = fact_ctx.get("confidence_rules") or {}
     data_type = fact_ctx["data_type"]
@@ -85,8 +99,9 @@ def _validate_one(ext: dict, fact_ctx: dict, document_type: str) -> Optional[dic
     if value is None:
         return None
 
-    # 3. Range check
-    if data_type in ("integer", "float", "currency", "percentage"):
+    # 3. Range check — skip for tabular extractions (confidence=1.0 means the value
+    # was read verbatim from a structured cell; rejecting it would silently drop real data)
+    if data_type in ("integer", "float", "currency", "percentage") and confidence < 1.0:
         try:
             num = float(value)
         except (TypeError, ValueError):
@@ -115,11 +130,18 @@ def _validate_one(ext: dict, fact_ctx: dict, document_type: str) -> Optional[dic
 def _coerce_type(value, data_type: str):
     try:
         if data_type == "integer":
-            return int(float(value))
+            result = int(float(value))
+            return result
         if data_type in ("float", "currency"):
-            return float(value)
+            result = float(value)
+            if math.isnan(result):
+                return None
+            return result
         if data_type == "percentage":
-            return float(value)
+            result = float(value)
+            if math.isnan(result):
+                return None
+            return result
         if data_type == "boolean":
             if isinstance(value, bool):
                 return value

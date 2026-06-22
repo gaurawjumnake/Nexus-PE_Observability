@@ -72,7 +72,7 @@ class OpenAIClient(BaseLLMClient):
         resp = self._client.chat.completions.create(
             model=self._model, messages=messages, max_tokens=max_tokens
         )
-        return resp.choices[0].message.content
+        return resp.choices[0].message.content #type:ignore
 
 
 # ------------------------------------------------------------------

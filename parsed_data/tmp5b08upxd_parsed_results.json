@@ -1,0 +1,118 @@
+[
+  {
+    "filename": "tmp5b08upxd.md",
+    "file_type": ".md",
+    "total_pages": 1,
+    "pages": [
+      {
+        "page_number": 1,
+        "text_content": "",
+        "images": [],
+        "tables": [
+          {
+            "headers": [
+              "Metric",
+              "Value"
+            ],
+            "row_count": 3,
+            "column_count": 2,
+            "data": [
+              [
+                "Total entities (AI policy population count)",
+                "220"
+              ],
+              [
+                "Compliant entities",
+                "207"
+              ],
+              [
+                "Policy conformance rate",
+                "94.1%"
+              ]
+            ]
+          },
+          {
+            "headers": [
+              "Incident ID",
+              "Incident Type",
+              "Incident Severity",
+              "Incident Status",
+              "Incident Period",
+              "Incident Resolution Time",
+              "Output ID",
+              "Output Criticality",
+              "Human Review Completed"
+            ],
+            "row_count": 2,
+            "column_count": 9,
+            "data": [
+              [
+                "INC-2026-0411",
+                "model_drift_alert",
+                "major",
+                "resolved",
+                "2026-05",
+                "90 minutes",
+                "OUT-22018",
+                "high",
+                "true"
+              ],
+              [
+                "INC-2026-0419",
+                "data_access_anomaly",
+                "major",
+                "resolved",
+                "2026-06",
+                "105 minutes",
+                "OUT-22041",
+                "medium",
+                "true"
+              ]
+            ]
+          },
+          {
+            "headers": [
+              "Vendor ID",
+              "Vendor",
+              "Compliance Status"
+            ],
+            "row_count": 3,
+            "column_count": 3,
+            "data": [
+              [
+                "VEND-OAI-001",
+                "OpenAI",
+                "compliant"
+              ],
+              [
+                "VEND-ANT-002",
+                "Anthropic",
+                "compliant"
+              ],
+              [
+                "VEND-AWS-003",
+                "Amazon Web Services",
+                "compliant"
+              ]
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 1,
+          "content_length": 0,
+          "file_type": ".md",
+          "has_visual_content": true,
+          "content_type": "mixed_content"
+        }
+      }
+    ],
+    "document_metadata": {
+      "total_documents": 1,
+      "extraction_method": "Docling",
+      "has_images": false,
+      "has_tables": true,
+      "estimated_pages": 1
+    },
+    "processing_time": 0.08723306655883789
+  }
+]

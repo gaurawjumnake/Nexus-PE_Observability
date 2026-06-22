@@ -1,0 +1,2659 @@
+{
+  "kpis": [
+    {
+      "kpi_id": "active_ai_users",
+      "company_id": "fluke",
+      "value": 189321,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "active_ai_users",
+      "company_id": "fluke",
+      "value": 189604,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "active_ai_users",
+      "company_id": "fluke",
+      "value": 189321,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:40"
+    },
+    {
+      "kpi_id": "active_ai_users",
+      "company_id": "fluke",
+      "value": 189321,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "active_ai_users",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:58"
+    },
+    {
+      "kpi_id": "adoption_velocity_rank",
+      "company_id": "fluke",
+      "value": 11,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "adoption_velocity_rank",
+      "company_id": "fluke",
+      "value": 11,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "adoption_velocity_rank",
+      "company_id": "fluke",
+      "value": 11,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:40"
+    },
+    {
+      "kpi_id": "adoption_velocity_rank",
+      "company_id": "fluke",
+      "value": 11,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "adoption_velocity_rank",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:58"
+    },
+    {
+      "kpi_id": "adoption_yoy_growth",
+      "company_id": "fluke",
+      "value": 17.66,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "adoption_yoy_growth",
+      "company_id": "fluke",
+      "value": 17.66,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "adoption_yoy_growth",
+      "company_id": "fluke",
+      "value": 17.66,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "adoption_yoy_growth",
+      "company_id": "fluke",
+      "value": 17.66,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "adoption_yoy_growth",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:58"
+    },
+    {
+      "kpi_id": "ai_assisted_revenue",
+      "company_id": "fluke",
+      "value": 17934454.5,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "ai_assisted_revenue",
+      "company_id": "fluke",
+      "value": 17969111.28,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "ai_assisted_revenue",
+      "company_id": "fluke",
+      "value": 17934454.5,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "ai_assisted_revenue",
+      "company_id": "fluke",
+      "value": 17934454.5,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "ai_assisted_revenue",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:58"
+    },
+    {
+      "kpi_id": "ai_governance_score",
+      "company_id": "fluke",
+      "value": 33.11364102564102,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "ai_governance_score",
+      "company_id": "fluke",
+      "value": 33.02817258883249,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "ai_governance_score",
+      "company_id": "fluke",
+      "value": 33.11364102564102,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "ai_governance_score",
+      "company_id": "fluke",
+      "value": 33.11364102564102,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "ai_governance_score",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:58"
+    },
+    {
+      "kpi_id": "ai_incident_rate",
+      "company_id": "fluke",
+      "value": 2.85,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "ai_incident_rate",
+      "company_id": "fluke",
+      "value": 2.85,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "ai_incident_rate",
+      "company_id": "fluke",
+      "value": 2.85,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "ai_incident_rate",
+      "company_id": "fluke",
+      "value": 2.85,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "ai_incident_rate",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0.3333333333333333,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:58"
+    },
+    {
+      "kpi_id": "ai_maturity_score",
+      "company_id": "fluke",
+      "value": 23.595820512820513,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "ai_maturity_score",
+      "company_id": "fluke",
+      "value": 23.540697969543146,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "ai_maturity_score",
+      "company_id": "fluke",
+      "value": 23.595820512820513,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "ai_maturity_score",
+      "company_id": "fluke",
+      "value": 23.595820512820513,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "ai_maturity_score",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:58"
+    },
+    {
+      "kpi_id": "ai_revenue",
+      "company_id": "fluke",
+      "value": 79530988.35000001,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "ai_revenue",
+      "company_id": "fluke",
+      "value": 79668405.52,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "ai_revenue",
+      "company_id": "fluke",
+      "value": 79530988.35000001,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "ai_revenue",
+      "company_id": "fluke",
+      "value": 79530988.35000001,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "ai_revenue",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:58"
+    },
+    {
+      "kpi_id": "ai_roi",
+      "company_id": "fluke",
+      "value": 0.752445577535734,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "ai_roi",
+      "company_id": "fluke",
+      "value": 0.7582991767387293,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "ai_roi",
+      "company_id": "fluke",
+      "value": 0.752445577535734,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "ai_roi",
+      "company_id": "fluke",
+      "value": 0.752445577535734,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "ai_roi",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "api_licensing_spend",
+      "company_id": "fluke",
+      "value": 4102090.77,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "api_licensing_spend",
+      "company_id": "fluke",
+      "value": 4114510.87,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "api_licensing_spend",
+      "company_id": "fluke",
+      "value": 4102090.77,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "api_licensing_spend",
+      "company_id": "fluke",
+      "value": 4102090.77,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "api_licensing_spend",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "api_success_rate",
+      "company_id": "fluke",
+      "value": 90.2,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "api_success_rate",
+      "company_id": "fluke",
+      "value": 90.2,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "api_success_rate",
+      "company_id": "fluke",
+      "value": 90.2,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "api_success_rate",
+      "company_id": "fluke",
+      "value": 90.2,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "api_success_rate",
+      "company_id": "novamind",
+      "value": "CALL-88502",
+      "coverage": 1,
+      "status": "calculated_derived",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "availability_uptime",
+      "company_id": "fluke",
+      "value": 96.78,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "availability_uptime",
+      "company_id": "fluke",
+      "value": 96.78,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "availability_uptime",
+      "company_id": "fluke",
+      "value": 96.78,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "availability_uptime",
+      "company_id": "fluke",
+      "value": 96.78,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "availability_uptime",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "budget_adherence",
+      "company_id": "fluke",
+      "value": -435565949.3262556,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "budget_adherence",
+      "company_id": "fluke",
+      "value": -436052544.9162925,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "budget_adherence",
+      "company_id": "fluke",
+      "value": -435565949.3262556,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "budget_adherence",
+      "company_id": "fluke",
+      "value": -435565949.3262556,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "budget_adherence",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "budget_variance",
+      "company_id": "fluke",
+      "value": 106670125.48,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "budget_variance",
+      "company_id": "fluke",
+      "value": 106789292.74000001,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "budget_variance",
+      "company_id": "fluke",
+      "value": 106670125.48,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "budget_variance",
+      "company_id": "fluke",
+      "value": 106670125.48,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "budget_variance",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "cloud_spend",
+      "company_id": "fluke",
+      "value": 18981804.62,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "cloud_spend",
+      "company_id": "fluke",
+      "value": 19100977.41,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "cloud_spend",
+      "company_id": "fluke",
+      "value": 18981804.62,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "cloud_spend",
+      "company_id": "fluke",
+      "value": 18981804.62,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "cloud_spend",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "company_maturity_rank",
+      "company_id": "fluke",
+      "value": 37,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "company_maturity_rank",
+      "company_id": "fluke",
+      "value": 37,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "company_maturity_rank",
+      "company_id": "fluke",
+      "value": 37,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "company_maturity_rank",
+      "company_id": "fluke",
+      "value": 37,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "company_maturity_rank",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "copilot_adoption",
+      "company_id": "fluke",
+      "value": 13.41,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "copilot_adoption",
+      "company_id": "fluke",
+      "value": 13.41,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "copilot_adoption",
+      "company_id": "fluke",
+      "value": 13.41,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "copilot_adoption",
+      "company_id": "fluke",
+      "value": 13.41,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "copilot_adoption",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "cost_efficiency_rank",
+      "company_id": "fluke",
+      "value": 22,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "cost_efficiency_rank",
+      "company_id": "fluke",
+      "value": 22,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "cost_efficiency_rank",
+      "company_id": "fluke",
+      "value": 22,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "cost_efficiency_rank",
+      "company_id": "fluke",
+      "value": 22,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "cost_efficiency_rank",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "cost_per_outcome",
+      "company_id": "fluke",
+      "value": null,
+      "coverage": 0.5,
+      "status": "insufficient_data",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "cost_per_outcome",
+      "company_id": "fluke",
+      "value": null,
+      "coverage": 0.5,
+      "status": "insufficient_data",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "cost_per_outcome",
+      "company_id": "fluke",
+      "value": null,
+      "coverage": 0.5,
+      "status": "insufficient_data",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "cost_per_outcome",
+      "company_id": "fluke",
+      "value": null,
+      "coverage": 0.5,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "cost_per_outcome",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "cost_savings",
+      "company_id": "fluke",
+      "value": 6677807.09,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "cost_savings",
+      "company_id": "fluke",
+      "value": 6699707.47,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "cost_savings",
+      "company_id": "fluke",
+      "value": 6677807.09,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "cost_savings",
+      "company_id": "fluke",
+      "value": 6677807.09,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "cost_savings",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "critical_incident_count",
+      "company_id": "fluke",
+      "value": 5,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "critical_incident_count",
+      "company_id": "fluke",
+      "value": 5,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "critical_incident_count",
+      "company_id": "fluke",
+      "value": 5,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "critical_incident_count",
+      "company_id": "fluke",
+      "value": 5,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "critical_incident_count",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0.6666666666666666,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "cross_sell_uplift",
+      "company_id": "fluke",
+      "value": 15.9,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "cross_sell_uplift",
+      "company_id": "fluke",
+      "value": 15.9,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "cross_sell_uplift",
+      "company_id": "fluke",
+      "value": 15.9,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "cross_sell_uplift",
+      "company_id": "fluke",
+      "value": 15.9,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "cross_sell_uplift",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "custom_agent_adoption",
+      "company_id": "fluke",
+      "value": 51.97,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "custom_agent_adoption",
+      "company_id": "fluke",
+      "value": 51.97,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "custom_agent_adoption",
+      "company_id": "fluke",
+      "value": 51.97,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "custom_agent_adoption",
+      "company_id": "fluke",
+      "value": 51.97,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "custom_agent_adoption",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "data_privacy_compliance",
+      "company_id": "fluke",
+      "value": 83.63384615384615,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "data_privacy_compliance",
+      "company_id": "fluke",
+      "value": 83.60812182741117,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "data_privacy_compliance",
+      "company_id": "fluke",
+      "value": 83.63384615384615,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "data_privacy_compliance",
+      "company_id": "fluke",
+      "value": 83.63384615384615,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "data_privacy_compliance",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "dau_mau_intensity",
+      "company_id": "fluke",
+      "value": 0.28,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "dau_mau_intensity",
+      "company_id": "fluke",
+      "value": 0.28,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "dau_mau_intensity",
+      "company_id": "fluke",
+      "value": 0.28,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "dau_mau_intensity",
+      "company_id": "fluke",
+      "value": 0.28,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "dau_mau_intensity",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "direct_ai_revenue",
+      "company_id": "fluke",
+      "value": 33450743.48,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "direct_ai_revenue",
+      "company_id": "fluke",
+      "value": 33522832.94,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "direct_ai_revenue",
+      "company_id": "fluke",
+      "value": 33450743.48,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "direct_ai_revenue",
+      "company_id": "fluke",
+      "value": 33450743.48,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "direct_ai_revenue",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "ebitda_uplift",
+      "company_id": "fluke",
+      "value": 2.83,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "ebitda_uplift",
+      "company_id": "fluke",
+      "value": 2.83,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "ebitda_uplift",
+      "company_id": "fluke",
+      "value": 2.83,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "ebitda_uplift",
+      "company_id": "fluke",
+      "value": 2.83,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "ebitda_uplift",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "embedded_analytics_adoption",
+      "company_id": "fluke",
+      "value": 27.2,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "embedded_analytics_adoption",
+      "company_id": "fluke",
+      "value": 27.2,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "embedded_analytics_adoption",
+      "company_id": "fluke",
+      "value": 27.2,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "embedded_analytics_adoption",
+      "company_id": "fluke",
+      "value": 27.2,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "embedded_analytics_adoption",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "error_rate",
+      "company_id": "fluke",
+      "value": 4.24,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "error_rate",
+      "company_id": "fluke",
+      "value": 4.24,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "error_rate",
+      "company_id": "fluke",
+      "value": 4.24,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "error_rate",
+      "company_id": "fluke",
+      "value": 4.24,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "error_rate",
+      "company_id": "novamind",
+      "value": "CALL-88502",
+      "coverage": 1,
+      "status": "calculated_derived",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "fallback_rate",
+      "company_id": "fluke",
+      "value": 6.66,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "fallback_rate",
+      "company_id": "fluke",
+      "value": 6.66,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "fallback_rate",
+      "company_id": "fluke",
+      "value": 6.66,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "fallback_rate",
+      "company_id": "fluke",
+      "value": 6.66,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "fallback_rate",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0.5,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "forecasted_ai_spend",
+      "company_id": "fluke",
+      "value": 178353.8,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "forecasted_ai_spend",
+      "company_id": "fluke",
+      "value": 178353.8,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "forecasted_ai_spend",
+      "company_id": "fluke",
+      "value": 178353.8,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "forecasted_ai_spend",
+      "company_id": "fluke",
+      "value": 178353.8,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "forecasted_ai_spend",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "governance_maturity_score",
+      "company_id": "fluke",
+      "value": 23.020307692307693,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "governance_maturity_score",
+      "company_id": "fluke",
+      "value": 22.921116751269036,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "governance_maturity_score",
+      "company_id": "fluke",
+      "value": 23.020307692307693,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "governance_maturity_score",
+      "company_id": "fluke",
+      "value": 23.020307692307693,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "governance_maturity_score",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "governance_rank",
+      "company_id": "fluke",
+      "value": 29,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "governance_rank",
+      "company_id": "fluke",
+      "value": 29,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:02"
+    },
+    {
+      "kpi_id": "governance_rank",
+      "company_id": "fluke",
+      "value": 29,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "governance_rank",
+      "company_id": "fluke",
+      "value": 29,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "governance_rank",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "hallucination_rate",
+      "company_id": "fluke",
+      "value": 5.92,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "hallucination_rate",
+      "company_id": "fluke",
+      "value": 5.92,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "hallucination_rate",
+      "company_id": "fluke",
+      "value": 5.92,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "hallucination_rate",
+      "company_id": "fluke",
+      "value": 5.92,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "hallucination_rate",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0.5,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "human_review_coverage",
+      "company_id": "fluke",
+      "value": 31.58,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "human_review_coverage",
+      "company_id": "fluke",
+      "value": 31.58,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "human_review_coverage",
+      "company_id": "fluke",
+      "value": 31.58,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "human_review_coverage",
+      "company_id": "fluke",
+      "value": 31.58,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "human_review_coverage",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0.6666666666666666,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "industry_benchmark_ratio",
+      "company_id": "fluke",
+      "value": 0.93,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "industry_benchmark_ratio",
+      "company_id": "fluke",
+      "value": 0.93,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "industry_benchmark_ratio",
+      "company_id": "fluke",
+      "value": 0.93,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "industry_benchmark_ratio",
+      "company_id": "fluke",
+      "value": 0.93,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "industry_benchmark_ratio",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "mttr",
+      "company_id": "fluke",
+      "value": 10.74,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "mttr",
+      "company_id": "fluke",
+      "value": 10.74,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "mttr",
+      "company_id": "fluke",
+      "value": 10.74,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "mttr",
+      "company_id": "fluke",
+      "value": 10.74,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "mttr",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0.3333333333333333,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "p95_latency",
+      "company_id": "fluke",
+      "value": 906,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "p95_latency",
+      "company_id": "fluke",
+      "value": 906,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "p95_latency",
+      "company_id": "fluke",
+      "value": 906,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "p95_latency",
+      "company_id": "fluke",
+      "value": 906,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "p95_latency",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "payback_period",
+      "company_id": "fluke",
+      "value": 8.33,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "payback_period",
+      "company_id": "fluke",
+      "value": 8.33,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "payback_period",
+      "company_id": "fluke",
+      "value": 8.33,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "payback_period",
+      "company_id": "fluke",
+      "value": 8.33,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "payback_period",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "percent_ai_in_production",
+      "company_id": "fluke",
+      "value": 26.9,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "percent_ai_in_production",
+      "company_id": "fluke",
+      "value": 26.9,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "percent_ai_in_production",
+      "company_id": "fluke",
+      "value": 26.9,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "percent_ai_in_production",
+      "company_id": "fluke",
+      "value": 26.9,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "percent_ai_in_production",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "pipeline_influenced_revenue",
+      "company_id": "fluke",
+      "value": 28145790.37,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "pipeline_influenced_revenue",
+      "company_id": "fluke",
+      "value": 28176461.3,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "pipeline_influenced_revenue",
+      "company_id": "fluke",
+      "value": 28145790.37,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "pipeline_influenced_revenue",
+      "company_id": "fluke",
+      "value": 28145790.37,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "pipeline_influenced_revenue",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "policy_compliance_rate",
+      "company_id": "fluke",
+      "value": 79.63,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "policy_compliance_rate",
+      "company_id": "fluke",
+      "value": 79.63,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "policy_compliance_rate",
+      "company_id": "fluke",
+      "value": 79.63,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "policy_compliance_rate",
+      "company_id": "fluke",
+      "value": 79.63,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "policy_compliance_rate",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "portfolio_ai_adoption_score",
+      "company_id": "fluke",
+      "value": 32.81,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "portfolio_ai_adoption_score",
+      "company_id": "fluke",
+      "value": 32.81,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "portfolio_ai_adoption_score",
+      "company_id": "fluke",
+      "value": 32.81,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "portfolio_ai_adoption_score",
+      "company_id": "fluke",
+      "value": 32.81,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "portfolio_ai_adoption_score",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "portfolio_benchmark_score",
+      "company_id": "fluke",
+      "value": 24.4,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "portfolio_benchmark_score",
+      "company_id": "fluke",
+      "value": 24.4,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "portfolio_benchmark_score",
+      "company_id": "fluke",
+      "value": 24.4,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "portfolio_benchmark_score",
+      "company_id": "fluke",
+      "value": 24.4,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "portfolio_benchmark_score",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "power_user_ratio",
+      "company_id": "fluke",
+      "value": 12.82,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "power_user_ratio",
+      "company_id": "fluke",
+      "value": 12.82,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "power_user_ratio",
+      "company_id": "fluke",
+      "value": 12.82,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "power_user_ratio",
+      "company_id": "fluke",
+      "value": 12.82,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "power_user_ratio",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "production_ratio",
+      "company_id": "fluke",
+      "value": 3.519191919191919,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "production_ratio",
+      "company_id": "fluke",
+      "value": 3.5080321285140563,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "production_ratio",
+      "company_id": "fluke",
+      "value": 3.519191919191919,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "production_ratio",
+      "company_id": "fluke",
+      "value": 3.519191919191919,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "production_ratio",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "productivity_gain",
+      "company_id": "fluke",
+      "value": 14.48,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "productivity_gain",
+      "company_id": "fluke",
+      "value": 14.48,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "productivity_gain",
+      "company_id": "fluke",
+      "value": 14.48,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "productivity_gain",
+      "company_id": "fluke",
+      "value": 14.48,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:07"
+    },
+    {
+      "kpi_id": "productivity_gain",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "projects_in_poc",
+      "company_id": "fluke",
+      "value": 990,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "projects_in_poc",
+      "company_id": "fluke",
+      "value": 996,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "projects_in_poc",
+      "company_id": "fluke",
+      "value": 990,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "projects_in_poc",
+      "company_id": "fluke",
+      "value": 990,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:08"
+    },
+    {
+      "kpi_id": "projects_in_poc",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0.5,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "projects_in_production",
+      "company_id": "fluke",
+      "value": 3484,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "projects_in_production",
+      "company_id": "fluke",
+      "value": 3494,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "projects_in_production",
+      "company_id": "fluke",
+      "value": 3484,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "projects_in_production",
+      "company_id": "fluke",
+      "value": 3484,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:08"
+    },
+    {
+      "kpi_id": "projects_in_production",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0.5,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "regulatory_readiness",
+      "company_id": "fluke",
+      "value": 32.40553846153846,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "regulatory_readiness",
+      "company_id": "fluke",
+      "value": 32.34583756345178,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "regulatory_readiness",
+      "company_id": "fluke",
+      "value": 32.40553846153846,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "regulatory_readiness",
+      "company_id": "fluke",
+      "value": 32.40553846153846,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:08"
+    },
+    {
+      "kpi_id": "regulatory_readiness",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "spend_by_model_family",
+      "company_id": "fluke",
+      "value": 10.176036391673595,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "spend_by_model_family",
+      "company_id": "fluke",
+      "value": 10.179545578128424,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "spend_by_model_family",
+      "company_id": "fluke",
+      "value": 10.176036391673595,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "spend_by_model_family",
+      "company_id": "fluke",
+      "value": 10.176036391673595,
+      "coverage": 1,
+      "status": "calculated",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:08"
+    },
+    {
+      "kpi_id": "spend_by_model_family",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "stalled_projects",
+      "company_id": "fluke",
+      "value": 5,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "stalled_projects",
+      "company_id": "fluke",
+      "value": 5,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "stalled_projects",
+      "company_id": "fluke",
+      "value": 5,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "stalled_projects",
+      "company_id": "fluke",
+      "value": 5,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:08"
+    },
+    {
+      "kpi_id": "stalled_projects",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0.3333333333333333,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "strategic_alignment_score",
+      "company_id": "fluke",
+      "value": 23.474512820512818,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "strategic_alignment_score",
+      "company_id": "fluke",
+      "value": 23.47279187817259,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "strategic_alignment_score",
+      "company_id": "fluke",
+      "value": 23.474512820512818,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "strategic_alignment_score",
+      "company_id": "fluke",
+      "value": 23.474512820512818,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:08"
+    },
+    {
+      "kpi_id": "strategic_alignment_score",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "talent_readiness_score",
+      "company_id": "fluke",
+      "value": 23.91425641025641,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "talent_readiness_score",
+      "company_id": "fluke",
+      "value": 23.871167512690356,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "talent_readiness_score",
+      "company_id": "fluke",
+      "value": 23.91425641025641,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "talent_readiness_score",
+      "company_id": "fluke",
+      "value": 23.91425641025641,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:08"
+    },
+    {
+      "kpi_id": "talent_readiness_score",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "technical_maturity_score",
+      "company_id": "fluke",
+      "value": 23.974205128205128,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "technical_maturity_score",
+      "company_id": "fluke",
+      "value": 23.89771573604061,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "technical_maturity_score",
+      "company_id": "fluke",
+      "value": 23.974205128205128,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "technical_maturity_score",
+      "company_id": "fluke",
+      "value": 23.974205128205128,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:08"
+    },
+    {
+      "kpi_id": "technical_maturity_score",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "top_quartile_position",
+      "company_id": "fluke",
+      "value": 33.01,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "top_quartile_position",
+      "company_id": "fluke",
+      "value": 33.01,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "top_quartile_position",
+      "company_id": "fluke",
+      "value": 33.01,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "top_quartile_position",
+      "company_id": "fluke",
+      "value": 33.01,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:08"
+    },
+    {
+      "kpi_id": "top_quartile_position",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "total_ai_projects",
+      "company_id": "fluke",
+      "value": 39,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "total_ai_projects",
+      "company_id": "fluke",
+      "value": 39,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "total_ai_projects",
+      "company_id": "fluke",
+      "value": 39,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "total_ai_projects",
+      "company_id": "fluke",
+      "value": 39,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:08"
+    },
+    {
+      "kpi_id": "total_ai_projects",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0.5,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "total_ai_spend",
+      "company_id": "fluke",
+      "value": 106670149.97,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "total_ai_spend",
+      "company_id": "fluke",
+      "value": 106789317.23,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "total_ai_spend",
+      "company_id": "fluke",
+      "value": 106670149.97,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "total_ai_spend",
+      "company_id": "fluke",
+      "value": 106670149.97,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:08"
+    },
+    {
+      "kpi_id": "total_ai_spend",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    },
+    {
+      "kpi_id": "vendor_compliance",
+      "company_id": "fluke",
+      "value": 68.66,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2023",
+      "timestamp": "2026-06-21 19:48:36"
+    },
+    {
+      "kpi_id": "vendor_compliance",
+      "company_id": "fluke",
+      "value": 68.66,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2024",
+      "timestamp": "2026-06-21 19:50:03"
+    },
+    {
+      "kpi_id": "vendor_compliance",
+      "company_id": "fluke",
+      "value": 68.66,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2025",
+      "timestamp": "2026-06-21 19:45:41"
+    },
+    {
+      "kpi_id": "vendor_compliance",
+      "company_id": "fluke",
+      "value": 68.66,
+      "coverage": 1,
+      "status": "calculated_direct",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:47:08"
+    },
+    {
+      "kpi_id": "vendor_compliance",
+      "company_id": "novamind",
+      "value": null,
+      "coverage": 0,
+      "status": "insufficient_data",
+      "period": "2026",
+      "timestamp": "2026-06-21 19:59:59"
+    }
+  ]
+}

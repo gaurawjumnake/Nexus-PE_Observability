@@ -1,0 +1,97 @@
+[
+  {
+    "filename": "tmp3lytyiy7.md",
+    "file_type": ".md",
+    "total_pages": 1,
+    "pages": [
+      {
+        "page_number": 1,
+        "text_content": "",
+        "images": [],
+        "tables": [
+          {
+            "headers": [
+              "Tool",
+              "Weekly Sessions"
+            ],
+            "row_count": 3,
+            "column_count": 2,
+            "data": [
+              [
+                "Copilot weekly sessions (copilot tool usage sessions)",
+                "1,200"
+              ],
+              [
+                "Custom agent weekly sessions",
+                "650"
+              ],
+              [
+                "Embedded analytics weekly sessions",
+                "870"
+              ]
+            ]
+          },
+          {
+            "headers": [
+              "Metric",
+              "Value"
+            ],
+            "row_count": 2,
+            "column_count": 2,
+            "data": [
+              [
+                "Output pre-AI per FTE (baseline productivity per FTE)",
+                "120.0 units/FTE"
+              ],
+              [
+                "Output post-AI per FTE (current productivity per FTE)",
+                "169.2 units/FTE"
+              ]
+            ]
+          },
+          {
+            "headers": [
+              "Component",
+              "Weight",
+              "Score"
+            ],
+            "row_count": 3,
+            "column_count": 3,
+            "data": [
+              [
+                "Certification density",
+                "40%",
+                "62.0"
+              ],
+              [
+                "AIQ survey score",
+                "35%",
+                "71.0"
+              ],
+              [
+                "Proficiency survey score",
+                "25%",
+                "70.0"
+              ]
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 1,
+          "content_length": 0,
+          "file_type": ".md",
+          "has_visual_content": true,
+          "content_type": "mixed_content"
+        }
+      }
+    ],
+    "document_metadata": {
+      "total_documents": 1,
+      "extraction_method": "Docling",
+      "has_images": false,
+      "has_tables": true,
+      "estimated_pages": 1
+    },
+    "processing_time": 0.07449007034301758
+  }
+]

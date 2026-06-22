@@ -1,83 +1,106 @@
-# Nexus Platform — Stage 2: Agents & Deterministic Engines
+# Nexus Platform — KPI Extractor
 
-Builds on Stage 1 (Registry MCP). Adds the three CrewAI agents and two
-deterministic engines that complete the pipeline.
+Document → Facts → KPIs → Insight pipeline. Three CrewAI-style agents
+plus two deterministic engines, backed by a YAML-defined fact/KPI
+registry that's indexed into SQLite for fast lookup.
 
 ## Folder Structure
 
 ```
-kpi_extractor/
-├── registry/                          # Stage 1 (unchanged)
-│   ├── facts/        102 YAML files
-│   └── kpis/         59 YAML files
-├── app/
-│   ├── core/
-│   │   ├── llm_client.py     LLM provider abstraction (Anthropic/OpenAI)
-│   │   └── chunking.py        Stage 1 - markdown -> chunk dicts
-│   ├── index/                 Stage 1 (unchanged) - SQLite registry index
-│   ├── mcp/                   Stage 1 (unchanged) - MCP server + client
-│   ├── agents/
-│   │   ├── base_agent.py             shared LLM + MCP wiring
-│   │   ├── document_classifier.py    Stage 3  (LLM, no MCP)
-│   │   ├── fact_extraction_agent.py  Stage 4+5 (MCP: discover_relevant_facts)
-│   │   └── insight_agent.py          Stage 11 (MCP: get_kpi_context, get_fact_context)
-│   ├── engine/
-│   │   ├── fact_validation_engine.py    Stage 6 - deterministic
-│   │   └── kpi_calculation_engine.py    Stage 8-10 - deterministic
-│   ├── db/
-│   │   ├── pg_schema.sql      Postgres schema
-│   │   └── pg_client.py       Postgres wrapper
-│   └── pipeline.py             Orchestration + CrewAI Crew definition
-├── data/registry.db            Built SQLite index
-└── tests/test_all.py           Full test suite (7/7 passing)
+backend/
+├── config.py                      Single source of truth for all paths
+├── db/
+│   ├── nexus.db                   fact + KPI value store (sqlite)
+│   ├── registry.db                registry index, derived from YAML (sqlite)
+│   └── registry_schema.sql        schema for registry.db
+└── kpi_extractor/
+    ├── extractor_pipeline.py      Orchestration: ingest_document / calculate_kpis / get_insights
+    └── app/
+        ├── core/
+        │   └── chunking.py        markdown -> chunk dicts
+        ├── registry/
+        │   ├── registry_service.py   reads + writes for facts & KPIs (no MCP, no subprocess)
+        │   ├── facts/*.yaml           source of truth - 102 facts
+        │   └── kpis/*.yaml            source of truth - 59 KPIs
+        ├── agents/
+        │   ├── base_agent.py              shared LLM + registry wiring
+        │   ├── document_classifier.py     Stage 3  (LLM only)
+        │   ├── fact_extraction_agent.py    Stage 4+5 (registry.discover_relevant_facts)
+        │   └── insight_agent.py            Stage 11 (registry.get_kpi_context / get_fact_context)
+        └── engine/
+            ├── fact_validation_engine.py    Stage 6 - deterministic
+            └── kpi_calculation_engine.py    Stage 8-10 - deterministic
 ```
 
-## Agent Responsibilities (CrewAI)
+## Why there's no MCP layer
 
-| Agent | Role | MCP Tools Used | LLM Calls |
+Earlier versions of this app routed registry lookups (`get_kpi_context`,
+`discover_relevant_facts`, etc.) through an MCP server running as a
+subprocess, talked to over JSON-RPC. That made sense if an *external*
+LLM client needed to discover and call these as tools across a process
+boundary. It doesn't make sense here: agents and engines are plain
+Python in the same process calling `RegistryService` methods directly -
+there's no LLM tool-calling boundary to bridge. The subprocess + RPC
+indirection only added latency and a process to babysit, for zero
+benefit. `registry_service.py` is the direct replacement: same method
+names (`get_kpi_context`, `discover_relevant_facts`, `retrieve_formula_context`,
+`search_registry`, ...), called as ordinary method calls.
+
+## Agent Responsibilities
+
+| Agent | Role | Registry calls | LLM Calls |
 |---|---|---|---|
 | **DocumentClassifierAgent** | Document Classifier | none | 1 per document |
 | **FactExtractionAgent** | Fact Extractor | `discover_relevant_facts(document_type)` | 1 per candidate fact |
 | **InsightAgent** | AI Investment Analyst | `get_kpi_context`, `get_fact_context` | 1 per question |
 
-KPI Calculation and Fact Validation are **not agents** — they are
-deterministic Python services (`app/engine/`).
+KPI Calculation and Fact Validation are **not agents** — deterministic
+Python services in `app/engine/`.
 
 ## Pipeline Flow
 
 ```
-ingest_document()
-    chunk_markdown()                          [Stage 1]
-    DocumentClassifierAgent.run()             [Stage 3, 1 LLM call]
-    FactExtractionAgent.run()                  [Stage 4+5]
-        -> discover_relevant_facts(doc_type)      MCP, rule-based scoping
-        -> _find_candidates()                     rule-based, no LLM
-        -> _extract_fact() per candidate          1 LLM call each
-    validate_extractions()                     [Stage 6, deterministic]
-    resolve_source_conflicts()                 [Stage 6, deterministic]
-    db.save_fact() per validated fact          [Stage 7]
+ingest_document() / ingest_document_from_chunks()
+    chunk_markdown()
+    DocumentClassifierAgent.run()              1 LLM call
+    FactExtractionAgent.run()
+        -> registry.discover_relevant_facts(doc_type)   rule-based scoping, no LLM
+        -> _find_candidates()                            rule-based, no LLM
+        -> _extract_fact() per candidate                 1 LLM call each
+    validate_extractions()                      deterministic
+    resolve_source_conflicts()                  deterministic
+    db.save_fact() per validated fact
 
 calculate_kpis()
-    KPICalculationEngine.calculate_all()       [Stage 8-10, deterministic]
-        -> retrieve_formula_context(kpi_id)       MCP
+    KPICalculationEngine.calculate_all()
+        -> registry.retrieve_formula_context(kpi_id)
         -> coverage check
-        -> _eval_formula()                        pure Python AST
+        -> _eval_formula()                       pure Python AST, deterministic
     db.save_kpi() per result
 
 get_insights()
-    InsightAgent.run()                          [Stage 11, 1 LLM call]
-        -> get_kpi_context() per relevant KPI     MCP
-        -> get_fact_context() per missing fact    MCP
+    InsightAgent.run()                           1 LLM call
+        -> registry.get_kpi_context() per relevant KPI
+        -> registry.get_fact_context() per missing fact
 ```
 
-## Fact Extraction Agent — candidate scoping example
+## Fact selection at scale (why no embeddings/vector search)
 
-For a `financial` document, `discover_relevant_facts("financial")` returns
-36 of the 102 facts (those with `financial` in `document_sources`), each
-with aliases + extraction patterns. The agent's rule-based
-`_find_candidates()` then narrows to only the facts whose alias/pattern
-text actually appears in the document's chunks - typically 3-8 facts per
-document - before any LLM extraction call.
+102 facts and 59 KPIs is small enough that a two-stage funnel of plain
+filtering does the job, with zero LLM/embedding cost:
+
+1. `discover_relevant_facts(document_type)` — SQL filter on
+   `document_sources`, narrows ~161 entities down to ~30-40 for a given
+   doc type.
+2. `_find_candidates()` in `fact_extraction_agent.py` — checks whether
+   each fact's `aliases`/`extraction_patterns` literally appear in the
+   document's chunks, narrowing further to typically 3-8 facts.
+
+Only after that does an LLM get called, once per surviving candidate,
+to extract the value. If recall ever becomes a real problem (document
+phrasing not covered by aliases), add a fuzzy-match fallback
+(`rapidfuzz`) before reaching for embeddings — a vector store would be
+solving a scale problem this registry doesn't have.
 
 ## Fact Validation Engine — what it enforces
 
@@ -92,7 +115,8 @@ document - before any LLM extraction call.
 ## KPI Calculation Engine — formula evaluation
 
 - `retrieve_formula_context(kpi_id)` returns the formula string + required
-  fact_ids with their data types.
+  fact_ids with their data types. Returns `None` if the KPI doesn't exist
+  (callers check for `None`, not an exception).
 - Coverage = `len(available_facts) / len(required_facts)`. If < 1.0,
   status = `insufficient_data` (no calculation attempted).
 - Arithmetic formulas (`(a + b) / c`) are evaluated via a restricted AST
@@ -102,52 +126,44 @@ document - before any LLM extraction call.
   are detected and treated as already pre-resolved into a derived fact
   upstream — the engine reads that derived fact's value directly.
 
-## Running Tests
-
-```bash
-cd kpi_extractor
-python3 tests/test_all.py
-```
-
-7/7 test groups pass without a live LLM or Postgres:
-- MCP layer runs as a real subprocess against SQLite
-- Agents use a `StubLLM` returning pre-canned JSON
-- Engines are fully deterministic
-
 ## Running for Real
 
 ```bash
-pip install crewai anthropic psycopg2-binary pyyaml
-
+pip install crewai anthropic pyyaml
 export ANTHROPIC_API_KEY=...
-export NEXUS_PG_HOST=... NEXUS_PG_DB=nexus NEXUS_PG_USER=... NEXUS_PG_PASSWORD=...
+```
 
-# 1. Create Postgres schema
-psql -f app/db/pg_schema.sql
+The registry SQLite index is built automatically on first app startup
+(see `api/deps.py`) — no manual build step needed. To force a full
+resync after hand-editing YAML files directly:
 
-# 2. Build/refresh registry index (after any YAML change)
-python -m app.index.index_builder
+```python
+from backend.kpi_extractor.app.registry.registry_service import RegistryService
+RegistryService().rebuild_from_yaml()
 ```
 
 ```python
-from app.core.llm_client import get_llm_client
-from app.mcp.client import RegistryMCPClient
-from app import pipeline
+from backend.utilites.llm_models import get_llm_client
+from backend.kpi_extractor.app.registry.registry_service import RegistryService
+from backend.kpi_extractor import extractor_pipeline as pipeline
 
 llm = get_llm_client()
-with RegistryMCPClient() as registry:
-    result = pipeline.ingest_document(markdown_text, "finance_q2.pdf",
-                                       "portco_001", "2026-Q2", llm, registry)
-    kpis = pipeline.calculate_kpis("portco_001", "2026-Q2", registry)
-    insight = pipeline.get_insights(
-        "Why did ROI improve this quarter?",
-        "portco_001", "2026-Q2", ["ai_roi", "ebitda_uplift"], llm, registry,
-    )
+registry = RegistryService()
+
+result = pipeline.ingest_document(markdown_text, "finance_q2.pdf",
+                                   "portco_001", "2026-Q2", llm, registry)
+kpis = pipeline.calculate_kpis("portco_001", "2026-Q2", registry)
+insight = pipeline.get_insights(
+    "Why did ROI improve this quarter?",
+    "portco_001", "2026-Q2", ["ai_roi", "ebitda_uplift"], llm, registry,
+)
 ```
 
-## New KPI / Fact = YAML only (unchanged)
+## Adding / removing a KPI or fact
 
-Add YAML to `registry/facts/` or `registry/kpis/`, run
-`python -m app.index.index_builder`. No agent or engine code changes -
-`discover_relevant_facts`, `get_kpi_context`, `retrieve_formula_context`
-all pick up new entries automatically.
+Use `RegistryService.add_fact` / `add_kpi` / `remove_fact` / `remove_kpi`
+(see `registry_service.py`) — each keeps the YAML file and the SQLite
+index in sync in one call, so you never need a manual rebuild step.
+`remove_fact` blocks if a KPI still depends on it unless you pass
+`force=True`. An admin HTTP API for these (for a dashboard) can sit on
+top of `RegistryService` directly.

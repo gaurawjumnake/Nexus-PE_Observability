@@ -1,23 +1,15 @@
-"""
-Wires all stages into three entry-point functions:
-
-    ingest_document(...)    Stages 1-6  → facts in Postgres
-    calculate_kpis(...)     Stages 8-10 → KPIs in Postgres
-    get_insights(...)       Stage 11    → executive analysis
-
-CrewAI three agents run as a sequential CrewAI crew when used in agentic mode. 
-For batch/API mode, call the entry-point functions directly.
-"""
 from typing import Optional, Any
 
 from backend.utilites.llm_models import BaseLLMClient, get_llm_client
 from backend.kpi_extractor.app.core.chunking import chunk_markdown
-from backend.kpi_extractor.app.mcp.client import RegistryMCPClient
+from backend.kpi_extractor.app.registry.registry_service import RegistryService
 from backend.kpi_extractor.app.agents.document_classifier import DocumentClassifierAgent
 from backend.kpi_extractor.app.agents.fact_extraction_agent import FactExtractionAgent
 from backend.kpi_extractor.app.agents.insight_agent import InsightAgent
 from backend.kpi_extractor.app.engine.fact_validation_engine import validate_extractions, resolve_source_conflicts
 from backend.kpi_extractor.app.engine.kpi_calculation_engine import KPICalculationEngine
+from backend.kpi_extractor.app.engine import tabular_extraction
+from backend.kpi_extractor.app.engine import fact_aggregation
 import backend.db.db_client as db
 from backend.utilites.llm_models import llm
 from crewai import Agent, Task, Crew, Process
@@ -31,7 +23,7 @@ def ingest_document(
     company_id: str,
     period: str,
     llm: BaseLLMClient,
-    registry: RegistryMCPClient,
+    registry: RegistryService,
 ) -> dict:
     """
     Full ingestion pipeline for one document.
@@ -42,7 +34,7 @@ def ingest_document(
         company_id    : portfolio company identifier
         period        : reporting period, e.g. '2026-Q2'
         llm           : LLM client instance
-        registry      : active RegistryMCPClient
+        registry      : active RegistryService
 
     Returns:
         {"document_id", "document_type", "facts_extracted", "facts_validated"}
@@ -92,7 +84,7 @@ def ingest_document_from_chunks(
     company_id: str,
     period: str,
     llm: BaseLLMClient,
-    registry: RegistryMCPClient,
+    registry: RegistryService,
 ) -> dict:
     """
     Stages 3-7 only - for use when chunks were already persisted by the
@@ -151,26 +143,249 @@ def ingest_document_from_chunks(
     }
 
 # ------------------------------------------------------------------
+# Stage 4+5+6+7, tabular counterpart: Structured Tables -> Facts/Observations
+# ------------------------------------------------------------------
+def ingest_structured_tables(
+    parsed_output: dict,
+    company_id: str,
+    period: str,
+    registry: RegistryService,
+    document_type: Optional[str] = None,
+    file_name: Optional[str] = None,
+    document_id: Optional[str] = None,
+) -> dict:
+    """
+    Deterministic counterpart to ingest_document_from_chunks() for the
+    structured output of DoclingDocumentParser.extract_structured_output()
+    - no LLM call anywhere in this path.
+
+        parsed_output["time_series_tables"] -> fact_observations
+            (dated rows, e.g. years of daily telemetry - aggregated into
+            KPI periods later via app.engine.fact_aggregation)
+        parsed_output["structured_tables"] -> facts
+            (flat rows with no date, e.g. a one-row-per-company KPI dump
+            - point-in-time, same storage as narrative-extracted facts)
+
+    document_id: pass this when a document record already exists for
+    this upload (e.g. the caller already ran the narrative path on the
+    same file and got a document_id back) - avoids creating a second,
+    orphaned document row for what is the same uploaded file. If
+    omitted, a new document record is created (e.g. for a standalone
+    csv/xlsx upload with no narrative pass at all).
+
+    document_type: pass this when the table came from an already-
+    classified document (e.g. an appendix table inside a narrative PDF
+    that DocumentClassifierAgent already classified). If omitted - the
+    case for a standalone csv/xlsx/json upload with no narrative for the
+    LLM classifier to read - falls back to
+    tabular_extraction.classify_document_type_from_columns() using the
+    first table's columns. If that can't determine a type either, the
+    whole call is skipped (status="skipped") rather than guessing.
+
+    Returns a summary dict including any column headers that didn't map
+    to a fact, so you can see at a glance what an upload's columns
+    didn't capture.
+    """
+    if document_id is None:
+        document_id = db.save_document(company_id, file_name or parsed_output.get("filename", "uploaded_table"))
+
+    all_tables = parsed_output.get("time_series_tables", []) + parsed_output.get("structured_tables", [])
+
+    if document_type is None:
+        sample_columns = []
+        if all_tables:
+            sample_columns = all_tables[0].get("value_columns") or all_tables[0].get("columns") or []
+        document_type = tabular_extraction.classify_document_type_from_columns(sample_columns, registry)
+        if document_type is None:
+            return {
+                "document_id": document_id,
+                "document_type": None,
+                "status": "skipped",
+                "reason": "Could not determine document_type from table columns and none was provided.",
+                "observations_saved": 0,
+                "facts_saved": 0,
+                "unmatched_columns": [],
+            }
+
+    db.set_document_type(document_id, document_type)
+
+    observations_saved = 0
+    facts_saved = 0
+    unmatched_all: list[str] = []
+
+    for table in parsed_output.get("time_series_tables", []):
+        extractions, unmatched = tabular_extraction.extract_observations_from_time_series_table(
+            table, document_type, registry, document_id=document_id,
+        )
+        unmatched_all.extend(unmatched)
+
+        validated = validate_extractions(extractions, document_type, registry)
+        rows = [{
+            "fact_id": v["fact_id"],
+            "company_id": company_id,
+            "observation_date": v["observation_date"],
+            "value": v["value"],
+            "confidence": v["confidence"],
+            "source_document": document_id,
+            "source_type": document_type,
+        } for v in validated]
+        observations_saved += db.save_observations_bulk(rows)
+
+    for table in parsed_output.get("structured_tables", []):
+        extractions, unmatched = tabular_extraction.extract_facts_from_structured_table(
+            table, document_type, registry, document_id=document_id,
+        )
+        unmatched_all.extend(unmatched)
+
+        validated = validate_extractions(extractions, document_type, registry)
+        resolved = resolve_source_conflicts(validated, registry)
+        for fact in resolved:
+            db.save_fact(
+                fact_id=fact["fact_id"],
+                company_id=company_id,
+                value=fact["value"],
+                confidence=fact["confidence"],
+                source_document=document_id,
+                source_chunk="",
+                source_type=document_type,
+                period=period,
+            )
+            facts_saved += 1
+
+    return {
+        "document_id": document_id,
+        "document_type": document_type,
+        "status": "ingested",
+        "observations_saved": observations_saved,
+        "facts_saved": facts_saved,
+        "unmatched_columns": sorted(set(unmatched_all)),
+    }
+
+
+# ------------------------------------------------------------------
 # Stage 8-10: Facts → KPIs
 # ------------------------------------------------------------------
 def calculate_kpis(
     company_id: str,
     period: str,
-    registry: RegistryMCPClient,
+    registry: RegistryService,
     kpi_ids: Optional[list[str]] = None,
 ) -> list[dict]:
     """
     Runs KPI Calculation Engine for a company/period.
-    Reads facts from Postgres, writes KPI results to Postgres.
+
+    Facts are read via fact_aggregation.get_facts_for_company_period,
+    NOT db.get_facts_for_company directly - this is what makes a fact
+    that arrived as a dated time series (fact_observations) actually
+    count toward KPI coverage, aggregated into this period using its own
+    aggregation_strategy. Point-in-time facts (the `facts` table) are
+    still included unchanged.
     """
     engine = KPICalculationEngine(registry)
     return engine.calculate_all(
         company_id=company_id,
         period=period,
-        get_facts_fn=db.get_facts_for_company,
+        get_facts_fn=lambda cid, p: fact_aggregation.get_facts_for_company_period(registry, cid, p),
         save_kpi_fn=db.save_kpi,
         kpi_ids=kpi_ids,
     )
+
+
+def calculate_kpis_for_periods(
+    company_id: str,
+    periods: list[str],
+    registry: RegistryService,
+    kpi_ids: Optional[list[str]] = None,
+) -> dict[str, list[dict]]:
+    """
+    Runs calculate_kpis once per period in `periods` (e.g. every distinct
+    year/quarter actually covered by an upload's time-series tables, from
+    fact_aggregation.derive_periods_from_tables) instead of trusting one
+    caller-supplied period that may not match the data at all.
+
+    Returns {period: [kpi_result, ...]}. An empty `periods` list returns
+    {} - callers should fall back to a single explicit period (e.g. the
+    one typed into the upload form) when there's no date-bearing table
+    to derive periods from.
+    """
+    return {p: calculate_kpis(company_id=company_id, period=p, registry=registry, kpi_ids=kpi_ids) for p in periods}
+
+
+def calculate_kpi_trend(
+    kpi_id: str,
+    company_id: str,
+    period_type: str,
+    start_period: str,
+    end_period: str,
+    registry: RegistryService,
+    save_results: bool = False,
+) -> list[dict]:
+    """
+    MoM / QoQ / YoY for one KPI: same formula, evaluated once per period
+    bucket between start_period and end_period (inclusive), each pulling
+    its own facts independently via fact_aggregation - a period with no
+    underlying data comes back insufficient_data rather than reusing a
+    neighboring period's value.
+
+    period_type: 'month' | 'quarter' | 'year'
+    start_period/end_period: in that granularity's format, e.g.
+        period_type='quarter' -> start_period='2025-Q1', end_period='2025-Q4'
+
+    save_results: if True, persists each period's result via db.save_kpi
+    (same as calculate_kpis does) - off by default since a trend is
+    often requested read-only for a dashboard chart.
+    """
+    periods = fact_aggregation.enumerate_periods(period_type, start_period, end_period)
+    engine = KPICalculationEngine(registry)
+    return engine.calculate_trend(
+        kpi_id=kpi_id,
+        company_id=company_id,
+        periods=periods,
+        get_facts_fn=lambda cid, p: fact_aggregation.get_facts_for_company_period(registry, cid, p),
+        save_kpi_fn=db.save_kpi if save_results else None,
+    )
+
+
+def calculate_kpi_trends(
+    kpi_ids: list[str],
+    company_id: str,
+    period_type: str,
+    start_period: str,
+    end_period: str,
+    registry: RegistryService,
+    save_results: bool = False,
+) -> dict[str, list[dict]]:
+    """
+    Like calculate_kpi_trend, but for several KPIs at once - e.g. a
+    dashboard chart with multiple lines. Computes each period's facts
+    ONCE via fact_aggregation and reuses that across every KPI, instead
+    of redundantly re-aggregating the same underlying facts once per
+    KPI per period.
+
+    Returns {kpi_id: [period_result, ...]}, one entry per kpi_id, each a
+    list in the same order as the resolved periods.
+    """
+    periods = fact_aggregation.enumerate_periods(period_type, start_period, end_period)
+    engine = KPICalculationEngine(registry)
+
+    facts_by_period = {
+        period: fact_aggregation.get_facts_for_company_period(registry, company_id, period)
+        for period in periods
+    }
+
+    def get_facts_fn(cid, period):
+        return facts_by_period[period]
+
+    return {
+        kpi_id: engine.calculate_trend(
+            kpi_id=kpi_id,
+            company_id=company_id,
+            periods=periods,
+            get_facts_fn=get_facts_fn,
+            save_kpi_fn=db.save_kpi if save_results else None,
+        )
+        for kpi_id in kpi_ids
+    }
 
 
 # ------------------------------------------------------------------
@@ -182,7 +397,7 @@ def get_insights(
     period: str,
     kpi_ids: list[str],
     llm: BaseLLMClient,
-    registry: RegistryMCPClient,
+    registry: RegistryService,
 ) -> str:
     """
     Runs the Insight Agent. Loads KPI + fact data ,
@@ -197,8 +412,9 @@ def get_insights(
         record["history"] = db.get_kpi_history(kid, company_id)
         kpi_records.append(record)
 
-    # Load underlying fact values
-    all_facts = db.get_facts_for_company(company_id, period)
+    # Load underlying fact values (aggregation-aware: includes time-series
+    # facts aggregated into this period, not just point-in-time facts)
+    all_facts = fact_aggregation.get_facts_for_company_period(registry, company_id, period)
     fact_records = [
         {"fact_id": fid, "value": val,
          "confidence": None, "source_type": None, "company_id": company_id}
@@ -208,35 +424,34 @@ def get_insights(
     # Build coverage records from KPI engine output
     coverage_records = []
     for kid in kpi_ids:
-        try:
-            ctx = registry.retrieve_formula_context(kid)
-            required = list(ctx["facts"].keys())
-            available = [f for f in required if f in all_facts]
-            missing = [f for f in required if f not in all_facts]
-            coverage_records.append({
-                "kpi_id": kid,
-                "required_facts": required,
-                "available_facts": available,
-                "missing_facts": missing,
-                "coverage": len(available) / len(required) if required else 1.0,
-                "ready_to_calculate": len(missing) == 0,
-            })
-        except RuntimeError:
-            pass
+        ctx = registry.retrieve_formula_context(kid)
+        if ctx is None:
+            continue
+        required = list(ctx["facts"].keys())
+        available = [f for f in required if f in all_facts]
+        missing = [f for f in required if f not in all_facts]
+        coverage_records.append({
+            "kpi_id": kid,
+            "required_facts": required,
+            "available_facts": available,
+            "missing_facts": missing,
+            "coverage": len(available) / len(required) if required else 1.0,
+            "ready_to_calculate": len(missing) == 0,
+        })
 
     agent = InsightAgent(llm, registry)
     return agent.run(question, kpi_records, fact_records, coverage_records, kpi_ids)
 
 
-def build_crew(llm: Optional[BaseLLMClient] = None, registry: Optional[RegistryMCPClient] = None):
+def build_crew(llm: Optional[BaseLLMClient] = None, registry: Optional[RegistryService] = None):
     """
     Returns a configured CrewAI Crew.
 
     Install: pip install crewai
     Usage:
-        with RegistryMCPClient() as registry:
-            crew = build_crew(get_llm_client(), registry)
-            crew.kickoff(inputs={"markdown": "...", "company_id": "...", ...})
+        registry = RegistryService()
+        crew = build_crew(get_llm_client(), registry)
+        crew.kickoff(inputs={"markdown": "...", "company_id": "...", ...})
     """
     llm = llm
 
@@ -313,14 +528,13 @@ def build_crew(llm: Optional[BaseLLMClient] = None, registry: Optional[RegistryM
 
 # if __name__ == "__main__":
 #     llm = get_llm_client()
-#     with RegistryMCPClient() as registry:
-#         result = ingest_document(
-#             markdown_text='## Revenue\nTotal AI revenue: /$5.2M',
-#             file_name='test.pdf',
-#             company_id='portco_001',
+#     registry = RegistryService()
+#     result = ingest_document(
+#         markdown_text='## Revenue\nTotal AI revenue: /$5.2M',
+#         file_name='test.pdf',
+#         company_id='portco_001',
 #             period='2026-Q2',
 #             llm=llm,
 #             registry=registry,
 #         )
 #     print(result)
-

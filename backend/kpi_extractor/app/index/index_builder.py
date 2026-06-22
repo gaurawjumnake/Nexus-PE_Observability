@@ -15,22 +15,24 @@ import os
 import json
 import sqlite3
 import time
+from pathlib import Path
 import yaml
 from backend.utilites.app_logger import Logger
 log = Logger()
 
-BASE_DIR = "backend/kpi_extractor"
-FACTS_DIR = os.path.join(BASE_DIR, "registry", "facts")
-KPIS_DIR  = os.path.join(BASE_DIR, "registry", "kpis")
-SCHEMA_PATH = os.path.join(BASE_DIR, "app", "db", "registry_schema.sql")
-DB_PATH     = os.path.join(BASE_DIR, "app", "db", "registry.db")
+from backend.config import FACTS_DIR, KPIS_DIR, REGISTRY_SCHEMA_PATH, REGISTRY_DB_PATH
+
+FACTS_DIR   = str(FACTS_DIR)
+KPIS_DIR    = str(KPIS_DIR)
+SCHEMA_PATH = str(REGISTRY_SCHEMA_PATH)
+DB_PATH     = str(REGISTRY_DB_PATH)
 
 
 def build_index(db_path: str = DB_PATH):
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)
-    if os.path.exists(db_path):
-        os.remove(db_path)
-
+    # os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    # if os.path.exists(db_path):
+    #     os.remove(db_path)
+    
     conn = sqlite3.connect(db_path)
     conn.executescript(open(SCHEMA_PATH).read())
 

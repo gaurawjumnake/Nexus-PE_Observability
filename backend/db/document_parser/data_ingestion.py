@@ -6,7 +6,7 @@ from typing import Any
 
 import pandas as pd
 from fastapi import HTTPException, UploadFile
-from sqlalchemy import inspect
+from sqlalchemy import inspect, text
 
 import backend.db.db_client as db
 from backend.utilites.app_logger import Logger
@@ -71,8 +71,65 @@ def copy_upload_to_temp(file: UploadFile, suffix: str) -> Path:
 
 
 def get_financial_columns() -> set[str]:
+    """
+    Returns financial_data's current column names. Calls
+    db.ensure_schema() first - financial_data is defined in
+    nexus_schema.sql (CREATE TABLE IF NOT EXISTS), so this is a no-op
+    when the table already exists, but self-heals it if it was ever
+    manually dropped, without requiring a server restart.
+    """
+    db.ensure_schema()
     columns = inspect(db.engine).get_columns(FINANCIAL_TABLE)
     return {column["name"] for column in columns}
+
+
+# Columns in financial_data that are metadata, not fact values.
+NON_FACT_COLUMNS = {"company_name", "financial_year", "date"}
+
+
+def sync_facts_from_financial_data(company_id: str) -> dict[str, Any]:
+    """
+    Bridge: financial_data (raw tabular uploads) -> facts (used by the KPI
+    engine). Without this, tabular financial uploads never produce KPIs,
+    since calculate_kpis() only reads from the facts table.
+
+    Groups all financial_data rows for `company_id` by financial_year and
+    writes one fact per numeric column per year (mean across rows in that
+    year), so multiple uploaded sheets/dates for the same year consolidate
+    into a single fact value.
+    """
+    frame = pd.read_sql(
+        text("SELECT * FROM financial_data WHERE LOWER(company_name) = :cid"),
+        db.engine,
+        params={"cid": company_id.lower()},
+    )
+    if frame.empty or "financial_year" not in frame.columns:
+        return {"years_synced": [], "facts_written": 0}
+
+    fact_columns = [c for c in frame.columns if c not in NON_FACT_COLUMNS]
+    years_synced: list[int] = []
+    facts_written = 0
+
+    for year, group in frame.dropna(subset=["financial_year"]).groupby("financial_year"):
+        period = str(int(year)) #type:ignore
+        means = group[fact_columns].mean(numeric_only=True, skipna=True)
+        for fact_id, value in means.items():
+            if pd.isna(value):
+                continue
+            db.save_fact(
+                fact_id=fact_id, #type:ignore
+                company_id=company_id,
+                value=round(float(value), 4),
+                confidence=1.0,
+                source_document="",
+                source_chunk="",
+                source_type="financial_data",
+                period=period,
+            )
+            facts_written += 1
+        years_synced.append(int(year)) #type:ignore
+
+    return {"years_synced": years_synced, "facts_written": facts_written}
 
 
 def read_tabular_frames(path: Path, suffix: str) -> dict[str, pd.DataFrame]:
@@ -98,6 +155,8 @@ def prepare_financial_frame(
         series = frame[source_column]
         if multiplier != 1:
             series = pd.to_numeric(series, errors="coerce") * multiplier
+        elif target_column == "company_name":
+            series = series.astype(str).str.strip().str.lower()
         output[target_column] = series
 
     if "company_name" in financial_columns and "company_name" not in output.columns:
@@ -124,7 +183,9 @@ def ingest_financial_upload(
     file: UploadFile,
     company_id: str,
     period: str,
+    registry: Any = None,
 ) -> dict[str, Any]:
+    company_id = company_id.strip().lower()
     filename = file.filename or "uploaded_financial_data"
     suffix = get_file_extension(filename)
     tmp_path = copy_upload_to_temp(file, suffix)
@@ -163,6 +224,24 @@ def ingest_financial_upload(
             f"Saved financial upload to {FINANCIAL_TABLE}: document_id={document_id}, "
             f"file_name={filename}, rows_inserted={total_rows}"
         )
+
+        facts_result = {"years_synced": [], "facts_written": 0}
+        kpis_calculated = 0
+        try:
+            facts_result = sync_facts_from_financial_data(company_id)
+            if registry is not None:
+                from backend.kpi_extractor.extractor_pipeline import calculate_kpis
+                for year in facts_result["years_synced"]:
+                    kpi_results = calculate_kpis(
+                        company_id=company_id, period=str(year), registry=registry
+                    )
+                    kpis_calculated += len(kpi_results)
+        except Exception as exc:
+            log.log_warning(
+                f"Facts/KPI sync failed for company_id={company_id}: {exc}. "
+                "Raw data was saved to financial_data; sync manually if needed."
+            )
+
         return {
             "document_id": document_id,
             "company_id": company_id,
@@ -173,6 +252,9 @@ def ingest_financial_upload(
             "document_type": "financial",
             "rows_inserted": total_rows,
             "sheets": sheets,
+            "facts_written": facts_result["facts_written"],
+            "years_synced": facts_result["years_synced"],
+            "kpis_calculated": kpis_calculated,
         }
     except HTTPException:
         raise

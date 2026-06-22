@@ -19,11 +19,10 @@ except ImportError as exc:  # pragma: no cover
     raise SystemExit("CrewAI is not installed. Install it with: uv add crewai") from exc
 
 
+from backend.config import DEFAULT_DB_PATH, DEFAULT_SQL_MODEL as DEFAULT_MODEL
+
 BASE_DIR = Path(__file__).resolve().parent
-WORKSPACE_ROOT = BASE_DIR.parents[1]
-DEFAULT_DB_PATH = WORKSPACE_ROOT / "backend" / "db" / "nexus.db"
-FALLBACK_DB_PATH = WORKSPACE_ROOT / "backend" / "db" / "nexus_1.db"
-DEFAULT_MODEL = "gemini/gemini-2.5-flash"
+DEFAULT_DB_PATH = Path(DEFAULT_DB_PATH)
 READ_ONLY_PREFIXES = ("select", "with")
 DANGEROUS_SQL = re.compile(
     r"\b(insert|update|delete|drop|alter|create|replace|truncate|attach|detach|vacuum|pragma)\b",
@@ -76,11 +75,8 @@ def resolve_db_path(db_path: Path | str | None = None) -> Path:
         log.log_info(f"Text-to-SQL DB path supplied by env: {resolved}")
         return resolved
 
-    if DEFAULT_DB_PATH.exists():
-        log.log_info(f"Text-to-SQL DB path using backend chatbot default: {DEFAULT_DB_PATH}")
-        return DEFAULT_DB_PATH
-    log.log_info(f"Text-to-SQL DB path using workspace fallback: {FALLBACK_DB_PATH}")
-    return FALLBACK_DB_PATH
+    log.log_info(f"Text-to-SQL DB path using canonical nexus.db: {DEFAULT_DB_PATH}")
+    return DEFAULT_DB_PATH
 
 
 def connect(db_path: Path) -> sqlite3.Connection:

@@ -1,23 +1,11 @@
-"""
-Shared singletons (LLM client + Registry MCP client).
-
-Created once at app startup via FastAPI lifespan, reused across all
-requests/background tasks. RegistryMCPClient spawns a single MCP server
-subprocess and is internally thread-safe, so it must NOT be re-created
-per request or per document.
-"""
 from backend.utilites.llm_models import get_llm_client
-from backend.kpi_extractor.app.mcp.client import RegistryMCPClient
+from backend.kpi_extractor.app.registry.registry_service import RegistryService
 
 
 def init_shared_resources(app):
     """Call once during FastAPI lifespan startup."""
     app.state.llm = get_llm_client()
-    app.state.registry = RegistryMCPClient().start()
+    app.state.registry = RegistryService()              # creates db/registry.db + schema if missing
+    if not app.state.registry.is_populated():
+        app.state.registry.rebuild_from_yaml()           # first-run population from registry/*.yaml
 
-
-def shutdown_shared_resources(app):
-    """Call once during FastAPI lifespan shutdown."""
-    registry: RegistryMCPClient = getattr(app.state, "registry", None)
-    if registry:
-        registry.stop()

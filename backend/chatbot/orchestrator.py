@@ -27,14 +27,11 @@ from pydantic import BaseModel, Field
 from backend.chatbot.chat import ChatQueryRequest, ChatQueryResponse, run_rag_query
 from backend.chatbot.text_to_sql_chatbot import FinancialTextToSQLChatbot
 from backend.utilites.app_logger import Logger
+from backend.config import DEFAULT_ORCHESTRATOR_MODEL as DEFAULT_MODEL
 
 log = Logger()
 
-RouteName = Literal["rag", "sql", "both"]
-DEFAULT_MODEL = os.getenv(
-    "NEXUS_ORCHESTRATOR_MODEL",
-    os.getenv("GEMINI_MODEL", "gemini/gemini-2.5-flash"),
-)
+RouteName = Literal["rag", "sql", "both", "registry", "chitchat"]
 
 
 # ---------------------------------------------------------------------------
@@ -51,13 +48,6 @@ class RoutePlan(BaseModel):
     route: RouteName
     confidence: float = Field(default=0.5, ge=0, le=1)
     reasoning: str = ""
-
-
-class AgenticAskResponse(BaseModel):
-    response: str
-    route_plan: RoutePlan
-    rag: Optional[dict[str, Any]] = None
-    sql: Optional[dict[str, Any]] = None
 
 
 class AgenticToolAskResponse(BaseModel):
@@ -223,7 +213,7 @@ SQL_KEYWORDS = {
     "percentage", "percent", "%",
     "rate", "ratio", "score", "index",
     # Data operations
-    "how much", "how many", "what was", "what is", "what are",
+    "how much", "how many",
     "calculate", "computed",
     "filter", "group by", "breakdown",
     "users", "adoption", "headcount",
@@ -244,9 +234,55 @@ RAG_KEYWORDS = {
 }
 
 
+# Phrases that signal the user wants to know *what a KPI/metric means*,
+# not its value for a company — answered from registry.db, not SQL/RAG.
+REGISTRY_TRIGGER_PATTERNS = (
+    r"\btell me (more |)about\b",
+    r"\bwhat (is|are|does)\b.*\b(kpi|metric|fact)\b",
+    r"\bwhat does\b.*\bmean\b",
+    r"\bexplain\b.*\b(kpi|metric|formula)\b",
+    r"\bdefine\b",
+    r"\bdefinition of\b",
+    r"\bhow (is|do you|to|are)\b.*\bcalculat",
+    r"\bhow (is|do you|to|are)\b.*\bcomput",
+    r"\bformula for\b",
+)
+
+# Greetings / chitchat — answered directly, no tool calls.
+CHITCHAT_PATTERNS = (
+    r"^\s*(hi|hello|hey|yo|sup)[\s!.,]*$",
+    r"^\s*(thanks|thank you|thx)[\s!.,]*$",
+    r"^\s*(bye|goodbye|see ya)[\s!.,]*$",
+    r"^\s*(how are you|what'?s up)[\s?!.,]*$",
+)
+
+
+def _strip_context_prefix(message: str) -> str:
+    """Strip a UI-injected '[Context: ...]' prefix before intent matching —
+    it's metadata about what the user clicked, not part of their question."""
+    return re.sub(r"^\s*\[context:[^\]]*\]\s*", "", message, flags=re.IGNORECASE)
+
+
 def classify_intent(request: AgenticAskRequest) -> RoutePlan:
     """Deterministic intent classifier with keyword scoring + data awareness."""
-    q = request.message.lower()
+    q = _strip_context_prefix(request.message).lower().strip()
+
+    for pattern in CHITCHAT_PATTERNS:
+        if re.match(pattern, q):
+            return RoutePlan(
+                route="chitchat",
+                confidence=0.9,
+                reasoning="Greeting/chitchat — no data lookup needed.",
+            )
+
+    for pattern in REGISTRY_TRIGGER_PATTERNS:
+        if re.search(pattern, q):
+            return RoutePlan(
+                route="registry",
+                confidence=0.8,
+                reasoning=f"Question asks about a KPI/metric definition (matched: '{pattern}').",
+            )
+
     words = set(re.findall(r"[a-z0-9%\-]+", q))
     # Also check multi-word phrases
     bigrams = set()
@@ -287,9 +323,6 @@ def classify_intent(request: AgenticAskRequest) -> RoutePlan:
         sql_score += 2.0  # Strong signal: comparing across years
     # Percentage / numeric ask
     if re.search(r"\b\d+(\.\d+)?%", q) or "percentage" in q or "%" in q:
-        sql_score += 1.5
-    # Aggregation function phrases
-    if re.search(r"\b(average|avg|total|sum|count|mean)\b", q):
         sql_score += 1.5
 
     # Normalize scores
@@ -385,6 +418,52 @@ async def run_rag(request: AgenticAskRequest) -> ChatQueryResponse:
     )
 
 
+async def run_registry(request: AgenticAskRequest, registry: Any) -> dict[str, Any]:
+    """Look up KPI/fact definitions directly from registry.db (no LLM, no embedding)."""
+    log.log_info("Registry lookup started")
+    hits = await asyncio.to_thread(registry.search_registry, request.message, 5)
+
+    details: list[dict[str, Any]] = []
+    for hit in hits:
+        try:
+            if hit.get("entity_type") == "kpi":
+                ctx = await asyncio.to_thread(registry.get_kpi_context, hit["entity_id"])
+            else:
+                ctx = await asyncio.to_thread(registry.get_fact_context, hit["entity_id"])
+            if ctx:
+                details.append({"entity_type": hit.get("entity_type"), **ctx})
+        except Exception as exc:
+            log.log_warning(f"Registry context lookup failed for {hit}: {exc}")
+
+    log.log_info(f"Registry lookup completed: hits={len(hits)}, details={len(details)}")
+    return {"hits": hits, "details": details}
+
+
+def format_registry_answer(registry_result: dict[str, Any]) -> str:
+    """Render registry details as markdown — deterministic, no LLM needed."""
+    details = registry_result.get("details", [])
+    if not details:
+        return "I couldn't find a matching KPI or fact definition in the registry for that question."
+
+    sections = []
+    for item in details[:3]:
+        name = item.get("name") or item.get("kpi_id") or item.get("fact_id") or "Unknown"
+        lines = [f"**{name}**"]
+        if item.get("description"):
+            lines.append(item["description"])
+        if item.get("formula"):
+            lines.append(f"- Formula: `{item['formula']}`")
+        if item.get("required_facts"):
+            lines.append(f"- Required facts: {', '.join(item['required_facts'])}")
+        if item.get("data_type"):
+            lines.append(f"- Data type: {item['data_type']}")
+        if item.get("thresholds"):
+            lines.append(f"- Thresholds: {item['thresholds']}")
+        sections.append("\n".join(lines))
+
+    return "\n\n".join(sections)
+
+
 # ---------------------------------------------------------------------------
 # Synthesis (CrewAI is only used here — not for tool selection)
 # ---------------------------------------------------------------------------
@@ -464,6 +543,7 @@ async def synthesize_answer(
 
 async def run_tool_based_agentic_query(
     request: AgenticAskRequest,
+    registry: Any,
 ) -> AgenticToolAskResponse:
     """Deterministic tool dispatch.
 
@@ -487,6 +567,39 @@ async def run_tool_based_agentic_query(
     tools_used: list[str] = []
     rag_result: Optional[ChatQueryResponse] = None
     sql_result: Optional[dict[str, Any]] = None
+
+    if route_plan.route == "chitchat":
+        return AgenticToolAskResponse(
+            response=(
+                "Hi! I'm your Nexus AI Assistant. Ask me about KPIs, portfolio "
+                "companies, or financial metrics, and I'll pull the relevant data "
+                "or definitions for you."
+            ),
+            tools_used=[],
+            route_plan=route_plan,
+            sql_query_executed=None,
+            iterations_hint="Route: chitchat | no tools called",
+        )
+
+    if route_plan.route == "registry":
+        try:
+            registry_result = await run_registry(request, registry)
+            answer = format_registry_answer(registry_result)
+            hits = len(registry_result.get("hits", []))
+        except Exception as exc:
+            log.log_error(f"Registry lookup failed: {type(exc).__name__}: {exc}")
+            answer = (
+                "I couldn't reach the KPI/metric registry right now, so I can't "
+                "look up that definition. Please try again in a moment."
+            )
+            hits = 0
+        return AgenticToolAskResponse(
+            response=answer,
+            tools_used=["registry"],
+            route_plan=route_plan,
+            sql_query_executed=None,
+            iterations_hint=f"Route: registry | hits={hits}",
+        )
 
     if route_plan.route in ("sql", "both"):
         try:
@@ -548,5 +661,3 @@ async def run_tool_based_agentic_query(
         sql_query_executed=sql_query_str,
         iterations_hint=f"Route: {route_plan.route} | Tools: {tools_used}",
     )
-
-

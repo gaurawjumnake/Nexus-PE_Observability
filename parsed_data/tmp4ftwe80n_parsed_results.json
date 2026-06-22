@@ -1,0 +1,57 @@
+[
+  {
+    "filename": "tmp4ftwe80n.docx",
+    "file_type": ".docx",
+    "total_pages": 1,
+    "pages": [
+      {
+        "page_number": 1,
+        "text_content": "",
+        "images": [],
+        "tables": [
+          {
+            "headers": [
+              "<!-- rich cell -->",
+              "<!-- rich cell -->"
+            ],
+            "row_count": 4,
+            "column_count": 2,
+            "data": [
+              [
+                "Revenue base (baseline revenue)",
+                "$76.7M"
+              ],
+              [
+                "EBITDA pre AI (pre-AI EBITDA)",
+                "$8.2M"
+              ],
+              [
+                "EBITDA post AI (post-AI EBITDA)",
+                "$15.26M"
+              ],
+              [
+                "EBITDA delta (EBITDA change)",
+                "$7.06M"
+              ]
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 1,
+          "content_length": 0,
+          "file_type": ".docx",
+          "has_visual_content": true,
+          "content_type": "mixed_content"
+        }
+      }
+    ],
+    "document_metadata": {
+      "total_documents": 1,
+      "extraction_method": "Docling",
+      "has_images": false,
+      "has_tables": true,
+      "estimated_pages": 1
+    },
+    "processing_time": 0.09961533546447754
+  }
+]

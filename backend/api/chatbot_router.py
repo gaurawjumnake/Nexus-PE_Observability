@@ -1,21 +1,25 @@
 from backend.chatbot.chat import (
-    run_rag_query, 
-    IndexDocumentRequest, 
-    CHROMA_COLLECTION, 
-    ChatQueryResponse, 
-    ChatQueryRequest, 
-    index_document_chunks
+    IndexDocumentRequest,
+    ChatQueryResponse,
+    ChatQueryRequest,
+    index_document_chunks,
+    run_rag_query,
 )
-from backend.chatbot.orchestrator import *
+from backend.chatbot.orchestrator import (
+    AgenticAskRequest,
+    AgenticToolAskResponse,
+    run_tool_based_agentic_query,
+)
 
 from backend.utilites.app_logger import Logger
-from fastapi import APIRouter, HTTPException
-import backend.db.db_client as db
+from fastapi import APIRouter, HTTPException, Request
+
 log = Logger()
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 ## Chat -----------------------------------------------------------------
+
 
 @router.post("/index/{document_id}")
 async def index_document(document_id: str, request: IndexDocumentRequest):
@@ -37,92 +41,39 @@ async def index_document(document_id: str, request: IndexDocumentRequest):
 
 @router.post("/query", response_model=ChatQueryResponse)
 async def query_chat(request: ChatQueryRequest):
+    """Direct RAG-only query (bypasses the orchestrator's SQL/RAG routing)."""
     try:
         return await run_rag_query(request)
     except Exception as exc:
         log.log_error(f"Chat query failed: {type(exc).__name__}: {exc}")
         raise HTTPException(status_code=500, detail=f"Chat query failed: {exc}")
-    
-# # Orchastrator ----------------------------------------
 
 
-@router.post("", response_model=AgenticToolAskResponse)
-async def ask_agentic_tools(request: AgenticAskRequest):
-    """Deterministic agentic endpoint.
+# Orchestrator ------------------------------------------------------------
 
-    Uses a keyword + data-availability intent classifier to decide the tool
-    route, then executes tools directly and synthesises the answer.
-    No LLM-based tool selection — only LLM-based answer synthesis.
+
+@router.post("/ask", response_model=AgenticToolAskResponse)
+async def ask_agentic(request: Request, body: AgenticAskRequest):
+    """Orchestrated ask.
+
+    1. classify_intent() scores the question for SQL vs RAG vs registry-lookup signals.
+    2. Routes deterministically to text-to-SQL, RAG, registry, or both sql+rag.
+    3. Synthesises one answer when both sql+rag were used.
     """
     try:
-        log.log_info(f"Agentic ask (deterministic) started: {request.model_dump()}")
-        return await run_tool_based_agentic_query(request)
-    except ValueError as exc:
-        raise HTTPException(status_code=422, detail=str(exc))
-    except Exception as exc:
-        log.log_error(
-            f"Deterministic agentic orchestrator failed: {type(exc).__name__}: {exc}"
-        )
-        raise HTTPException(
-            status_code=500,
-            detail=f"Agentic orchestrator failed: {exc}",
-        )
-
-
-# ---------------------------------------------------------------------------
-# Original router-based endpoint (kept for backwards compatibility)
-# ---------------------------------------------------------------------------
-
-
-async def choose_route(request: AgenticAskRequest) -> RoutePlan:
-    """Compatibility wrapper — uses the same deterministic classifier."""
-    return classify_intent(request)
-
-
-@router.post("/ask", response_model=AgenticAskResponse)
-async def ask_agentic(request: AgenticAskRequest):
-    try:
-        log.log_info(f"Agentic ask started: {request.model_dump()}")
-        route_plan = await choose_route(request)
-        rag_result: Optional[ChatQueryResponse] = None
-        sql_result: Optional[dict[str, Any]] = None
-
-        if route_plan.route in {"sql", "both"}:
-            log.log_info("Route includes SQL; invoking text-to-SQL")
-            sql_result = await run_sql(request)
-        if route_plan.route in {"rag", "both"}:
-            log.log_info("Route includes RAG; invoking document retrieval")
-            rag_result = await run_rag(request)
-
-        question = request.message
-        if request.contexts:
-            question += f" (Context: {', '.join(request.contexts)})"
-
-        answer = await synthesize_answer(
-            question=question,
-            route_plan=route_plan,
-            rag_result=rag_result,
-            sql_result=sql_result,
-            verbose=False,
-        )
-
-        response = AgenticAskResponse(
-            response=answer,
-            route_plan=route_plan,
-            rag=rag_result.model_dump() if rag_result else None,
-            sql=sql_result,
-        )
-        log.log_info(
-            f"Agentic ask completed: route={route_plan.route}, "
-            f"has_rag={rag_result is not None}, has_sql={sql_result is not None}"
-        )
-        return response
+        log.log_info(f"Agentic ask started: {body.model_dump()}")
+        return await run_tool_based_agentic_query(body, request.app.state.registry)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
     except Exception as exc:
         log.log_error(f"Agentic orchestrator failed: {type(exc).__name__}: {exc}")
-        raise HTTPException(
-            status_code=500, detail=f"Agentic orchestrator failed: {exc}"
+        return AgenticToolAskResponse(
+            response=(
+                "Something went wrong while processing that request. "
+                "Please try again — if it keeps happening, let the team know."
+            ),
+            tools_used=[],
+            route_plan=None,
+            sql_query_executed=None,
+            iterations_hint=f"error: {type(exc).__name__}",
         )
-    
-

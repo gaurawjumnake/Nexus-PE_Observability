@@ -36,7 +36,7 @@ COLUMN_RANGES = {
     'projects_in_production': (0, 100), 'regulatory_readiness': (20, 95), 'spend_by_model_family': (5000, 300000),
     'stalled_projects': (0, 15), 'strategic_alignment_score': (10, 90), 'talent_readiness_score': (10, 90),
     'technical_maturity_score': (10, 90), 'top_quartile_position': (0, 100), 'total_ai_projects': (5, 150),
-    'total_ai_spend': (50000, 3000000), 'vendor_compliance': (60, 100),
+    'total_ai_spend': (50000, 3000000), 'vendor_compliance': (60, 100), 'approved_ai_budget ':(0,2000000)
 }
 
 # Columns that should be whole numbers
@@ -63,7 +63,7 @@ def generate_synthetic_data(company_name, columns, year, seed=None):
         
         # Randomly select 20-30 dates in this month
         num_entries = rng.integers(20, 31)  # 20-30 inclusive
-        random_days = sorted(rng.choice(range(1, num_days_in_month + 1), size=num_entries, replace=False))
+        random_days = sorted(rng.choice(range(1, num_days_in_month + 1), size=num_entries, replace=True))
         
         # Generate dates for this month
         month_dates = [datetime(year, month, day) for day in random_days]
@@ -74,7 +74,7 @@ def generate_synthetic_data(company_name, columns, year, seed=None):
         month_progress = month / 12
         
         for col in columns:
-            low, high = COLUMN_RANGES.get(col, (0, 100))
+            low, high = COLUMN_RANGES.get(col, (0, 101))
             
             # Add a slight trend across the year
             base_value = low + (high - low) * month_progress * 0.3
@@ -132,7 +132,7 @@ def main(company_name, year, seed=None, outdir='.'):
         'portfolio_ai_adoption_score', 'portfolio_benchmark_score', 'power_user_ratio', 'production_ratio',
         'productivity_gain', 'projects_in_poc', 'projects_in_production', 'regulatory_readiness',
         'spend_by_model_family', 'stalled_projects', 'strategic_alignment_score', 'talent_readiness_score',
-        'technical_maturity_score', 'top_quartile_position', 'total_ai_projects', 'total_ai_spend', 'vendor_compliance'
+        'technical_maturity_score', 'top_quartile_position', 'total_ai_projects', 'total_ai_spend', 'vendor_compliance', 'approved_ai_budget' 
     ]
     
     print(f"SYNTHETIC DATA GENERATOR - DAILY ENTRIES")
@@ -143,7 +143,7 @@ def main(company_name, year, seed=None, outdir='.'):
     
     # Generate data
     print(f"\nGenerating synthetic data...")
-    df = generate_synthetic_data(company_name, columns, year=year, seed=seed)
+    df = generate_synthetic_data(company_name, columns, year=year)
     
     # Display summary
     print(f"\n" + "-" * 80)
@@ -169,7 +169,7 @@ def main(company_name, year, seed=None, outdir='.'):
 
 
 if __name__ == "__main__":
-    company_name = "Fluke"
-    year = 2023
-    seed = 42 
-    df = main(company_name, year, seed=seed, outdir='.')
+    company_name = "Provation"
+    year = 2026
+    # seed = 42 
+    df = main(company_name, year, outdir='.')

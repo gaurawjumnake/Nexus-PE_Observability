@@ -18,16 +18,13 @@ from pydantic import BaseModel, Field
 
 import backend.db.db_client as db
 from backend.utilites.app_logger import Logger
+from backend.config import CHROMA_PATH as _CHROMA_PATH, CHROMA_COLLECTION, DEFAULT_RAG_MODEL
 
 load_dotenv()
 
 log = Logger()
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_CHROMA_PATH = PROJECT_ROOT / "backend" / "kpi_extractor" / "app" / "db" / "chroma"
-CHROMA_PATH = os.getenv("CHROMA_PATH", str(DEFAULT_CHROMA_PATH))
-CHROMA_COLLECTION = os.getenv("CHROMA_COLLECTION", "nexus_document_chunks")
-DEFAULT_RAG_MODEL = os.getenv("NEXUS_RAG_MODEL", os.getenv("GEMINI_MODEL", "gemini/gemini-2.5-flash"))
+CHROMA_PATH = str(_CHROMA_PATH)
 
 
 class IndexDocumentRequest(BaseModel):
@@ -82,7 +79,7 @@ class GeminiEmbeddingFunction(EmbeddingFunction):
                 model=self.model,
                 contents=text,
             )
-            embeddings.append(response.embeddings[0].values)
+            embeddings.append(response.embeddings[0].values) 
         log.log_info(f"Gemini embeddings created: {len(embeddings)}")
         return embeddings
 
@@ -138,10 +135,7 @@ def get_crewai_llm():
 
 
 def get_chroma_path() -> Path:
-    path = Path(CHROMA_PATH)
-    if not path.is_absolute():
-        path = PROJECT_ROOT / path
-    return path
+    return Path(CHROMA_PATH)
 
 
 def get_collection():

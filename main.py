@@ -1,14 +1,9 @@
-"""
-Nexus API entrypoint.
-
-Run with: uvicorn backend.main:app --reload
-"""
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.api.deps import init_shared_resources, shutdown_shared_resources
+from backend.api.deps import init_shared_resources
 # from backend.chatbot.orchestrator import router as analytics_router
 # from backend.chatbot.chat import router as chat_router
 from backend.api.documents_router import router as documents_router
@@ -18,12 +13,8 @@ from backend.api.chatbot_router import router as chat_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: one shared LLM client + one shared RegistryMCPClient
-    # (single MCP server subprocess) for the whole app lifetime.
     init_shared_resources(app)
     yield
-    # Shutdown: terminate the MCP server subprocess.
-    shutdown_shared_resources(app)
 
 
 app = FastAPI(title="Nexus KPI Pipeline", lifespan=lifespan)
@@ -39,8 +30,6 @@ app.add_middleware(
 app.include_router(documents_router)
 app.include_router(kpi_router)
 app.include_router(chat_router)
-# app.include_router(chat_router)
-# app.include_router(analytics_router)
 
 
 @app.get("/health")
