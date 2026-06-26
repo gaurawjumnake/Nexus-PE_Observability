@@ -61,7 +61,7 @@ def resolve_source_conflicts(
             winners.append(candidates[0])
             continue
         fact_ctx = registry.get_fact_context(fact_id)
-        winner = _pick_by_priority(candidates, fact_ctx["source_priority"])
+        winner = _pick_by_priority(candidates, fact_ctx["source_priority"]) #type:ignore
         winners.append(winner)
     return winners
 

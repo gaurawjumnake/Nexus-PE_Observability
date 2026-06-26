@@ -7,7 +7,7 @@ from pathlib import Path
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request
 
 from backend.config import PARSED_FILE_PATH
-from backend.db.document_parser.data_ingestion import (
+from backend.document_parser.data_ingestion import (
     ingest_financial_upload,
     is_rag_file,
     is_tabular_file,
@@ -115,8 +115,12 @@ def process_uploaded_document(
             status_code=422,
             detail=f"Parsing failed for {filename} - no narrative content or tables found",
         )
-    log.log_info(f"Saving parsed data...")
+    log.log_info(
+        f"Saving parsed data: has_narrative={has_narrative}, "
+        f"ts_tables={len(time_series_tables)}, structured_tables={len(structured_tables)}"
+    )
     document_id = db.save_document(company_id, filename)
+    log.log_info(f"Document saved: document_id={document_id}")
 
     result = {
         "document_id": document_id,
@@ -215,6 +219,7 @@ def process_uploaded_document(
     try:
         derived_periods = fact_aggregation.derive_periods_from_tables(time_series_tables)
         periods_to_calculate = derived_periods or [period]
+        log.log_info(f"Calculating KPIs for periods={periods_to_calculate}, company_id={company_id}")
 
         kpi_results_by_period = calculate_kpis_for_periods(
             company_id=company_id, periods=periods_to_calculate, registry=registry,

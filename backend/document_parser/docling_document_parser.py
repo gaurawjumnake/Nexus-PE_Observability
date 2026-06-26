@@ -199,17 +199,6 @@ def _build_structured_output(parsed_document: Dict[str, Any]) -> Dict[str, Any]:
 
 
 class DoclingDocumentParser:
-    """
-    Drop-in replacement for LlamaCloudDocumentParser, backed by Docling
-    (open-source, runs fully local, no API key / credits required).
-
-    Keeps the same dataclasses (ParsedPage / ParsedDocument) and the same
-    public method surface (parse_single_document, parse_multiple_documents,
-    parse_directory, save_results, get_summary_statistics, run_parser,
-    extract_all_text) so it can be swapped into the existing pipeline with
-    minimal changes elsewhere.
-    """
-
     SUPPORTED_EXTENSIONS = SUPPORTED_DOC_EXTENSIONS
 
     def __init__(self, max_timeout: int = 300, do_ocr: bool = False, do_table_structure: bool = True):

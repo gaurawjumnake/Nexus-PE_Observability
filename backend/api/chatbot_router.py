@@ -5,6 +5,7 @@ from backend.chatbot.chat import (
     index_document_chunks,
     run_rag_query,
 )
+from backend.chatbot.chat_history import ChatHistoryStore
 from backend.chatbot.orchestrator import (
     AgenticAskRequest,
     AgenticToolAskResponse,
@@ -77,3 +78,13 @@ async def ask_agentic(request: Request, body: AgenticAskRequest):
             sql_query_executed=None,
             iterations_hint=f"error: {type(exc).__name__}",
         )
+
+
+@router.delete("/history/{session_id}")
+async def clear_chat_history(session_id: str):
+    """Clear all stored chat history for a session (UI 'New Chat' / clear action)."""
+    found = ChatHistoryStore.clear(session_id)
+    if not found:
+        raise HTTPException(status_code=404, detail=f"No history found for session '{session_id}'")
+    log.log_info(f"Chat history cleared for session_id={session_id}")
+    return {"session_id": session_id, "cleared": True}

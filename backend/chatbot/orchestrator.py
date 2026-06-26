@@ -15,7 +15,6 @@ was causing incorrect routing (e.g. choosing RAG for quantitative queries).
 
 import asyncio
 import json
-import os
 import re
 import sqlite3
 from pathlib import Path
@@ -25,8 +24,10 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from backend.chatbot.chat import ChatQueryRequest, ChatQueryResponse, run_rag_query
+from backend.chatbot.chat_history import ChatHistoryStore, needs_rewrite, rewrite_with_history
 from backend.chatbot.text_to_sql_chatbot import FinancialTextToSQLChatbot
 from backend.utilites.app_logger import Logger
+from backend.utilites.llm_models import get_crewai_llm
 from backend.config import DEFAULT_ORCHESTRATOR_MODEL as DEFAULT_MODEL
 
 log = Logger()
@@ -42,6 +43,9 @@ RouteName = Literal["rag", "sql", "both", "registry", "chitchat"]
 class AgenticAskRequest(BaseModel):
     message: str = Field(..., min_length=1)
     contexts: Optional[list[str]] = Field(default_factory=list)
+    session_id: Optional[str] = None
+    top_c: int = Field(default=5, ge=1, le=20)
+    company_id: Optional[str] = None
 
 
 class RoutePlan(BaseModel):
@@ -63,19 +67,6 @@ class AgenticToolAskResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
-
-
-def get_crewai_llm():
-    from crewai import LLM
-
-    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
-    if not api_key:
-        raise ValueError(
-            "Missing GEMINI_API_KEY or GOOGLE_API_KEY for CrewAI Gemini LLM"
-        )
-
-    log.log_info(f"Creating CrewAI orchestrator LLM with model={DEFAULT_MODEL}")
-    return LLM(model=DEFAULT_MODEL, api_key=api_key, temperature=0)
 
 
 def parse_json_object(text: Any) -> dict[str, Any]:
@@ -237,7 +228,9 @@ RAG_KEYWORDS = {
 # Phrases that signal the user wants to know *what a KPI/metric means*,
 # not its value for a company — answered from registry.db, not SQL/RAG.
 REGISTRY_TRIGGER_PATTERNS = (
-    r"\btell me (more |)about\b",
+    r"\btell me (more |)(on|about|regarding)\b",
+    r"\btell me more\b",
+    r"\bmore (detail|info|information)s?\b",
     r"\bwhat (is|are|does)\b.*\b(kpi|metric|fact)\b",
     r"\bwhat does\b.*\bmean\b",
     r"\bexplain\b.*\b(kpi|metric|formula)\b",
@@ -263,9 +256,16 @@ def _strip_context_prefix(message: str) -> str:
     return re.sub(r"^\s*\[context:[^\]]*\]\s*", "", message, flags=re.IGNORECASE)
 
 
+def _extract_context_kpi(message: str) -> Optional[str]:
+    """Return the KPI/entity name from a UI-injected '[Context: ...]' prefix, or None."""
+    m = re.match(r"^\s*\[context:\s*([^\]]+)\]\s*", message, flags=re.IGNORECASE)
+    return m.group(1).strip() if m else None
+
+
 def classify_intent(request: AgenticAskRequest) -> RoutePlan:
     """Deterministic intent classifier with keyword scoring + data awareness."""
     q = _strip_context_prefix(request.message).lower().strip()
+    context_kpi = _extract_context_kpi(request.message)
 
     for pattern in CHITCHAT_PATTERNS:
         if re.match(pattern, q):
@@ -282,6 +282,17 @@ def classify_intent(request: AgenticAskRequest) -> RoutePlan:
                 confidence=0.8,
                 reasoning=f"Question asks about a KPI/metric definition (matched: '{pattern}').",
             )
+
+    # Contextual follow-up: when UI provides a KPI/metric in context and the question
+    # is qualitative (why/explain/low/high/threshold), look up the registry definition.
+    if context_kpi and re.search(
+        r"\b(why|low|high|bad|poor|good|explain|score|threshold|benchmark|rating)\b", q
+    ):
+        return RoutePlan(
+            route="registry",
+            confidence=0.75,
+            reasoning=f"Contextual question about '{context_kpi}' — looking up definition and thresholds.",
+        )
 
     words = set(re.findall(r"[a-z0-9%\-]+", q))
     # Also check multi-word phrases
@@ -413,7 +424,8 @@ async def run_rag(request: AgenticAskRequest) -> ChatQueryResponse:
     return await run_rag_query(
         ChatQueryRequest(
             message=question,
-            contexts=request.contexts
+            contexts=request.contexts,
+            company_id=request.company_id,
         )
     )
 
@@ -421,7 +433,12 @@ async def run_rag(request: AgenticAskRequest) -> ChatQueryResponse:
 async def run_registry(request: AgenticAskRequest, registry: Any) -> dict[str, Any]:
     """Look up KPI/fact definitions directly from registry.db (no LLM, no embedding)."""
     log.log_info("Registry lookup started")
-    hits = await asyncio.to_thread(registry.search_registry, request.message, 5)
+    # Use the context KPI name when available — generic phrases like "tell me more on
+    # this" or "why is the score low" produce meaningless FTS results on their own.
+    context_kpi = _extract_context_kpi(request.message)
+    search_query = context_kpi if context_kpi else request.message
+    log.log_info(f"Registry search query: {search_query!r} (context_kpi={context_kpi!r})")
+    hits = await asyncio.to_thread(registry.search_registry, search_query, 5)
 
     details: list[dict[str, Any]] = []
     for hit in hits:
@@ -498,7 +515,7 @@ async def synthesize_answer(
             "You write concise executive answers. You keep SQL facts and document "
             "evidence distinct, and you do not invent missing information."
         ),
-        llm=get_crewai_llm(),
+        llm=get_crewai_llm(DEFAULT_MODEL),
         verbose=verbose,
         allow_delegation=False,
     )
@@ -555,6 +572,16 @@ async def run_tool_based_agentic_query(
         f"Deterministic agentic query started: message={request.message!r}"
     )
 
+    # ── Step 0: Chat history — rewrite follow-up questions ────────────────
+    if request.session_id:
+        history = ChatHistoryStore.get(request.session_id, request.top_c)
+        ChatHistoryStore.add(request.session_id, "user", request.message)
+        if history and needs_rewrite(request.message):
+            rewritten = rewrite_with_history(request.message, history, DEFAULT_MODEL)
+            if rewritten != request.message:
+                log.log_info(f"Query rewritten: {request.message!r} -> {rewritten!r}")
+                request = request.model_copy(update={"message": rewritten})
+
     # ── Step 1: Classify intent ────────────────────────────────────────────
     route_plan = classify_intent(request)
     log.log_info(
@@ -593,6 +620,8 @@ async def run_tool_based_agentic_query(
                 "look up that definition. Please try again in a moment."
             )
             hits = 0
+        if request.session_id:
+            ChatHistoryStore.add(request.session_id, "assistant", answer)
         return AgenticToolAskResponse(
             response=answer,
             tools_used=["registry"],
@@ -648,6 +677,9 @@ async def run_tool_based_agentic_query(
     )
 
     sql_query_str = None
+
+    if request.session_id:
+        ChatHistoryStore.add(request.session_id, "assistant", answer)
 
     log.log_info(
         f"Deterministic agentic query completed: route={route_plan.route}, "

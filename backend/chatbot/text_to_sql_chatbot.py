@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Any
 
 from backend.utilites.app_logger import Logger
+from backend.utilites.llm_models import get_crewai_llm
+from backend.config import DEFAULT_SQL_MODEL as DEFAULT_MODEL
 
 try:
     from dotenv import load_dotenv
@@ -14,15 +16,10 @@ except ImportError:  # pragma: no cover
     load_dotenv = None
 
 try:
-    from crewai import Agent, Crew, LLM, Process, Task
+    from crewai import Agent, Crew, Process, Task
 except ImportError as exc:  # pragma: no cover
     raise SystemExit("CrewAI is not installed. Install it with: uv add crewai") from exc
 
-
-from backend.config import DEFAULT_DB_PATH, DEFAULT_SQL_MODEL as DEFAULT_MODEL
-
-BASE_DIR = Path(__file__).resolve().parent
-DEFAULT_DB_PATH = Path(DEFAULT_DB_PATH)
 READ_ONLY_PREFIXES = ("select", "with")
 DANGEROUS_SQL = re.compile(
     r"\b(insert|update|delete|drop|alter|create|replace|truncate|attach|detach|vacuum|pragma)\b",
@@ -37,30 +34,11 @@ class SQLValidationError(ValueError):
 
 def load_environment() -> None:
     if load_dotenv:
-        load_dotenv(BASE_DIR / ".env")
         load_dotenv()
 
     gemini_key = os.getenv("GEMINI_API_KEY")
     if gemini_key and not os.getenv("GOOGLE_API_KEY"):
         os.environ["GOOGLE_API_KEY"] = gemini_key
-
-
-def get_llm(model: str | None = None) -> LLM:
-    load_environment()
-    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
-    if not api_key:
-        raise SystemExit(
-            "Missing Gemini API key. Set GEMINI_API_KEY in your environment "
-            "or in backend/chatbot/.env."
-        )
-
-    selected_model = model or os.getenv("GEMINI_MODEL", DEFAULT_MODEL)
-    log.log_info(f"Creating CrewAI text-to-SQL LLM with model={selected_model}")
-    return LLM(
-        model=selected_model,
-        api_key=api_key,
-        temperature=0,
-    )
 
 
 def resolve_db_path(db_path: Path | str | None = None) -> Path:
@@ -75,8 +53,9 @@ def resolve_db_path(db_path: Path | str | None = None) -> Path:
         log.log_info(f"Text-to-SQL DB path supplied by env: {resolved}")
         return resolved
 
-    log.log_info(f"Text-to-SQL DB path using canonical nexus.db: {DEFAULT_DB_PATH}")
-    return DEFAULT_DB_PATH
+    raise FileNotFoundError(
+        "No database path configured. Set FINANCIAL_DATA_DB_PATH or NEXUS_TEXT_TO_SQL_DB_PATH."
+    )
 
 
 def connect(db_path: Path) -> sqlite3.Connection:
@@ -89,7 +68,8 @@ def build_schema_context(db_path: Path) -> str:
     log.log_info(f"Building SQLite schema context for db_path={db_path}")
     with connect(db_path) as conn:
         table_rows = conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('financial_data', 'kpis') ORDER BY name"
+            "SELECT name FROM sqlite_master WHERE type='table' "
+            "AND name IN ('financial_data', 'kpis', 'fact_observations', 'facts') ORDER BY name"
         ).fetchall()
 
         sections: list[str] = []
@@ -182,7 +162,10 @@ def normalize_sql(sql: str, row_limit: int) -> str:
         raise SQLValidationError("Generated SQL contains a blocked keyword.")
     if ";" in sql:
         raise SQLValidationError("Only one SQL statement is allowed.")
-    if not re.search(r"\blimit\s+\d+\b", lowered):
+    # Aggregation queries (GROUP BY) already consolidate rows — do not add an
+    # arbitrary LIMIT that would silently drop groups and skew results.
+    is_aggregation = bool(re.search(r"\bgroup\s+by\b", lowered))
+    if not is_aggregation and not re.search(r"\blimit\s+\d+\b", lowered):
         sql = f"{sql} LIMIT {row_limit}"
     log.log_info(f"Validated read-only SQL: {sql}")
     return sql
@@ -221,7 +204,8 @@ class FinancialTextToSQLChatbot:
         self.db_path = resolved_db_path
         self.row_limit = row_limit
         self.verbose = verbose
-        self.llm = get_llm(model)
+        load_environment()
+        self.llm = get_crewai_llm(model or DEFAULT_MODEL)
         self.schema_context = build_schema_context(resolved_db_path)
         log.log_info(
             f"FinancialTextToSQLChatbot initialized: db_path={self.db_path}, "
@@ -286,7 +270,11 @@ class FinancialTextToSQLChatbot:
                 "- Use only the tables and columns in the schema.\n"
                 "- Query must be read-only SELECT or WITH.\n"
                 "- Prefer clear aliases.\n"
-                "- Add LIMIT {row_limit} for detail queries.\n"
+                "- For comparison, ranking, or summary questions (highest, lowest, total, "
+                "average, by company, by year, etc.) use GROUP BY with the appropriate "
+                "aggregate function (SUM, AVG, MAX, MIN, COUNT). Never add LIMIT to "
+                "aggregation queries — return all groups so results are complete.\n"
+                "- For row-level detail queries that are not aggregated, add LIMIT {row_limit}.\n"
                 "- Return JSON only with keys: sql, rationale."
             ),
             expected_output='JSON only: {"sql": "...", "rationale": "..."}',

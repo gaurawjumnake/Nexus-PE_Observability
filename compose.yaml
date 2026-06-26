@@ -6,3 +6,19 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - 8005:8005
+    env_file:
+      - .env
+    environment:
+      CHROMA_PATH: /var/app/db/chroma
+    volumes:
+      - nexus_data:/var/app/db
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8005"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8005/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  nexus_data:

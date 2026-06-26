@@ -13,9 +13,8 @@ Layout assumed (this file lives at backend/, one level below the workspace root)
         ├── config.py
         ├── api/
         ├── db/
-        │   ├── nexus.db                fact/KPI value store (sqlite)
-        │   ├── registry.db             registry index (sqlite, derived from YAML)
-        │   ├── registry_schema.sql     schema for registry.db
+        │   ├── nexus_schema.sql        schema applied to Postgres on startup
+        │   ├── registry_schema.sql     schema for registry (applied to Postgres)
         │   └── chroma/                 Chroma vector store
         ├── document_parser/
         ├── kpi_extractor/
@@ -38,12 +37,8 @@ WORKSPACE_ROOT = PROJECT_ROOT.parent
 # Database paths
 # ---------------------------------------------------------------------------
 DB_DIR              = PROJECT_ROOT / "db"
-DEFAULT_DB_PATH     = DB_DIR / "nexus.db"               # fact/KPI value store
-REGISTRY_DB_PATH    = DB_DIR / "registry.db"            # registry index (sqlite)
 REGISTRY_SCHEMA_PATH = DB_DIR / "registry_schema.sql"  # schema for registry.db
-CHROMA_DIR          = DB_DIR / "chroma"                 # Chroma vector store
-
-DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{DEFAULT_DB_PATH}")
+CHROMA_DIR          = Path(os.getenv("CHROMA_PATH",       str(DB_DIR / "chroma")))
 
 # ---------------------------------------------------------------------------
 # KPI extractor / registry
@@ -76,3 +71,4 @@ DEFAULT_GEMINI_MODEL    = os.getenv("GEMINI_MODEL", "gemini/gemini-2.5-flash")
 DEFAULT_RAG_MODEL       = os.getenv("NEXUS_RAG_MODEL", DEFAULT_GEMINI_MODEL)
 DEFAULT_ORCHESTRATOR_MODEL = os.getenv("NEXUS_ORCHESTRATOR_MODEL", DEFAULT_GEMINI_MODEL)
 DEFAULT_SQL_MODEL       = os.getenv("NEXUS_SQL_MODEL", DEFAULT_GEMINI_MODEL)
+

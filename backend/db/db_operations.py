@@ -360,7 +360,7 @@ class DBOperations:
             print("  Cancelled.\n")
 
 
-from backend.config import DEFAULT_DB_PATH, DATABASE_URL
+from backend.db.db_client import DATABASE_URL
 
 def main():
     dbops = DBOperations(DATABASE_URL)

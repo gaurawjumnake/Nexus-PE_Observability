@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS documents (
     company_id      TEXT NOT NULL,
     file_name       TEXT NOT NULL,
     document_type   TEXT,
-    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_documents_company
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS document_chunks (
     chunk_index     INTEGER NOT NULL,
     page_number     INTEGER,
     section_title   TEXT,
-    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (document_id)
         REFERENCES documents(document_id)
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS facts (
     source_type         TEXT NOT NULL,
     period              TEXT,
 
-    timestamp           DATETIME DEFAULT CURRENT_TIMESTAMP,
+    timestamp           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (fact_id, company_id, period),
 
@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS fact_observations (
     source_document     TEXT,
     source_type         TEXT,            -- classified document_type, e.g. 'financial'
 
-    created_at          DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (fact_id, company_id, observation_date),
 
@@ -127,7 +127,7 @@ CREATE TABLE IF NOT EXISTS kpis (
 
     period          TEXT,
 
-    timestamp       DATETIME DEFAULT CURRENT_TIMESTAMP,
+    timestamp       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (kpi_id, company_id, period)
 );

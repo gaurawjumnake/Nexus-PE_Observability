@@ -18,6 +18,7 @@ from pydantic import BaseModel, Field
 
 import backend.db.db_client as db
 from backend.utilites.app_logger import Logger
+from backend.utilites.llm_models import get_crewai_llm
 from backend.config import CHROMA_PATH as _CHROMA_PATH, CHROMA_COLLECTION, DEFAULT_RAG_MODEL
 
 load_dotenv()
@@ -36,6 +37,7 @@ class IndexDocumentRequest(BaseModel):
 class ChatQueryRequest(BaseModel):
     message: str = Field(..., min_length=1)
     contexts: Optional[list[str]] = Field(default_factory=list)
+    company_id: Optional[str] = None
 
 
 class Citation(BaseModel):
@@ -73,13 +75,11 @@ class GeminiEmbeddingFunction(EmbeddingFunction):
 
     def __call__(self, input: Documents) -> Embeddings:
         log.log_info(f"Embedding {len(input)} document chunk(s) with Gemini")
-        embeddings = []
-        for text in input:
-            response = self.client.models.embed_content(
-                model=self.model,
-                contents=text,
-            )
-            embeddings.append(response.embeddings[0].values) 
+        response = self.client.models.embed_content(
+            model=self.model,
+            contents=list(input),
+        )
+        embeddings = [e.values for e in response.embeddings]
         log.log_info(f"Gemini embeddings created: {len(embeddings)}")
         return embeddings
 
@@ -123,33 +123,26 @@ def get_embedding_function() -> EmbeddingFunction:
     raise ValueError(f"Unsupported embedding provider: {provider}")
 
 
-def get_crewai_llm():
-    from crewai import LLM
-
-    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
-    if not api_key:
-        raise ValueError("Missing GEMINI_API_KEY or GOOGLE_API_KEY for CrewAI Gemini LLM")
-
-    log.log_info(f"Creating CrewAI RAG LLM with model={DEFAULT_RAG_MODEL}")
-    return LLM(model=DEFAULT_RAG_MODEL, api_key=api_key, temperature=0)
-
-
 def get_chroma_path() -> Path:
     return Path(CHROMA_PATH)
 
 
+_chroma_collection = None
+
 def get_collection():
-    chroma_path = get_chroma_path()
-    chroma_path.mkdir(parents=True, exist_ok=True)
-    log.log_info(f"Opening Chroma collection={CHROMA_COLLECTION} at path={chroma_path}")
-    client = chromadb.PersistentClient(path=str(chroma_path))
-    collection = client.get_or_create_collection(
-        name=CHROMA_COLLECTION,
-        embedding_function=get_embedding_function(),
-        metadata={"hnsw:space": "cosine"},
-    )
-    log.log_info(f"Chroma collection ready: {CHROMA_COLLECTION}")
-    return collection
+    global _chroma_collection
+    if _chroma_collection is None:
+        chroma_path = get_chroma_path()
+        chroma_path.mkdir(parents=True, exist_ok=True)
+        log.log_info(f"Opening Chroma collection={CHROMA_COLLECTION} at path={chroma_path}")
+        client = chromadb.PersistentClient(path=str(chroma_path))
+        _chroma_collection = client.get_or_create_collection(
+            name=CHROMA_COLLECTION,
+            embedding_function=get_embedding_function(),
+            metadata={"hnsw:space": "cosine"},
+        )
+        log.log_info(f"Chroma collection ready: {CHROMA_COLLECTION}")
+    return _chroma_collection
 
 
 def build_where(
@@ -169,12 +162,14 @@ def build_where(
 
 def retrieve_context(request: ChatQueryRequest) -> RetrievedContext:
     log.log_info(
-        f"RAG retrieval started: message={request.message}"
+        f"RAG retrieval started: message={request.message}, company_id={request.company_id}"
     )
     collection = get_collection()
+    where = {"company_id": request.company_id} if request.company_id else None
     results = collection.query(
         query_texts=[request.message],
         n_results=8,
+        where=where,
     )
 
     documents = results.get("documents", [[]])[0]
@@ -227,7 +222,7 @@ async def answer_with_rag(question: str, context: RetrievedContext) -> str:
             "You are a careful analyst. You ground every claim in the supplied "
             "source excerpts and clearly say when the excerpts are insufficient."
         ),
-        llm=get_crewai_llm(),
+        llm=get_crewai_llm(DEFAULT_RAG_MODEL),
         verbose=False,
         allow_delegation=False,
     )

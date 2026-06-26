@@ -258,13 +258,13 @@ def _eval_node(node, variables: dict):
             return v
 
     if isinstance(node, ast.Constant):
-        return float(node.value)
+        return float(node.value) #type:ignore
 
     raise TypeError(f"Unsupported AST node: {type(node).__name__}")
 
 
 def _result(
-    kpi_id: str, value, coverage: float, status: str, missing: list = None
+    kpi_id: str, value, coverage: float, status: str, missing: Optional[list] = None
 ) -> dict:
     r = {"kpi_id": kpi_id, "kpi": kpi_id, "value": value, "coverage": coverage, "status": status}
     if missing:

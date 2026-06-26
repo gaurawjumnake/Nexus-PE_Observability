@@ -3,7 +3,7 @@ import pymupdf4llm
 import os
 from crewai import Agent, Task, Crew, Process
 from pathlib import Path
-from backend.utilites.llm_models import llm
+from backend.utilites.llm_models import get_crewai_llm
 from backend.utilites.file_reader_tool import CustomFileReaderTool
 from backend.utilites.app_logger import Logger
 from pydantic import BaseModel

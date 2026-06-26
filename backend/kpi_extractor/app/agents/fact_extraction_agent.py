@@ -136,15 +136,15 @@ class FactExtractionAgent(BaseAgent):
         except ValueError:
             return None
 
-        if parsed.get("value") is None:
+        if parsed.get("value") is None: #type:ignore
             return None
 
         source_chunk = candidate_chunks[0]
         return {
             "fact_id":     fact_meta["fact_id"],
-            "value":       parsed["value"],
-            "confidence":  float(parsed.get("confidence", 0.0)),
-            "verbatim":    parsed.get("verbatim", ""),
+            "value":       parsed["value"], #type:ignore
+            "confidence":  float(parsed.get("confidence", 0.0)), #type:ignore
+            "verbatim":    parsed.get("verbatim", ""), #type:ignore
             "chunk_id":    source_chunk["chunk_id"],
             "document_id": source_chunk["document_id"],
         }

@@ -87,7 +87,7 @@ def get_financial_columns() -> set[str]:
 NON_FACT_COLUMNS = {"company_name", "financial_year", "date"}
 
 
-def sync_facts_from_financial_data(company_id: str) -> dict[str, Any]:
+def sync_facts_from_financial_data(company_id: str, document_id: str | None = None) -> dict[str, Any]:
     """
     Bridge: financial_data (raw tabular uploads) -> facts (used by the KPI
     engine). Without this, tabular financial uploads never produce KPIs,
@@ -98,11 +98,13 @@ def sync_facts_from_financial_data(company_id: str) -> dict[str, Any]:
     year), so multiple uploaded sheets/dates for the same year consolidate
     into a single fact value.
     """
-    frame = pd.read_sql(
-        text("SELECT * FROM financial_data WHERE LOWER(company_name) = :cid"),
-        db.engine,
-        params={"cid": company_id.lower()},
-    )
+    with db.engine.connect() as conn:
+        frame = pd.read_sql(
+            text("SELECT * FROM financial_data WHERE LOWER(company_name) = :cid").bindparams(
+                cid=company_id.lower()
+            ),
+            conn,
+        )
     if frame.empty or "financial_year" not in frame.columns:
         return {"years_synced": [], "facts_written": 0}
 
@@ -121,8 +123,8 @@ def sync_facts_from_financial_data(company_id: str) -> dict[str, Any]:
                 company_id=company_id,
                 value=round(float(value), 4),
                 confidence=1.0,
-                source_document="",
-                source_chunk="",
+                source_document=document_id,
+                source_chunk=None,
                 source_type="financial_data",
                 period=period,
             )
@@ -228,7 +230,7 @@ def ingest_financial_upload(
         facts_result = {"years_synced": [], "facts_written": 0}
         kpis_calculated = 0
         try:
-            facts_result = sync_facts_from_financial_data(company_id)
+            facts_result = sync_facts_from_financial_data(company_id, document_id=document_id)
             if registry is not None:
                 from backend.kpi_extractor.extractor_pipeline import calculate_kpis
                 for year in facts_result["years_synced"]:

@@ -12,14 +12,53 @@ log = Logger()
 from sqlalchemy import create_engine, text, inspect
 from sqlalchemy.orm import sessionmaker
 
-from backend.config import DB_DIR, DEFAULT_DB_PATH, CHROMA_DIR, DATABASE_URL
+from backend.config import DB_DIR, CHROMA_DIR
 
 # Re-export as strings for callers that expect os.path-style string paths.
-DB_DIR      = str(DB_DIR)
-DEFAULT_DB_PATH = str(DEFAULT_DB_PATH)
-CHROMA_DIR  = str(CHROMA_DIR)
+DB_DIR     = str(DB_DIR)
+CHROMA_DIR = str(CHROMA_DIR)
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+
+def pg_connect_kwargs() -> dict:
+    """Postgres connection params from env — single source for all psycopg2 callers."""
+    return {
+        "host": os.getenv("POSTGRES_HOST"),
+        "port": int(os.getenv("POSTGRES_PORT", 5432)),
+        "dbname": os.getenv("POSTGRES_DB", "postgres"),
+        "user": os.getenv("POSTGRES_USER", "postgres"),
+        "password": os.getenv("POSTGRES_PWD", ""),
+        "connect_timeout": 10,
+        "sslmode": "require",
+    }
+
+
+def _build_database_url() -> str:
+    if url := os.getenv("DATABASE_URL"):
+        return url
+    pg_host = os.getenv("POSTGRES_HOST")
+    if pg_host:
+        kw = pg_connect_kwargs()
+        return f"postgresql+psycopg2://{kw['user']}:{kw['password']}@{kw['host']}:{kw['port']}/{kw['dbname']}?sslmode=require"
+    raise RuntimeError("No database configured. Set DATABASE_URL or POSTGRES_HOST.")
+
+
+DATABASE_URL = _build_database_url()
+
+engine = create_engine(
+    DATABASE_URL,
+    pool_size=5,
+    max_overflow=2,
+    pool_pre_ping=True,   # drops stale connections silently before use
+    pool_recycle=240,     # recycle before Supabase's ~5-min idle timeout
+    connect_args={
+        "connect_timeout": 10,       # fail fast on unreachable host
+        "keepalives": 1,             # enable TCP keepalives
+        "keepalives_idle": 30,       # send first keepalive after 30s idle
+        "keepalives_interval": 5,    # retry every 5s
+        "keepalives_count": 5,       # drop after 5 missed keepalives (~55s)
+        "options": "-c statement_timeout=30000",  # cancel any query > 30s
+    },
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -130,7 +169,7 @@ def get_chunks(document_id: str) -> list[dict]:
 # Facts ------------------------------------------------------------------
 
 def save_fact(fact_id: str, company_id: str, value, confidence: float,
-              source_document: str, source_chunk: str,
+              source_document: str, source_chunk: str | None,
               source_type: str, period: str):
     company_id = company_id.strip().lower()
     value_json = json.dumps(value)

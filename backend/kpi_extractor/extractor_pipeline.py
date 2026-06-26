@@ -1,6 +1,6 @@
 from typing import Optional, Any
 
-from backend.utilites.llm_models import BaseLLMClient, get_llm_client
+from backend.utilites.llm_models import BaseLLMClient
 from backend.kpi_extractor.app.core.chunking import chunk_markdown
 from backend.kpi_extractor.app.registry.registry_service import RegistryService
 from backend.kpi_extractor.app.agents.document_classifier import DocumentClassifierAgent
@@ -11,8 +11,10 @@ from backend.kpi_extractor.app.engine.kpi_calculation_engine import KPICalculati
 from backend.kpi_extractor.app.engine import tabular_extraction
 from backend.kpi_extractor.app.engine import fact_aggregation
 import backend.db.db_client as db
-from backend.utilites.llm_models import llm
 from crewai import Agent, Task, Crew, Process
+from backend.utilites.app_logger import Logger
+
+log = Logger()
 
 # ------------------------------------------------------------------
 # Stage 1-6: Document → Validated Facts
@@ -213,7 +215,15 @@ def ingest_structured_tables(
     facts_saved = 0
     unmatched_all: list[str] = []
 
-    for table in parsed_output.get("time_series_tables", []):
+    ts_tables = parsed_output.get("time_series_tables", [])
+    st_tables = parsed_output.get("structured_tables", [])
+    log.log_info(
+        f"ingest_structured_tables: document_id={document_id}, "
+        f"type={document_type}, ts_tables={len(ts_tables)}, structured_tables={len(st_tables)}"
+    )
+
+    for i, table in enumerate(ts_tables):
+        log.log_info(f"Processing time_series_table {i+1}/{len(ts_tables)}")
         extractions, unmatched = tabular_extraction.extract_observations_from_time_series_table(
             table, document_type, registry, document_id=document_id,
         )
@@ -229,9 +239,11 @@ def ingest_structured_tables(
             "source_document": document_id,
             "source_type": document_type,
         } for v in validated]
+        log.log_info(f"Saving {len(rows)} observations for time_series_table {i+1}")
         observations_saved += db.save_observations_bulk(rows)
 
-    for table in parsed_output.get("structured_tables", []):
+    for i, table in enumerate(st_tables):
+        log.log_info(f"Processing structured_table {i+1}/{len(st_tables)}")
         extractions, unmatched = tabular_extraction.extract_facts_from_structured_table(
             table, document_type, registry, document_id=document_id,
         )
@@ -246,12 +258,15 @@ def ingest_structured_tables(
                 value=fact["value"],
                 confidence=fact["confidence"],
                 source_document=document_id,
-                source_chunk="",
+                source_chunk=None,
                 source_type=document_type,
                 period=period,
             )
             facts_saved += 1
 
+    log.log_info(
+        f"ingest_structured_tables done: observations={observations_saved}, facts={facts_saved}"
+    )
     return {
         "document_id": document_id,
         "document_type": document_type,

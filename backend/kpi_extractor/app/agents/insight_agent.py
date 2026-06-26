@@ -98,10 +98,10 @@ class InsightAgent(BaseAgent):
             try:
                 ctx = self.registry.get_kpi_context(kpi_id)
                 lines.append(
-                    f"KPI: {ctx['name']} ({kpi_id})\n"
-                    f"  Formula: {ctx.get('formula', 'N/A')}\n"
-                    f"  Required facts: {', '.join(ctx['required_facts'])}\n"
-                    f"  Required docs:  {', '.join(ctx['required_documents'])}"
+                    f"KPI: {ctx['name']} ({kpi_id})\n"  #type:ignore
+                    f"  Formula: {ctx.get('formula', 'N/A')}\n"  #type:ignore
+                    f"  Required facts: {', '.join(ctx['required_facts'])}\n" #type:ignore
+                    f"  Required docs:  {', '.join(ctx['required_documents'])}" #type:ignore
                 )
             except RuntimeError:
                 lines.append(f"KPI: {kpi_id} — definition not found in registry")
@@ -115,9 +115,9 @@ class InsightAgent(BaseAgent):
             try:
                 fact_ctx = self.registry.get_fact_context(fact_id)
                 lines.append(
-                    f"Missing fact: {fact_ctx['name']} ({fact_id})\n"
-                    f"  Description: {fact_ctx['description']}\n"
-                    f"  Find in: {', '.join(fact_ctx['source_priority'][:3])}"
+                    f"Missing fact: {fact_ctx['name']} ({fact_id})\n" #type:ignore
+                    f"  Description: {fact_ctx['description']}\n" #type:ignore
+                    f"  Find in: {', '.join(fact_ctx['source_priority'][:3])}" #type:ignore
                 )
             except RuntimeError:
                 pass
