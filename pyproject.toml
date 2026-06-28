@@ -22,6 +22,7 @@ dependencies = [
     "pdfminer.six>=20231228",
     "uvicorn>=0.49.0",
     "docling>=2.95.0",
+    "psycopg2>=2.9.12",
 ]
 
 [[tool.uv.index]]

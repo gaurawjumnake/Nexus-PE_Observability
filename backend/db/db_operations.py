@@ -29,8 +29,8 @@ class DBOperations:
         """Return column info and row count for a table."""
         inspector = inspect(self.engine)
         columns = inspector.get_columns(table_name)
-        with self.engine.connect() as conn:
-            count = conn.execute(text(f'SELECT COUNT(*) FROM "{table_name}"')).scalar()
+        import backend.db.db_client as db
+        count = db.get_pg_table_count(table_name)
         return {
             "columns": [{"name": c["name"], "type": str(c["type"])} for c in columns],
             "row_count": count,
@@ -41,15 +41,8 @@ class DBOperations:
 
     def get_records(self, engine, table_name: str, limit: int | None = 20) -> list[dict]:
         """Fetch rows from a table as list of dicts."""
-        meta = MetaData()
-        table = Table(table_name, meta, autoload_with=engine)
-        with engine.connect() as conn:
-            query = table.select()
-            if limit:
-                query = query.limit(limit)
-            rows = conn.execute(query).fetchall()
-            cols = [c.name for c in table.columns]
-        return [dict(zip(cols, row)) for row in rows]
+        import backend.db.db_client as db
+        return db.get_records_from_table(table_name, limit)
 
 
     def print_table(self, rows: list[dict], title: str = ""):
@@ -81,21 +74,8 @@ class DBOperations:
 
     def search_records(self, table_name: str, column: str, value: str, exact: bool = False) -> list[dict]:
         """Search rows where column matches value (exact or LIKE)."""
-        meta = MetaData()
-        table = Table(table_name, meta, autoload_with=self.engine)
-
-        if column not in [c.name for c in table.columns]:
-            print(f"  ✗ Column '{column}' not found in '{table_name}'")
-            return []
-
-        col = table.c[column]
-        condition = (col == value) if exact else col.like(f"%{value}%")
-
-        with self.engine.connect() as conn:
-            rows = conn.execute(table.select().where(condition)).fetchall()
-            cols = [c.name for c in table.columns]
-
-        return [dict(zip(cols, row)) for row in rows]
+        import backend.db.db_client as db
+        return db.search_records_in_table(table_name, column, value, exact)
 
 
     # # Delete ---------------------------------------------------------
@@ -106,43 +86,25 @@ class DBOperations:
         Returns the number of rows deleted. Use exact=True by default
         to avoid accidentally deleting more rows than intended via LIKE matches.
         """
-        meta = MetaData()
-        table = Table(table_name, meta, autoload_with=self.engine)
-
-        if column not in [c.name for c in table.columns]:
-            print(f"  ✗ Column '{column}' not found in '{table_name}'")
-            return 0
-
-        col = table.c[column]
-        condition = (col == value) if exact else col.like(f"%{value}%")
-
-        with self.engine.begin() as conn:
-            result = conn.execute(table.delete().where(condition))
-            deleted = result.rowcount
-
+        import backend.db.db_client as db
+        deleted = db.delete_records_from_table(table_name, column, value, exact)
         print(f"  ✓ Deleted {deleted} row(s) from '{table_name}'")
         return deleted
 
 
     def delete_all_records(self, table_name: str) -> int:
         """Delete ALL rows from a table (keeps the table/schema intact)."""
-        meta = MetaData()
-        table = Table(table_name, meta, autoload_with=self.engine)
-
-        with self.engine.begin() as conn:
-            result = conn.execute(table.delete())
-            deleted = result.rowcount
-
+        import backend.db.db_client as db
+        deleted = db.delete_all_records_from_table(table_name)
         print(f"  ✓ Deleted all {deleted} row(s) from '{table_name}'")
         return deleted
 
 
     def drop_table(self, table_name: str) -> bool:
         """Drop an entire table from the database."""
-        meta = MetaData()
         try:
-            table = Table(table_name, meta, autoload_with=self.engine)
-            table.drop(self.engine)
+            import backend.db.db_client as db
+            db.drop_pg_table(table_name)
             print(f"  ✓ Dropped table '{table_name}'")
             return True
         except Exception as e:
@@ -166,8 +128,8 @@ class DBOperations:
             return False
 
         try:
-            with self.engine.begin() as conn:
-                conn.execute(text(f'ALTER TABLE "{table_name}" DROP COLUMN "{column_name}"'))
+            import backend.db.db_client as db
+            db.drop_pg_column(table_name, column_name)
             print(f"  ✓ Dropped column '{column_name}' from '{table_name}'")
             return True
         except Exception as e:
@@ -197,19 +159,11 @@ class DBOperations:
         tmp_table_name = f"{table_name}__tmp_rebuild"
 
         try:
-            with self.engine.begin() as conn:
-                # Build column defs for the new table
-                col_defs = ", ".join(f'"{c.name}" {c.type}' for c in remaining_cols)
-                conn.execute(text(f'CREATE TABLE "{tmp_table_name}" ({col_defs})'))
-
-                cols_csv = ", ".join(f'"{c}"' for c in col_names)
-                conn.execute(text(
-                    f'INSERT INTO "{tmp_table_name}" ({cols_csv}) '
-                    f'SELECT {cols_csv} FROM "{table_name}"'
-                ))
-
-                conn.execute(text(f'DROP TABLE "{table_name}"'))
-                conn.execute(text(f'ALTER TABLE "{tmp_table_name}" RENAME TO "{table_name}"'))
+            # Build column defs for the new table
+            col_defs = ", ".join(f'"{c.name}" {c.type}' for c in remaining_cols)
+            cols_csv = ", ".join(f'"{c}"' for c in col_names)
+            import backend.db.db_client as db
+            db.rebuild_pg_table_without_column(table_name, tmp_table_name, col_defs, cols_csv)
 
             print(f"  ✓ Dropped column '{column_name}' from '{table_name}' (via rebuild)")
             return True

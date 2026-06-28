@@ -113,38 +113,16 @@ def check_sql_data_availability(company_id: str) -> dict[str, Any]:
         return {"available": False, "row_count": 0, "columns": [], "years": []}
 
     try:
-        conn = sqlite3.connect(db_path)
-        conn.row_factory = sqlite3.Row
-
-        # Check if financial_data table exists
-        tables = conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='financial_data'"
-        ).fetchall()
-        if not tables:
-            conn.close()
+        import backend.db.db_client as db
+        if not db.check_sqlite_table_exists(db_path, "financial_data"):
             return {"available": False, "row_count": 0, "columns": [], "years": []}
 
-        # Get columns
-        cols = conn.execute("PRAGMA table_info(financial_data)").fetchall()
+        cols = db.get_sqlite_table_info(db_path, "financial_data")
         column_names = [c["name"] for c in cols]
 
-        # Count rows for this company (fuzzy match on company_name)
-        row_count = conn.execute(
-            "SELECT COUNT(*) AS cnt FROM financial_data "
-            "WHERE LOWER(company_name) LIKE ?",
-            (f"%{company_id.lower()}%",),
-        ).fetchone()["cnt"]
+        row_count = db.get_sqlite_company_row_count(db_path, company_id)
+        years = db.get_sqlite_company_years(db_path, company_id)
 
-        # Get distinct years
-        years_rows = conn.execute(
-            "SELECT DISTINCT financial_year FROM financial_data "
-            "WHERE LOWER(company_name) LIKE ? AND financial_year IS NOT NULL "
-            "ORDER BY financial_year",
-            (f"%{company_id.lower()}%",),
-        ).fetchall()
-        years = [r["financial_year"] for r in years_rows]
-
-        conn.close()
         return {
             "available": row_count > 0,
             "row_count": row_count,
@@ -163,19 +141,7 @@ def get_uploaded_document_types(company_id: str) -> dict[str, int]:
     """
     try:
         import backend.db.db_client as db
-
-        with db.get_cursor() as cur:
-            from sqlalchemy import text
-
-            rows = cur.execute(
-                text(
-                    "SELECT document_type, COUNT(*) AS cnt "
-                    "FROM documents WHERE company_id = :cid "
-                    "GROUP BY document_type"
-                ),
-                {"cid": company_id},
-            ).fetchall()
-            return {str(r.document_type or "unknown"): r.cnt for r in rows}
+        return db.get_document_type_counts(company_id)
     except Exception as exc:
         log.log_warning(f"Document type lookup failed: {exc}")
         return {}
@@ -394,24 +360,54 @@ def classify_intent(request: AgenticAskRequest) -> RoutePlan:
 
 
 async def run_sql(request: AgenticAskRequest) -> dict[str, Any]:
-    log.log_info("Text-to-SQL execution started")
-    bot = FinancialTextToSQLChatbot(
-        db_path=None,
-        row_limit=100,
-        verbose=False,
-    )
-    
+    """Replaced raw text-to-SQL with an agent using DatabaseOperationsTool."""
+    log.log_info("DB Tool Agent execution started")
+    from crewai import Agent, Crew, Process, Task
+    from backend.chatbot.tools.db_tool import DatabaseOperationsTool
+
     question = request.message
     if request.contexts:
         question += f" (Context: {', '.join(request.contexts)})"
-        
-    result = await bot.ask(question)
-    result = dict(result)
-    result.pop("sql", None)
-    log.log_info(
-        f"Text-to-SQL execution completed: row_count={result.get('row_count')}"
+
+    db_agent = Agent(
+        role="Database Operations Analyst",
+        goal="Answer the user's question by utilizing the DatabaseOperationsTool to retrieve data.",
+        backstory=(
+            "You are a backend database analyst. You do not write raw SQL. "
+            "Instead, you use the DatabaseOperationsTool to invoke python functions from db_client.py "
+            "to fetch the required data. If the user asks for KPIs, fetch KPIs. If they ask for financial data, "
+            "fetch financial data. Be flexible with column and fact names (e.g. 'ai_revenue' might answer a question about 'AI Revenue')."
+        ),
+        llm=get_crewai_llm(DEFAULT_MODEL),
+        verbose=False,
+        allow_delegation=False,
+        tools=[DatabaseOperationsTool()],
     )
-    return result
+
+    db_task = Task(
+        description=(
+            "Answer the following question using the DatabaseOperationsTool if data is needed.\n\n"
+            f"Question: {question}\n\n"
+            "Rules:\n"
+            "- Use the tool to gather any necessary data.\n"
+            "- If the tool returns JSON with field names close to what the user asked (like 'ai_revenue' for AI Revenue), use that data.\n"
+            "- Provide a clear, concise answer based ONLY on the data returned by the tool.\n"
+            "- If the tool returns an error or absolutely no matching data, state that clearly."
+        ),
+        expected_output="A direct, informative answer to the question based on database results.",
+        agent=db_agent,
+    )
+
+    result = await Crew(
+        agents=[db_agent],
+        tasks=[db_task],
+        process=Process.sequential,
+        verbose=False,
+    ).kickoff_async()
+
+    answer = str(getattr(result, "raw", result)).strip()
+    log.log_info(f"DB Tool Agent execution completed, answer_chars={len(answer)}")
+    return {"answer": answer, "row_count": 1}
 
 
 async def run_rag(request: AgenticAskRequest) -> ChatQueryResponse:
@@ -507,17 +503,20 @@ async def synthesize_answer(
 
     # Both tools were used — synthesise
     from crewai import Agent, Crew, Process, Task
+    from backend.chatbot.tools.db_tool import DatabaseOperationsTool
 
     synthesis_agent = Agent(
         role="Nexus Answer Synthesizer",
-        goal="Combine document evidence and SQL analytics into one direct answer.",
+        goal="Combine document evidence and SQL analytics into one direct answer, supplementing with live DB queries if needed.",
         backstory=(
             "You write concise executive answers. You keep SQL facts and document "
-            "evidence distinct, and you do not invent missing information."
+            "evidence distinct, and you do not invent missing information. "
+            "If any specific data point is missing from your context, use the DatabaseOperationsTool to retrieve it."
         ),
         llm=get_crewai_llm(DEFAULT_MODEL),
         verbose=verbose,
         allow_delegation=False,
+        tools=[DatabaseOperationsTool()],
     )
     synthesis_task = Task(
         description=(

@@ -11,5 +11,6 @@ wheels/
 .env
 
 dump/
+graphify-out/
 # Added by code-review-graph
 .code-review-graph/

@@ -98,13 +98,7 @@ def sync_facts_from_financial_data(company_id: str, document_id: str | None = No
     year), so multiple uploaded sheets/dates for the same year consolidate
     into a single fact value.
     """
-    with db.engine.connect() as conn:
-        frame = pd.read_sql(
-            text("SELECT * FROM financial_data WHERE LOWER(company_name) = :cid").bindparams(
-                cid=company_id.lower()
-            ),
-            conn,
-        )
+    frame = db.get_financial_data(company_id)
     if frame.empty or "financial_year" not in frame.columns:
         return {"years_synced": [], "facts_written": 0}
 
@@ -211,7 +205,7 @@ def ingest_financial_upload(
                 sheets.append({"sheet_name": sheet_name, "rows_inserted": 0})
                 continue
 
-            prepared.to_sql(FINANCIAL_TABLE, db.engine, if_exists="append", index=False)
+            db.append_financial_data(prepared)
             inserted = len(prepared)
             total_rows += inserted
             sheets.append({"sheet_name": sheet_name, "rows_inserted": inserted})

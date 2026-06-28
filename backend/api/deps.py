@@ -29,8 +29,8 @@ def get_registry() -> RegistryService:
 def check_db() -> dict:
     """Ping the database and return a status dict. Safe to call at any time."""
     try:
-        with engine.connect() as conn:
-            conn.execute(text("SELECT 1"))
+        import backend.db.db_client as db
+        db.check_db_connection()
         return {"status": "ok"}
     except Exception as e:
         return {"status": "error", "detail": str(e)}

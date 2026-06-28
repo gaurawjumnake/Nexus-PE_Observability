@@ -58,66 +58,48 @@ def resolve_db_path(db_path: Path | str | None = None) -> Path:
     )
 
 
-def connect(db_path: Path) -> sqlite3.Connection:
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-
 def build_schema_context(db_path: Path) -> str:
+    import backend.db.db_client as db
     log.log_info(f"Building SQLite schema context for db_path={db_path}")
-    with connect(db_path) as conn:
-        table_rows = conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' "
-            "AND name IN ('financial_data', 'kpis', 'fact_observations', 'facts') ORDER BY name"
-        ).fetchall()
 
-        sections: list[str] = []
-        for table_row in table_rows:
-            table = table_row["name"]
-            columns = conn.execute(f'PRAGMA table_info("{table}")').fetchall()
-            count = conn.execute(f'SELECT COUNT(*) AS count FROM "{table}"').fetchone()["count"]
-            sample = conn.execute(f'SELECT * FROM "{table}" LIMIT 3').fetchall()
-            column_lines = [f"- {col['name']} ({col['type'] or 'UNKNOWN'})" for col in columns]
-            sections.append(
-                "\n".join(
-                    [
-                        f"Table: {table}",
-                        f"Rows: {count}",
-                        "Columns:",
-                        *column_lines,
-                        "Sample rows:",
-                        json.dumps([dict(row) for row in sample], indent=2, default=str),
-                    ]
-                )
-            )
+    table_rows = db.get_sqlite_table_names(db_path)
 
-        business_context: dict[str, Any] = {"notes": ["The database is SQLite."]}
-        table_names = {row["name"] for row in table_rows}
-        if "financial_data" in table_names:
-            companies = conn.execute(
-                """
-                SELECT company_name, MIN(financial_year) AS min_year,
-                       MAX(financial_year) AS max_year, COUNT(*) AS rows
-                FROM financial_data
-                GROUP BY company_name
-                ORDER BY company_name
-                """
-            ).fetchall()
-            date_range = conn.execute(
-                "SELECT MIN(date) AS min_date, MAX(date) AS max_date FROM financial_data"
-            ).fetchone()
-            business_context.update(
-                {
-                    "companies": [dict(row) for row in companies],
-                    "date_range": dict(date_range),
-                    "notes": [
-                        "The main table is financial_data.",
-                        "Use company_name for company filters and financial_year for yearly filters.",
-                        "date is a timestamp string; use SQLite date functions when needed.",
-                    ],
-                }
+    sections: list[str] = []
+    for table_row in table_rows:
+        table = table_row["name"]
+        columns = db.get_sqlite_table_info(db_path, table)
+        count = db.get_sqlite_table_count(db_path, table)
+        sample = db.get_sqlite_table_sample(db_path, table, limit=3)
+        column_lines = [f"- {col['name']} ({col['type'] or 'UNKNOWN'})" for col in columns]
+        sections.append(
+            "\n".join(
+                [
+                    f"Table: {table}",
+                    f"Rows: {count}",
+                    "Columns:",
+                    *column_lines,
+                    "Sample rows:",
+                    json.dumps([dict(row) for row in sample], indent=2, default=str),
+                ]
             )
+        )
+
+    business_context: dict[str, Any] = {"notes": ["The database is SQLite."]}
+    table_names = {row["name"] for row in table_rows}
+    if "financial_data" in table_names:
+        companies = db.get_sqlite_companies_summary(db_path)
+        date_range = db.get_sqlite_date_range(db_path)
+        business_context.update(
+            {
+                "companies": [dict(row) for row in companies],
+                "date_range": dict(date_range),
+                "notes": [
+                    "The main table is financial_data.",
+                    "Use company_name for company filters and financial_year for yearly filters.",
+                    "date is a timestamp string; use SQLite date functions when needed.",
+                ],
+            }
+        )
 
     schema_context = "\n\n".join(
         [
@@ -172,11 +154,12 @@ def normalize_sql(sql: str, row_limit: int) -> str:
 
 
 def execute_sql(db_path: Path, sql: str, row_limit: int) -> dict[str, Any]:
+    import backend.db.db_client as db
     safe_sql = normalize_sql(sql, row_limit)
     log.log_info(f"Executing SQLite query against {db_path}")
-    with connect(db_path) as conn:
-        conn.execute(f"EXPLAIN QUERY PLAN {safe_sql}").fetchall()
-        rows = conn.execute(safe_sql).fetchmany(row_limit)
+    
+    db.explain_sqlite_query(db_path, safe_sql)
+    rows = db.execute_sqlite_query(db_path, safe_sql, limit=row_limit)
 
     log.log_info(f"SQLite query completed: row_count={len(rows)}")
     return {
@@ -350,13 +333,20 @@ class FinancialTextToSQLChatbot:
 
     async def _answer_question(self, question: str, query_result: dict[str, Any]) -> str:
         log.log_info("Starting CrewAI SQL result answer")
+        from backend.chatbot.tools.db_tool import DatabaseOperationsTool
+        
         analyst = Agent(
             role="Financial Data Analyst",
             goal="Explain SQL result rows as a concise business answer.",
-            backstory="You translate financial and AI metrics into direct business answers.",
+            backstory=(
+                "You translate financial and AI metrics into direct business answers. "
+                "If you need extra context about a company or a KPI not present in the results, "
+                "you can use the DatabaseOperationsTool."
+            ),
             llm=self.llm,
             verbose=self.verbose,
             allow_delegation=False,
+            tools=[DatabaseOperationsTool()],
         )
         answer_task = Task(
             description=(

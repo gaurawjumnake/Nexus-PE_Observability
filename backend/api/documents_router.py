@@ -237,7 +237,7 @@ def process_uploaded_document(
 
 
 @router.post("/upload")
-async def upload_document(
+def upload_document(
     request: Request,
     file: UploadFile = File(...),
     company_id: str = Form(...),
@@ -299,7 +299,7 @@ async def upload_document(
 
 
 @router.get("/{document_id}")
-async def get_document_chunks(document_id: str):
+def get_document_chunks(document_id: str):
     """Inspect persisted chunks for a document (debug / status check)."""
     chunks = db.get_chunks(document_id)
     if not chunks:
