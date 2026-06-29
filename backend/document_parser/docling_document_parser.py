@@ -181,13 +181,17 @@ def _build_structured_output(parsed_document: Dict[str, Any]) -> Dict[str, Any]:
                     "columns": classified["columns"],
                     "rows": classified["rows"],
                 })
-            else:  # narrative_markdown - flatten exactly as the old extract_all_text() did
-                narrative_parts.append(f"\n### Table {table_idx}\n")
-                if headers:
-                    narrative_parts.append("| " + " | ".join(str(h) for h in headers) + " |\n")
-                    narrative_parts.append("|" + "|".join(["---"] * len(headers)) + "|\n")
-                for row in data:
-                    narrative_parts.append("| " + " | ".join(str(cell) for cell in row) + " |\n")
+            else:
+                # Narrative-markdown tables: export_to_markdown() already
+                # embeds them in text_content, so only add explicitly when
+                # the page had no text (avoids duplicate table blocks).
+                if not text_content:
+                    narrative_parts.append(f"\n### Table {table_idx}\n")
+                    if headers:
+                        narrative_parts.append("| " + " | ".join(str(h) for h in headers) + " |\n")
+                        narrative_parts.append("|" + "|".join(["---"] * len(headers)) + "|\n")
+                    for row in data:
+                        narrative_parts.append("| " + " | ".join(str(cell) for cell in row) + " |\n")
 
     return {
         "filename": filename,
@@ -203,10 +207,6 @@ class DoclingDocumentParser:
 
     def __init__(self, max_timeout: int = 300, do_ocr: bool = False, do_table_structure: bool = True):
         self.max_timeout = max_timeout
-
-        # Configure the PDF pipeline (OCR + table structure recognition).
-        # Other formats (docx/pptx/xlsx) use Docling's default backends,
-        # which already extract native tables/text without needing OCR.
         pdf_opts = PdfPipelineOptions()
         pdf_opts.do_ocr = do_ocr
         pdf_opts.do_table_structure = do_table_structure
@@ -275,9 +275,14 @@ class DoclingDocumentParser:
         """
         file_type = Path(file_path).suffix.lower()
 
-        # Docling exposes doc.pages (dict keyed by page number) for paginated
-        # formats. For non-paginated formats we treat the whole doc as 1 page.
-        page_numbers = sorted(getattr(doc, "pages", {}).keys()) or [1]
+        # Docling populates doc.pages (dict keyed by page number) only for
+        # paginated formats (PDF). Non-paginated formats (docx, md, txt) have
+        # an empty dict — treat the whole doc as one page and export WITHOUT
+        # page_no, otherwise export_to_markdown(page_no=1) returns empty
+        # string because the document has no internal page structure.
+        raw_page_numbers = sorted(getattr(doc, "pages", {}).keys())
+        is_paginated = bool(raw_page_numbers)
+        page_numbers = raw_page_numbers or [1]
 
         # Pre-extract all tables once; each table item carries a .prov with
         # page number info we can use to bucket them per page.
@@ -286,14 +291,22 @@ class DoclingDocumentParser:
 
         parsed_pages = []
         for page_no in page_numbers:
-            try:
-                page_text = doc.export_to_markdown(page_no=page_no) if hasattr(doc, "export_to_markdown") else ""
-            except TypeError:
-                # Older docling versions may not support page_no filtering
-                page_text = doc.export_to_markdown() if page_no == page_numbers[0] else ""
-            except Exception as e:
-                log.log_warning(f"Could not export markdown for page {page_no}: {str(e)}")
-                page_text = ""
+            if not is_paginated:
+                # Non-paginated: export whole document once on the single page.
+                try:
+                    page_text = doc.export_to_markdown() if hasattr(doc, "export_to_markdown") else ""
+                except Exception as e:
+                    log.log_warning(f"Could not export markdown: {str(e)}")
+                    page_text = ""
+            else:
+                try:
+                    page_text = doc.export_to_markdown(page_no=page_no) if hasattr(doc, "export_to_markdown") else ""
+                except TypeError:
+                    # Older docling versions may not support page_no filtering
+                    page_text = doc.export_to_markdown() if page_no == page_numbers[0] else ""
+                except Exception as e:
+                    log.log_warning(f"Could not export markdown for page {page_no}: {str(e)}")
+                    page_text = ""
 
             tables = all_tables_by_page.get(page_no, [])
             images = all_pictures_by_page.get(page_no, [])
@@ -318,16 +331,24 @@ class DoclingDocumentParser:
 
         return parsed_pages
 
+    @staticmethod
+    def _strip_md_formatting(text: str) -> str:
+        """Remove markdown bold/italic markers from a header string."""
+        import re as _re
+        return _re.sub(r"[\*_]{1,3}(.*?)[\*_]{1,3}", r"\1", str(text)).strip()
+
     def _collect_tables_by_page(self, doc) -> Dict[int, List[Dict[str, Any]]]:
-        """Use Docling's structured TableItem objects -- no regex needed."""
         tables_by_page: Dict[int, List[Dict[str, Any]]] = {}
 
         for table in getattr(doc, "tables", []):
             page_no = self._get_item_page(table)
             try:
-                df = table.export_to_dataframe()
-                headers = list(df.columns)
-                # Convert to list of dicts, preserving native types and replacing NaN with None
+                # Pass doc so Docling can resolve rich-cell formatting;
+                # without it, styled header cells become '<!-- rich cell -->'.
+                df = table.export_to_dataframe(doc)
+                # Strip residual bold/italic markdown markers from column names
+                # (e.g. '**Metric**' → 'Metric').
+                headers = [self._strip_md_formatting(h) for h in df.columns]
                 rows = [
                     [None if pd.isna(cell) else cell for cell in row]
                     for row in df.values.tolist()
@@ -574,9 +595,9 @@ class DoclingDocumentParser:
 
 # if __name__ == "__main__":
 #     parser = DoclingDocumentParser()
-#     test_path = Path("sample_data/synth/Fluke_2024.xlsx")
+#     test_path = Path("sample_data/synth/novamind/novamind_board_deck_q2_2026.docx")
 #     if test_path.exists():
 #         parsed = parser.run_parser(modified_name=test_path.stem, file_path=str(test_path))
-#         print(json.dumps(parsed[0], indent=2)[:1000] if parsed else "No data returned")
+#         print(json.dumps(parsed, indent=2)[:1000] if parsed else "No data returned")
 #     else:
 #         log.log_error(f"Test file not found at: {test_path}")

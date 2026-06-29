@@ -11,6 +11,7 @@ from backend.document_parser.data_ingestion import (
     ingest_financial_upload,
     is_rag_file,
     is_tabular_file,
+    pandas_parse_tabular,
 )
 from backend.document_parser.docling_document_parser import DoclingDocumentParser
 from backend.kpi_extractor.app.core.chunking import chunk_markdown
@@ -273,10 +274,59 @@ def upload_document(
         try:
             narrative_result = process_uploaded_document(file, company_id, period, request)
         except HTTPException as e:
-            narrative_result = {
-                "status": "skipped",
-                "warning": f"Docling/fact-extraction pass over the spreadsheet failed: {e.detail}",
-            }
+            # Docling can't parse many xlsx files (they're not valid zip archives).
+            # Fall back to pandas-based tabular parsing which produces the same
+            # {time_series_tables, structured_tables} structure — this is what
+            # captures direct KPI/fact column names from the spreadsheet.
+            log.log_warning(
+                f"Docling failed for {file.filename} ({e.detail}); "
+                "falling back to pandas tabular parser."
+            )
+            narrative_result = {"status": "skipped", "warning": e.detail}
+            try:
+                import tempfile, shutil
+                suffix = Path(file.filename or "").suffix
+                file.file.seek(0)
+                with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp2:
+                    shutil.copyfileobj(file.file, tmp2)
+                    tmp2_path = Path(tmp2.name)
+                try:
+                    pandas_parsed = pandas_parse_tabular(tmp2_path, suffix, file.filename or "")
+                finally:
+                    tmp2_path.unlink(missing_ok=True)
+
+                ts = pandas_parsed.get("time_series_tables", [])
+                st = pandas_parsed.get("structured_tables", [])
+                if ts or st:
+                    registry = request.app.state.registry
+                    doc_id = financial_result.get("document_id")
+                    tabular_result = ingest_structured_tables(
+                        pandas_parsed,
+                        company_id=company_id,
+                        period=period,
+                        registry=registry,
+                        file_name=file.filename,
+                        document_id=doc_id,
+                    )
+                    derived_periods = (
+                        __import__("backend.kpi_extractor.app.engine.fact_aggregation",
+                                   fromlist=["derive_periods_from_tables"])
+                        .derive_periods_from_tables(ts) or [period]
+                    )
+                    kpi_results_by_period = calculate_kpis_for_periods(
+                        company_id=company_id,
+                        periods=derived_periods,
+                        registry=registry,
+                    )
+                    narrative_result = {
+                        **tabular_result,
+                        "status": "pandas_tabular",
+                        "kpis_calculated": sum(len(v) for v in kpi_results_by_period.values()),
+                        "kpi_periods": derived_periods,
+                    }
+            except Exception as pandas_exc:
+                log.log_warning(f"Pandas tabular fallback also failed: {pandas_exc}")
+                narrative_result["pandas_warning"] = str(pandas_exc)
 
         document = {
             **financial_result,

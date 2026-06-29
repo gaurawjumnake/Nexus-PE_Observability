@@ -15,7 +15,7 @@ log = Logger()
 
 TABULAR_EXTENSIONS = {".csv", ".xls", ".xlsx"}
 RAG_EXTENSIONS = {".pdf", ".doc", ".docx", ".txt", ".md", ".markdown"}
-FINANCIAL_TABLE = "financial_data"
+FINANCIAL_TABLE = "nexus_financial_data"
 
 COLUMN_ALIASES: dict[str, tuple[str, float]] = {
     "period": ("date", 1),
@@ -117,7 +117,7 @@ def sync_facts_from_financial_data(company_id: str, document_id: str | None = No
                 company_id=company_id,
                 value=round(float(value), 4),
                 confidence=1.0,
-                source_document=document_id,
+                source_document=document_id, #type:ignore
                 source_chunk=None,
                 source_type="financial_data",
                 period=period,
@@ -131,7 +131,101 @@ def sync_facts_from_financial_data(company_id: str, document_id: str | None = No
 def read_tabular_frames(path: Path, suffix: str) -> dict[str, pd.DataFrame]:
     if suffix == ".csv":
         return {"data": pd.read_csv(path)}
-    return pd.read_excel(path, sheet_name=None)
+    for engine in ("openpyxl", "xlrd"):
+        try:
+            return pd.read_excel(path, sheet_name=None, engine=engine)
+        except Exception:
+            continue
+    raise ValueError(f"Could not read {path.name} with any available Excel engine.")
+
+
+def pandas_parse_tabular(path: Path, suffix: str, filename: str) -> dict:
+    """
+    Pandas-based fallback for tabular files that Docling can't parse (e.g.
+    xlsx files that aren't valid zip archives). Produces the same
+    {time_series_tables, structured_tables} structure that
+    DoclingDocumentParser.extract_structured_output() returns, so the
+    output can be passed directly to ingest_structured_tables().
+
+    A sheet is treated as a time_series_table when any column parses as
+    dates for ≥70% of its non-empty values. The date column is normalised
+    to ISO 'YYYY-MM-DD'. All other columns become value_columns - this
+    captures direct fact/KPI values written as column headers in the
+    spreadsheet, not just the few names in COLUMN_ALIASES.
+    """
+    frames = read_tabular_frames(path, suffix)
+    time_series_tables = []
+    structured_tables = []
+
+    for sheet_name, df in frames.items():
+        if df.empty:
+            continue
+
+        df = df.dropna(how="all").reset_index(drop=True)
+        headers = [str(c) for c in df.columns]
+
+        # Detect date column: first column where ≥70% of values parse as dates.
+        date_col_idx = None
+        date_series = None
+        for i, col in enumerate(df.columns):
+            try:
+                parsed = pd.to_datetime(df[col], errors="coerce")
+                rate = parsed.notna().mean()
+                if rate >= 0.7:
+                    date_col_idx = i
+                    date_series = parsed
+                    break
+            except Exception:
+                continue
+
+        if date_col_idx is not None:
+            date_header = headers[date_col_idx]
+            value_columns = [h for j, h in enumerate(headers) if j != date_col_idx]
+            rows = []
+            for idx, row in df.iterrows():
+                iso_date = date_series.iloc[idx]  # type: ignore[index]
+                if pd.isna(iso_date):
+                    continue
+                row_dict: dict = {"date": iso_date.date().isoformat()}
+                for j, h in enumerate(headers):
+                    if j == date_col_idx:
+                        continue
+                    cell = row.iloc[j]
+                    row_dict[h] = None if pd.isna(cell) else cell
+                rows.append(row_dict)
+
+            if rows:
+                time_series_tables.append({
+                    "page_number": 1,
+                    "table_index": len(time_series_tables) + 1,
+                    "sheet_name": sheet_name,
+                    "date_column": date_header,
+                    "value_columns": value_columns,
+                    "rows": rows,
+                })
+        else:
+            rows = []
+            for _, row in df.iterrows():
+                row_dict = {}
+                for h, cell in zip(headers, row):
+                    row_dict[h] = None if (not isinstance(cell, str) and pd.isna(cell)) else cell
+                rows.append(row_dict)
+            if rows:
+                structured_tables.append({
+                    "page_number": 1,
+                    "table_index": len(structured_tables) + 1,
+                    "sheet_name": sheet_name,
+                    "columns": headers,
+                    "rows": rows,
+                })
+
+    return {
+        "filename": filename,
+        "file_type": suffix,
+        "narrative_markdown": "",
+        "time_series_tables": time_series_tables,
+        "structured_tables": structured_tables,
+    }
 
 
 def prepare_financial_frame(

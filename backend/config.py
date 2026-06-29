@@ -36,7 +36,7 @@ WORKSPACE_ROOT = PROJECT_ROOT.parent
 # ---------------------------------------------------------------------------
 # Database paths
 # ---------------------------------------------------------------------------
-DB_DIR              = PROJECT_ROOT / "db"
+DB_DIR              = PROJECT_ROOT / "db/schema_template"
 REGISTRY_SCHEMA_PATH = DB_DIR / "registry_schema.sql"  # schema for registry.db
 CHROMA_DIR          = Path(os.getenv("CHROMA_PATH",       str(DB_DIR / "chroma")))
 

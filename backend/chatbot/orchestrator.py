@@ -16,7 +16,6 @@ was causing incorrect routing (e.g. choosing RAG for quantitative queries).
 import asyncio
 import json
 import re
-import sqlite3
 from pathlib import Path
 from typing import Any, Literal, Optional
 
@@ -114,10 +113,10 @@ def check_sql_data_availability(company_id: str) -> dict[str, Any]:
 
     try:
         import backend.db.db_client as db
-        if not db.check_sqlite_table_exists(db_path, "financial_data"):
+        if not db.check_sqlite_table_exists(db_path, "nexus_financial_data"):
             return {"available": False, "row_count": 0, "columns": [], "years": []}
 
-        cols = db.get_sqlite_table_info(db_path, "financial_data")
+        cols = db.get_sqlite_table_info(db_path, "nexus_financial_data")
         column_names = [c["name"] for c in cols]
 
         row_count = db.get_sqlite_company_row_count(db_path, company_id)
@@ -148,66 +147,10 @@ def get_uploaded_document_types(company_id: str) -> dict[str, int]:
 
 
 # ---------------------------------------------------------------------------
-# Intent classifier — the core routing logic
+# Intent classifier — LLM-based routing
 # ---------------------------------------------------------------------------
 
-# Keywords that signal a SQL / quantitative question
-SQL_KEYWORDS = {
-    # Aggregations
-    "average", "avg", "mean", "sum", "total", "count",
-    "minimum", "min", "maximum", "max",
-    # Rankings & comparisons
-    "highest", "lowest", "top", "bottom", "rank", "ranking",
-    "compare", "comparison", "versus", "vs",
-    # Trends & time
-    "trend", "growth", "decline", "change", "increase", "decrease",
-    "year", "years", "month", "quarter", "annual", "yearly", "monthly",
-    "yoy", "y-o-y", "qoq", "q-o-q",
-    "2020", "2021", "2022", "2023", "2024", "2025", "2026",
-    # Financial metrics
-    "roi", "revenue", "spend", "spending", "cost", "savings",
-    "ebitda", "margin", "profit", "loss", "budget",
-    "percentage", "percent", "%",
-    "rate", "ratio", "score", "index",
-    # Data operations
-    "how much", "how many",
-    "calculate", "computed",
-    "filter", "group by", "breakdown",
-    "users", "adoption", "headcount",
-}
-
-# Keywords that signal a RAG / qualitative question
-RAG_KEYWORDS = {
-    "why", "explain", "reason", "reasons", "cause", "causes",
-    "driver", "drivers", "factor", "factors",
-    "strategy", "strategic", "initiative", "initiatives",
-    "risk", "risks", "challenge", "challenges", "opportunity",
-    "summarize", "summarise", "summary", "overview", "describe",
-    "context", "background", "detail", "details",
-    "document", "report", "source", "evidence", "finding",
-    "recommend", "recommendation", "suggestion",
-    "narrative", "qualitative", "insight", "insights",
-    "what happened", "what led to", "what caused",
-}
-
-
-# Phrases that signal the user wants to know *what a KPI/metric means*,
-# not its value for a company — answered from registry.db, not SQL/RAG.
-REGISTRY_TRIGGER_PATTERNS = (
-    r"\btell me (more |)(on|about|regarding)\b",
-    r"\btell me more\b",
-    r"\bmore (detail|info|information)s?\b",
-    r"\bwhat (is|are|does)\b.*\b(kpi|metric|fact)\b",
-    r"\bwhat does\b.*\bmean\b",
-    r"\bexplain\b.*\b(kpi|metric|formula)\b",
-    r"\bdefine\b",
-    r"\bdefinition of\b",
-    r"\bhow (is|do you|to|are)\b.*\bcalculat",
-    r"\bhow (is|do you|to|are)\b.*\bcomput",
-    r"\bformula for\b",
-)
-
-# Greetings / chitchat — answered directly, no tool calls.
+# Chitchat fast-path: no LLM cost for trivial inputs.
 CHITCHAT_PATTERNS = (
     r"^\s*(hi|hello|hey|yo|sup)[\s!.,]*$",
     r"^\s*(thanks|thank you|thx)[\s!.,]*$",
@@ -215,21 +158,48 @@ CHITCHAT_PATTERNS = (
     r"^\s*(how are you|what'?s up)[\s?!.,]*$",
 )
 
+_CLASSIFIER_SYSTEM = (
+    "You are a routing classifier for a financial portfolio analytics chatbot. "
+    "Your only job is to return valid JSON — no explanation, no markdown fences."
+)
+
+_CLASSIFIER_USER_TMPL = """\
+Classify the user question into exactly one route.
+
+Routes:
+- "registry"  : user wants to understand WHAT a KPI/metric IS — its definition, formula, thresholds, data type, or how it is calculated
+- "sql"        : user wants actual data values — comparisons, rankings, trends, totals across companies or years
+- "rag"        : user wants qualitative reasoning from documents — strategy, narrative, root causes, or explanations from reports
+- "both"       : user wants data AND qualitative context together (e.g. "which company is lowest and why", "compare revenue and explain the gap")
+- "chitchat"   : off-topic, greeting, or non-business question
+
+Context KPI (the card the user clicked on, if any): {context_kpi}
+User question: {question}
+
+Decision rules:
+- "which company … and why" or any request for data + an explanation → "both"
+- Context KPI set + question is about definition / formula / calculation → "registry"
+- Context KPI set + question is about comparing companies or fetching values → "sql" or "both"
+- When unsure between sql and rag → "both"
+
+Respond with ONLY this JSON (no markdown, no extra text):
+{{"route": "<route>", "confidence": <0.0-1.0>, "reasoning": "<one sentence>"}}"""
+
 
 def _strip_context_prefix(message: str) -> str:
-    """Strip a UI-injected '[Context: ...]' prefix before intent matching —
-    it's metadata about what the user clicked, not part of their question."""
     return re.sub(r"^\s*\[context:[^\]]*\]\s*", "", message, flags=re.IGNORECASE)
 
 
 def _extract_context_kpi(message: str) -> Optional[str]:
-    """Return the KPI/entity name from a UI-injected '[Context: ...]' prefix, or None."""
     m = re.match(r"^\s*\[context:\s*([^\]]+)\]\s*", message, flags=re.IGNORECASE)
     return m.group(1).strip() if m else None
 
 
-def classify_intent(request: AgenticAskRequest) -> RoutePlan:
-    """Deterministic intent classifier with keyword scoring + data awareness."""
+async def classify_intent(request: AgenticAskRequest) -> RoutePlan:
+    """LLM-based intent classifier. Chitchat is short-circuited via regex;
+    everything else is routed by a fast Gemini call with structured JSON output."""
+    from backend.utilites.llm_models import get_llm_client
+
     q = _strip_context_prefix(request.message).lower().strip()
     context_kpi = _extract_context_kpi(request.message)
 
@@ -241,117 +211,34 @@ def classify_intent(request: AgenticAskRequest) -> RoutePlan:
                 reasoning="Greeting/chitchat — no data lookup needed.",
             )
 
-    for pattern in REGISTRY_TRIGGER_PATTERNS:
-        if re.search(pattern, q):
-            return RoutePlan(
-                route="registry",
-                confidence=0.8,
-                reasoning=f"Question asks about a KPI/metric definition (matched: '{pattern}').",
-            )
-
-    # Contextual follow-up: when UI provides a KPI/metric in context and the question
-    # is qualitative (why/explain/low/high/threshold), look up the registry definition.
-    if context_kpi and re.search(
-        r"\b(why|low|high|bad|poor|good|explain|score|threshold|benchmark|rating)\b", q
-    ):
-        return RoutePlan(
-            route="registry",
-            confidence=0.75,
-            reasoning=f"Contextual question about '{context_kpi}' — looking up definition and thresholds.",
-        )
-
-    words = set(re.findall(r"[a-z0-9%\-]+", q))
-    # Also check multi-word phrases
-    bigrams = set()
-    word_list = re.findall(r"[a-z0-9%\-]+", q)
-    for i in range(len(word_list) - 1):
-        bigrams.add(f"{word_list[i]} {word_list[i+1]}")
-
-    all_tokens = words | bigrams
-
-    sql_score = 0.0
-    rag_score = 0.0
-    sql_matches = []
-    rag_matches = []
-
-    for kw in SQL_KEYWORDS:
-        if kw in all_tokens or kw in q:
-            weight = 1.5 if kw in {
-                "average", "avg", "sum", "total", "roi", "percentage",
-                "percent", "%", "trend", "compare", "how much", "how many",
-            } else 1.0
-            sql_score += weight
-            sql_matches.append(kw)
-
-    for kw in RAG_KEYWORDS:
-        if kw in all_tokens or kw in q:
-            weight = 1.5 if kw in {
-                "why", "explain", "summarize", "summarise", "reason",
-                "driver", "strategy", "what caused", "what led to",
-            } else 1.0
-            rag_score += weight
-            rag_matches.append(kw)
-
-    # Regex boosters for strong SQL signals
-    # Year range patterns like "2023 and 2026", "2023-2026", "in 2023"
-    if re.search(r"\b20\d{2}\b", q):
-        sql_score += 1.0
-    if re.search(r"\b20\d{2}\s*(and|to|-|–)\s*20\d{2}\b", q):
-        sql_score += 2.0  # Strong signal: comparing across years
-    # Percentage / numeric ask
-    if re.search(r"\b\d+(\.\d+)?%", q) or "percentage" in q or "%" in q:
-        sql_score += 1.5
-
-    # Normalize scores
-    total = sql_score + rag_score
-    if total == 0:
-        # No signal at all
-        return RoutePlan(
-            route="both",
-            confidence=0.5,
-            reasoning="No clear signal from question; defaulting to both.",
-        )
-
-    sql_ratio = sql_score / total
-    rag_ratio = rag_score / total
-
-    log.log_info(
-        f"Intent scores: sql={sql_score:.1f} ({sql_matches}), "
-        f"rag={rag_score:.1f} ({rag_matches}), "
-        f"sql_ratio={sql_ratio:.2f}, rag_ratio={rag_ratio:.2f}"
+    user_prompt = _CLASSIFIER_USER_TMPL.format(
+        context_kpi=context_kpi or "none",
+        question=request.message,
     )
 
-    # Decision thresholds
-    BOTH_THRESHOLD = 0.15  # If the gap is within this, use both
-
-    if abs(sql_ratio - rag_ratio) <= BOTH_THRESHOLD:
-        return RoutePlan(
-            route="both",
-            confidence=0.6,
-            reasoning=(
-                f"Question has both quantitative ({sql_matches[:3]}) and "
-                f"qualitative ({rag_matches[:3]}) signals. Using both tools."
-            ),
+    try:
+        llm = get_llm_client()
+        raw = await asyncio.to_thread(
+            llm.complete, user_prompt, _CLASSIFIER_SYSTEM, 256, 0.0
         )
-
-    if sql_ratio > rag_ratio:
-        confidence = min(0.95, 0.5 + sql_ratio * 0.5)
-        return RoutePlan(
-            route="sql",
-            confidence=confidence,
-            reasoning=(
-                f"Quantitative signals dominate: {sql_matches[:5]}."
-            ),
+        data = parse_json_object(raw)
+        route = data.get("route", "both")
+        if route not in ("registry", "sql", "rag", "both", "chitchat"):
+            log.log_warning(f"LLM classifier returned unknown route {route!r}; defaulting to 'both'")
+            route = "both"
+        plan = RoutePlan(
+            route=route,
+            confidence=float(data.get("confidence", 0.7)),
+            reasoning=str(data.get("reasoning", "")),
         )
-    else:
-        confidence = min(0.95, 0.5 + rag_ratio * 0.5)
-        return RoutePlan(
-            route="rag",
-            confidence=confidence,
-            reasoning=(
-                f"Qualitative signals dominate: {rag_matches[:5]}."
-            ),
+        log.log_info(
+            f"LLM classifier: route={plan.route}, confidence={plan.confidence:.2f}, "
+            f"reasoning={plan.reasoning!r}"
         )
+        return plan
+    except Exception as exc:
+        log.log_warning(f"LLM classifier failed ({exc}); defaulting to 'both'")
+        return RoutePlan(route="both", confidence=0.5, reasoning=f"Classifier error: {exc}")
 
 
 # ---------------------------------------------------------------------------
@@ -376,7 +263,8 @@ async def run_sql(request: AgenticAskRequest) -> dict[str, Any]:
             "You are a backend database analyst. You do not write raw SQL. "
             "Instead, you use the DatabaseOperationsTool to invoke python functions from db_client.py "
             "to fetch the required data. If the user asks for KPIs, fetch KPIs. If they ask for financial data, "
-            "fetch financial data. Be flexible with column and fact names (e.g. 'ai_revenue' might answer a question about 'AI Revenue')."
+            "fetch financial data. Be flexible with column and fact names (e.g. 'ai_revenue' might answer a question about 'AI Revenue'). "
+            "For statistical or deep-analysis questions, always fetch the full dataset — never apply artificial row limits."
         ),
         llm=get_crewai_llm(DEFAULT_MODEL),
         verbose=False,
@@ -391,6 +279,7 @@ async def run_sql(request: AgenticAskRequest) -> dict[str, Any]:
             "Rules:\n"
             "- Use the tool to gather any necessary data.\n"
             "- If the tool returns JSON with field names close to what the user asked (like 'ai_revenue' for AI Revenue), use that data.\n"
+            "- For statistical or analytical questions, fetch the complete dataset — do not pass limit parameters that would truncate results.\n"
             "- Provide a clear, concise answer based ONLY on the data returned by the tool.\n"
             "- If the tool returns an error or absolutely no matching data, state that clearly."
         ),
@@ -426,15 +315,52 @@ async def run_rag(request: AgenticAskRequest) -> ChatQueryResponse:
     )
 
 
+def _clean_search_query(text: str) -> str:
+    """Normalize any text before passing to FTS.
+
+    Handles the common ways KPI/fact names arrive dirty:
+    - Parenthetical qualifiers  "AI ROI (Portfolio-wide)"  → "AI ROI"
+    - Hyphens used as separators "AI-Attributed Revenue"   → "AI Attributed Revenue"
+    - Underscores as word sep    "ai_attributed_revenue"   → "ai attributed revenue"
+    - Brackets/special chars     "[Context: X] why..."     → "why..."
+    - Trailing punctuation / extra whitespace
+    """
+    # Drop parenthetical qualifiers like "(Portfolio-wide)", "(Total)", "(Q2 2026)"
+    text = re.sub(r"\([^)]*\)", " ", text)
+    # Drop square-bracket context tags injected by the UI
+    text = re.sub(r"\[[^\]]*\]", " ", text)
+    # Replace hyphens and underscores with spaces so "AI-Attributed" → "AI Attributed"
+    text = re.sub(r"[-_]", " ", text)
+    # Remove everything that isn't a letter, digit, or space
+    text = re.sub(r"[^\w\s]", " ", text)
+    # Collapse runs of whitespace
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
 async def run_registry(request: AgenticAskRequest, registry: Any) -> dict[str, Any]:
     """Look up KPI/fact definitions directly from registry.db (no LLM, no embedding)."""
     log.log_info("Registry lookup started")
-    # Use the context KPI name when available — generic phrases like "tell me more on
-    # this" or "why is the score low" produce meaningless FTS results on their own.
     context_kpi = _extract_context_kpi(request.message)
-    search_query = context_kpi if context_kpi else request.message
-    log.log_info(f"Registry search query: {search_query!r} (context_kpi={context_kpi!r})")
+    raw_query = context_kpi if context_kpi else request.message
+    search_query = _clean_search_query(raw_query)
+    log.log_info(f"Registry search query: {search_query!r} (raw={raw_query!r})")
     hits = await asyncio.to_thread(registry.search_registry, search_query, 5)
+
+    # Fallback 1: if context_kpi alone found nothing, try the cleaned stripped question
+    if not hits and context_kpi:
+        fallback = _clean_search_query(_strip_context_prefix(request.message))
+        log.log_info(f"Registry FTS fallback (stripped message): {fallback!r}")
+        hits = await asyncio.to_thread(registry.search_registry, fallback, 5)
+
+    # Fallback 2: try each meaningful word from the cleaned context_kpi individually
+    if not hits and context_kpi:
+        for term in _clean_search_query(context_kpi).split():
+            if len(term) > 3:
+                hits = await asyncio.to_thread(registry.search_registry, term, 5)
+                if hits:
+                    log.log_info(f"Registry FTS matched on term {term!r}")
+                    break
 
     details: list[dict[str, Any]] = []
     for hit in hits:
@@ -452,29 +378,63 @@ async def run_registry(request: AgenticAskRequest, registry: Any) -> dict[str, A
     return {"hits": hits, "details": details}
 
 
-def format_registry_answer(registry_result: dict[str, Any]) -> str:
-    """Render registry details as markdown — deterministic, no LLM needed."""
+def _format_registry_details(registry_result: dict[str, Any]) -> str:
+    """Render registry details as structured markdown (used as LLM input context)."""
     details = registry_result.get("details", [])
-    if not details:
-        return "I couldn't find a matching KPI or fact definition in the registry for that question."
-
     sections = []
     for item in details[:3]:
         name = item.get("name") or item.get("kpi_id") or item.get("fact_id") or "Unknown"
         lines = [f"**{name}**"]
         if item.get("description"):
             lines.append(item["description"])
+        if item.get("business_value"):
+            lines.append(f"- Business value: {item['business_value']}")
         if item.get("formula"):
             lines.append(f"- Formula: `{item['formula']}`")
         if item.get("required_facts"):
             lines.append(f"- Required facts: {', '.join(item['required_facts'])}")
+        if item.get("derived_facts"):
+            lines.append(f"- Derived facts: {', '.join(item['derived_facts'])}")
         if item.get("data_type"):
             lines.append(f"- Data type: {item['data_type']}")
+        if item.get("unit"):
+            lines.append(f"- Unit: {item['unit']}")
         if item.get("thresholds"):
             lines.append(f"- Thresholds: {item['thresholds']}")
+        if item.get("example_calculation"):
+            lines.append(f"- Example: {item['example_calculation']}")
         sections.append("\n".join(lines))
-
     return "\n\n".join(sections)
+
+
+async def synthesize_registry_answer(question: str, registry_result: dict[str, Any]) -> str:
+    """LLM-synthesized answer from registry details. Falls back to raw formatting if LLM fails."""
+    from backend.utilites.llm_models import get_llm_client
+
+    details = registry_result.get("details", [])
+    if not details:
+        return "I couldn't find a matching KPI or fact definition in the registry for that question."
+
+    raw_context = _format_registry_details(registry_result)
+    prompt = (
+        f"Answer the following question directly using only the KPI/metric registry definitions below.\n\n"
+        f"Question: {question}\n\n"
+        f"Registry definitions:\n{raw_context}\n\n"
+        "Rules:\n"
+        "- Answer the question directly — do not say 'the registry shows' or 'according to the registry'.\n"
+        "- If the question asks about calculation basis or formula, explain it clearly in plain language.\n"
+        "- If multiple related metrics are shown, identify which is most relevant and explain the relationship.\n"
+        "- If facts/inputs are listed, explain what they mean in context.\n"
+        "- Be concise and specific. Use markdown where helpful."
+    )
+    try:
+        llm = get_llm_client()
+        answer = await asyncio.to_thread(llm.complete, prompt, None, 600, 0.0)
+        log.log_info(f"Registry synthesis completed, chars={len(answer)}")
+        return answer.strip()
+    except Exception as exc:
+        log.log_warning(f"Registry synthesis LLM failed ({exc}); falling back to template")
+        return raw_context
 
 
 # ---------------------------------------------------------------------------
@@ -488,11 +448,14 @@ async def synthesize_answer(
     rag_result: Optional[ChatQueryResponse],
     sql_result: Optional[dict[str, Any]],
     verbose: bool,
+    registry_context: Optional[str] = None,
 ) -> str:
     """Produce a final answer.
 
     For single-tool results the answer is returned directly.
-    For combined results a CrewAI synthesis agent merges both.
+    For combined results a CrewAI synthesis agent merges all available context.
+    registry_context is included when a context KPI is known — it replaces RAG
+    for the 'how/why is this calculated' part of mixed questions.
     """
     if route_plan.route == "rag" and rag_result:
         log.log_info("Returning direct RAG answer")
@@ -507,11 +470,15 @@ async def synthesize_answer(
 
     synthesis_agent = Agent(
         role="Nexus Answer Synthesizer",
-        goal="Combine document evidence and SQL analytics into one direct answer, supplementing with live DB queries if needed.",
+        goal=(
+            "Combine data results, KPI/metric definitions, and document evidence "
+            "into one direct, well-reasoned answer."
+        ),
         backstory=(
-            "You write concise executive answers. You keep SQL facts and document "
-            "evidence distinct, and you do not invent missing information. "
-            "If any specific data point is missing from your context, use the DatabaseOperationsTool to retrieve it."
+            "You write concise executive answers grounded only in the provided context. "
+            "When KPI/metric definitions are available, use them to explain 'how' or 'why' "
+            "instead of relying on document excerpts. "
+            "If any specific data point is still missing, use the DatabaseOperationsTool to retrieve it."
         ),
         llm=get_crewai_llm(DEFAULT_MODEL),
         verbose=verbose,
@@ -520,16 +487,19 @@ async def synthesize_answer(
     )
     synthesis_task = Task(
         description=(
-            "Synthesize the final answer.\n\n"
+            "Synthesize the final answer from all available context.\n\n"
             "Question: {question}\n"
-            "Route plan: {route_plan}\n"
-            "SQL result: {sql_result}\n"
-            "RAG result: {rag_result}\n\n"
+            "SQL / database result: {sql_result}\n"
+            "KPI/metric registry definitions: {registry_context}\n"
+            "Document RAG result: {rag_result}\n\n"
             "Rules:\n"
-            "- Lead with the answer.\n"
-            "- Use SQL for numbers and RAG for explanations/evidence.\n"
-            "- Mention if one side lacked useful evidence.\n"
-            "- Keep it concise."
+            "- Lead with the direct answer.\n"
+            "- Use SQL data for numbers, rankings, and company comparisons.\n"
+            "- Use registry definitions to explain formulas, calculation basis, or what a metric means — "
+            "prefer this over document excerpts when registry context is available.\n"
+            "- Only fall back to document RAG for narrative or strategic context not covered by the above.\n"
+            "- Do NOT say 'indexed documents do not provide' if registry definitions are present — use those.\n"
+            "- Keep it concise and specific."
         ),
         expected_output="Concise markdown answer.",
         agent=synthesis_agent,
@@ -542,8 +512,8 @@ async def synthesize_answer(
     ).kickoff_async(
         inputs={
             "question": question,
-            "route_plan": route_plan.model_dump(),
             "sql_result": sql_result or {},
+            "registry_context": registry_context or "Not available.",
             "rag_result": rag_result.model_dump() if rag_result else {},
         }
     )
@@ -572,17 +542,25 @@ async def run_tool_based_agentic_query(
     )
 
     # ── Step 0: Chat history — rewrite follow-up questions ────────────────
+    # IMPORTANT: rewrite BEFORE storing so history always contains the self-contained
+    # question that matches the assistant's answer.  Storing the original first and
+    # then answering the rewritten version creates a history mismatch that causes
+    # future rewrites to reference wrong context.
+    # Also skip rewriting when [Context: KPI] is already present — the context is
+    # explicit and there is nothing ambiguous to resolve.
     if request.session_id:
         history = ChatHistoryStore.get(request.session_id, request.top_c)
-        ChatHistoryStore.add(request.session_id, "user", request.message)
-        if history and needs_rewrite(request.message):
+        context_kpi_explicit = bool(_extract_context_kpi(request.message))
+        if history and not context_kpi_explicit and needs_rewrite(request.message):
             rewritten = rewrite_with_history(request.message, history, DEFAULT_MODEL)
             if rewritten != request.message:
                 log.log_info(f"Query rewritten: {request.message!r} -> {rewritten!r}")
                 request = request.model_copy(update={"message": rewritten})
+        # Store after rewrite so the recorded question matches the answer we will return
+        ChatHistoryStore.add(request.session_id, "user", request.message)
 
     # ── Step 1: Classify intent ────────────────────────────────────────────
-    route_plan = classify_intent(request)
+    route_plan = await classify_intent(request)
     log.log_info(
         f"Intent classification: route={route_plan.route}, "
         f"confidence={route_plan.confidence:.2f}, "
@@ -610,7 +588,7 @@ async def run_tool_based_agentic_query(
     if route_plan.route == "registry":
         try:
             registry_result = await run_registry(request, registry)
-            answer = format_registry_answer(registry_result)
+            answer = await synthesize_registry_answer(request.message, registry_result)
             hits = len(registry_result.get("hits", []))
         except Exception as exc:
             log.log_error(f"Registry lookup failed: {type(exc).__name__}: {exc}")
@@ -658,7 +636,21 @@ async def run_tool_based_agentic_query(
             elif not sql_result:
                 raise
 
-    # # Step 3: Synthesise answer --------------------------------------------
+    # ── Step 3: Fetch registry context when a KPI card is in context ──────
+    # Enriches synthesis so "how/why" parts are answered from KPI definitions
+    # rather than document excerpts.
+    registry_context: Optional[str] = None
+    context_kpi = _extract_context_kpi(request.message)
+    if context_kpi:
+        try:
+            reg_result = await run_registry(request, registry)
+            if reg_result.get("details"):
+                registry_context = _format_registry_details(reg_result)
+                log.log_info(f"Registry context fetched for synthesis: kpi={context_kpi!r}")
+        except Exception as exc:
+            log.log_warning(f"Registry context fetch for synthesis failed: {exc}")
+
+    # ── Step 4: Synthesise answer ──────────────────────────────────────────
 
     if not sql_result and not rag_result:
         raise ValueError("Both SQL and RAG tools failed to produce results.")
@@ -673,6 +665,7 @@ async def run_tool_based_agentic_query(
         rag_result=rag_result,
         sql_result=sql_result,
         verbose=False,
+        registry_context=registry_context,
     )
 
     sql_query_str = None

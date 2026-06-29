@@ -1,0 +1,135 @@
+[
+  {
+    "filename": "tmp5wo2oa67.md",
+    "file_type": ".md",
+    "total_pages": 1,
+    "pages": [
+      {
+        "page_number": 1,
+        "text_content": "# NovaMind AI — Independent AI Model Audit Report\n\n**Reporting Period:** Q2 2026  |  **Prepared by:** Internal Audit &amp; Model Risk Team  |  **Distribution:** Audit Committee, Portfolio Operations\n\n## 1. Audit Scope\n\nThis audit reviewed NovaMind AI's model outputs, data pipeline compliance, and incident handling for the quarter ended 30 June 2026, sampling production decisions from the underwriting and fraud-detection model suites.\n\n## 2. AI Output Review Sample\n\n| Output ID   | Evaluated Output ID   | Output Criticality   | Hallucination Flag   | Human Review Completed   |\n|-------------|-----------------------|----------------------|----------------------|--------------------------|\n| OUT-22014   | EVAL-22014            | high                 | false                | true                     |\n| OUT-22018   | EVAL-22018            | high                 | false                | true                     |\n| OUT-22041   | EVAL-22041            | medium               | true                 | true                     |\n| OUT-22055   | EVAL-22055            | low                  | false                | true                     |\n| OUT-22067   | EVAL-22067            | high                 | false                | true                     |\n\nOf 5 sampled high- and medium-criticality AI outputs (decision criticality level), all 5 were reviewed by a human (human-in-the-loop review status: completed), and 1 was flagged for a factual error (hallucination detected indicator), consistent with the telemetry log for the same period.\n\n## 3. Model Bias &amp; Risk Scoring\n\nThe model bias risk score (AI bias risk rating) assigned by the independent audit team this quarter: 14.0/100, within acceptable risk tolerance for production lending models.\n\n## 4. Data Pipeline Compliance\n\nTotal AI data pipelines audited: 25. Compliant AI pipelines (privacy-compliant pipelines count): 24, yielding a 96% pipeline compliance rate, consistent with the governance team's self-reported figure.\n\nData privacy compliance score (GDPR/CCPA compliance score): 88.0/100.\n\n## 5. Governance &amp; Regulatory Findings\n\n- **Governance maturity rating** (portco governance rating): 4.1/5\n- **Regulatory readiness rating** (AI regulation preparedness rating / portfolio regulatory readiness): 70.0/100\n\n## 6. Vendor Security Review\n\n| Vendor ID    | Vendor              | Vendor Security Compliance Status   |\n|--------------|---------------------|-------------------------------------|\n| VEND-OAI-001 | OpenAI              | compliant                           |\n| VEND-ANT-002 | Anthropic           | compliant                           |\n| VEND-AWS-003 | Amazon Web Services | compliant                           |\n\n## 7. Incident Review\n\n| Incident ID   | Incident Type       | Incident Severity   | Incident Status   | Incident Period   | Incident Resolution Time   |\n|---------------|---------------------|---------------------|-------------------|-------------------|----------------------------|\n| INC-2026-0411 | model_drift_alert   | major               | resolved          | 2026-05           | 90 minutes                 |\n| INC-2026-0419 | data_access_anomaly | major               | resolved          | 2026-06           | 105 minutes                |\n\nTotal entities in scope for this audit cycle: 220, of which 207 were found policy-compliant (compliant entities), matching the Risk &amp; Compliance Office's quarterly self-assessment.\n\n## 8. Audit Opinion\n\nBased on the sample reviewed, Internal Audit finds NovaMind AI's model governance controls to be operating effectively, with one minor finding related to hallucination detection latency on the fraud-detection endpoint, to be remediated in Q3.",
+        "images": [],
+        "tables": [
+          {
+            "headers": [
+              "Output ID",
+              "Evaluated Output ID",
+              "Output Criticality",
+              "Hallucination Flag",
+              "Human Review Completed"
+            ],
+            "row_count": 5,
+            "column_count": 5,
+            "data": [
+              [
+                "OUT-22014",
+                "EVAL-22014",
+                "high",
+                "false",
+                "true"
+              ],
+              [
+                "OUT-22018",
+                "EVAL-22018",
+                "high",
+                "false",
+                "true"
+              ],
+              [
+                "OUT-22041",
+                "EVAL-22041",
+                "medium",
+                "true",
+                "true"
+              ],
+              [
+                "OUT-22055",
+                "EVAL-22055",
+                "low",
+                "false",
+                "true"
+              ],
+              [
+                "OUT-22067",
+                "EVAL-22067",
+                "high",
+                "false",
+                "true"
+              ]
+            ]
+          },
+          {
+            "headers": [
+              "Vendor ID",
+              "Vendor",
+              "Vendor Security Compliance Status"
+            ],
+            "row_count": 3,
+            "column_count": 3,
+            "data": [
+              [
+                "VEND-OAI-001",
+                "OpenAI",
+                "compliant"
+              ],
+              [
+                "VEND-ANT-002",
+                "Anthropic",
+                "compliant"
+              ],
+              [
+                "VEND-AWS-003",
+                "Amazon Web Services",
+                "compliant"
+              ]
+            ]
+          },
+          {
+            "headers": [
+              "Incident ID",
+              "Incident Type",
+              "Incident Severity",
+              "Incident Status",
+              "Incident Period",
+              "Incident Resolution Time"
+            ],
+            "row_count": 2,
+            "column_count": 6,
+            "data": [
+              [
+                "INC-2026-0411",
+                "model_drift_alert",
+                "major",
+                "resolved",
+                "2026-05",
+                "90 minutes"
+              ],
+              [
+                "INC-2026-0419",
+                "data_access_anomaly",
+                "major",
+                "resolved",
+                "2026-06",
+                "105 minutes"
+              ]
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 1,
+          "content_length": 3709,
+          "file_type": ".md",
+          "has_visual_content": true,
+          "content_type": "mixed_content"
+        }
+      }
+    ],
+    "document_metadata": {
+      "total_documents": 1,
+      "extraction_method": "Docling",
+      "has_images": false,
+      "has_tables": true,
+      "estimated_pages": 1
+    },
+    "processing_time": 0.05704164505004883
+  }
+]

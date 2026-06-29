@@ -1,0 +1,57 @@
+[
+  {
+    "filename": "tmp3pmo5wqe.docx",
+    "file_type": ".docx",
+    "total_pages": 1,
+    "pages": [
+      {
+        "page_number": 1,
+        "text_content": "## NovaMind AI — Q2 2026 Board Summary: AI Program Update\n\n*Prepared for: Board of Directors · Summit Capital Partners*\n\n### Executive Summary\n\nNovaMind AI's AI program continues to scale ahead of plan. The company's AI maturity score (cross-portfolio AI capability score) reached 3.8 out of 5 this quarter, ahead of the portfolio average maturity score of 3.5 across Summit Capital's AI portfolio companies.\n\n### Financial Impact\n\n| **Metric**                      | **Value**   |\n|---------------------------------|-------------|\n| Revenue base (baseline revenue) | $76.7M      |\n| EBITDA pre AI (pre-AI EBITDA)   | $8.2M       |\n| EBITDA post AI (post-AI EBITDA) | $15.26M     |\n| EBITDA delta (EBITDA change)    | $7.06M      |\n\nThe EBITDA delta of $7.06M against a revenue base of $76.7M represents a +9.2 percentage point EBITDA uplift attributable to the AI program this quarter.\n\n### Strategic Alignment &amp; Governance\n\nThe Board Risk Committee rates NovaMind's strategic alignment rating (AI strategy alignment rating) at 4.3 out of 5, reflecting tight integration of the AI roadmap with the company's core lending product strategy.\n\n### Portfolio Benchmark Context\n\nAcross the Summit Capital portfolio, the average AI maturity score (portfolio-wide AI maturity score) is 3.5, with peer maturity score distribution (industry maturity benchmark distribution) showing a 25th percentile of 2.8, median of 3.4, and 75th percentile of 4.0. NovaMind's 3.8 score places it comfortably in the upper quartile of the benchmark distribution.\n\n*Prepared by: NovaMind AI Executive Team · For Board Distribution Only*",
+        "images": [],
+        "tables": [
+          {
+            "headers": [
+              "Metric",
+              "Value"
+            ],
+            "row_count": 4,
+            "column_count": 2,
+            "data": [
+              [
+                "Revenue base (baseline revenue)",
+                "$76.7M"
+              ],
+              [
+                "EBITDA pre AI (pre-AI EBITDA)",
+                "$8.2M"
+              ],
+              [
+                "EBITDA post AI (post-AI EBITDA)",
+                "$15.26M"
+              ],
+              [
+                "EBITDA delta (EBITDA change)",
+                "$7.06M"
+              ]
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 1,
+          "content_length": 1614,
+          "file_type": ".docx",
+          "has_visual_content": true,
+          "content_type": "mixed_content"
+        }
+      }
+    ],
+    "document_metadata": {
+      "total_documents": 1,
+      "extraction_method": "Docling",
+      "has_images": false,
+      "has_tables": true,
+      "estimated_pages": 1
+    },
+    "processing_time": 0.6962368488311768
+  }
+]

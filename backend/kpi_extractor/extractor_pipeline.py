@@ -541,15 +541,101 @@ def build_crew(llm: Optional[BaseLLMClient] = None, registry: Optional[RegistryS
         verbose=False,
     )
 
+
+def test_extractor(
+    file_path: str,
+    company_id: str,
+    period: str,
+    kpi_ids: Optional[list[str]] = None,
+) -> dict:
+
+    import json
+    from pathlib import Path
+    from backend.document_parser.docling_document_parser import DoclingDocumentParser
+
+    registry = RegistryService()
+    parser = DoclingDocumentParser()
+    filename = Path(file_path).name
+
+    log.log_info(f"[diagnostic] parsing {file_path}")
+    parsed = parser.extract_structured_output(modified_name=Path(file_path).stem, file_path=file_path)
+
+    ts_tables = parsed.get("time_series_tables", [])
+    st_tables = parsed.get("structured_tables", [])
+    narrative = parsed.get("narrative_markdown", "")
+
+    # Pandas fallback: Docling can't parse xlsx files that aren't valid zip archives.
+    if not ts_tables and not st_tables and not narrative.strip():
+        suffix = Path(file_path).suffix.lower()
+        if suffix in (".xlsx", ".xls", ".csv"):
+            from backend.document_parser.data_ingestion import pandas_parse_tabular
+            log.log_info(f"[diagnostic] Docling produced no output; using pandas fallback")
+            parsed = pandas_parse_tabular(Path(file_path), suffix, filename)
+            ts_tables = parsed.get("time_series_tables", [])
+            st_tables = parsed.get("structured_tables", [])
+            narrative = ""
+
+    log.log_info(
+        f"[diagnostic] parsed: ts_tables={len(ts_tables)}, "
+        f"structured_tables={len(st_tables)}, narrative_chars={len(narrative)}"
+    )
+
+    ingest_result: dict = {}
+
+    if ts_tables or st_tables:
+        ingest_result = ingest_structured_tables(
+            parsed,
+            company_id=company_id,
+            period=period,
+            registry=registry,
+            file_name=filename,
+        )
+        log.log_info(f"[diagnostic] tabular ingest: {ingest_result}")
+    elif narrative.strip():
+        from backend.utilites.llm_models import get_llm_client
+        llm = get_llm_client()
+        from backend.kpi_extractor.app.core.chunking import chunk_markdown
+        doc_id = db.save_document(company_id, filename)
+        chunks = chunk_markdown(narrative, doc_id)
+        db.save_chunks(chunks)
+        ingest_result = ingest_document_from_chunks(
+            document_id=doc_id,
+            company_id=company_id,
+            period=period,
+            llm=llm,
+            registry=registry,
+        )
+        log.log_info(f"[diagnostic] narrative ingest: {ingest_result}")
+    else:
+        log.log_warning("[diagnostic] no extractable content found in file")
+
+    derived_periods = fact_aggregation.derive_periods_from_tables(ts_tables) or [period]
+    log.log_info(f"[diagnostic] calculating KPIs for periods={derived_periods}")
+
+    kpi_results: dict[str, list[dict]] = {}
+    for p in derived_periods:
+        kpi_results[p] = calculate_kpis(
+            company_id=company_id,
+            period=p,
+            registry=registry,
+            kpi_ids=kpi_ids or None,
+        )
+
+    output = {
+        "file": file_path,
+        "company_id": company_id,
+        "period": period,
+        "ingest": ingest_result,
+        "kpi_periods": derived_periods,
+        "kpis": kpi_results,
+    }
+    print(json.dumps(output, indent=2, default=str))
+    return output
+
+
 # if __name__ == "__main__":
-#     llm = get_llm_client()
-#     registry = RegistryService()
-#     result = ingest_document(
-#         markdown_text='## Revenue\nTotal AI revenue: /$5.2M',
-#         file_name='test.pdf',
-#         company_id='portco_001',
-#             period='2026-Q2',
-#             llm=llm,
-#             registry=registry,
-#         )
-#     print(result)
+#     file_path = "sample_data/synth/Fluke_2023.xlsx"
+#     company_id = "Fluke"
+#     period = 2023
+#     ans =  test_extractor(file_path, company_id, period)
+#     print(ans)

@@ -37,6 +37,11 @@ def _normalize(text: str) -> str:
     return re.sub(r"[_\-]+", " ", text.strip().lower())
 
 
+def _collapse(text: str) -> str:
+    """Remove all non-alphanumeric chars — lets 'activeaiusers' match 'active_ai_users'."""
+    return re.sub(r"[^a-z0-9]", "", text.strip().lower())
+
+
 def map_column_to_fact(column_header: str, relevant_facts: list[dict]) -> Optional[dict]:
     """
     Matches one table column header against a set of facts' aliases /
@@ -50,6 +55,7 @@ def map_column_to_fact(column_header: str, relevant_facts: list[dict]) -> Option
     fact from a different domain can't accidentally win a fuzzy match.
     """
     header_norm = _normalize(column_header)
+    header_collapsed = _collapse(column_header)
     if not header_norm:
         return None
 
@@ -62,6 +68,11 @@ def map_column_to_fact(column_header: str, relevant_facts: list[dict]) -> Option
                 continue
             if term_norm == header_norm:
                 return fact  # exact match - can't do better than this
+            # Collapsed match: handles column headers where word separators
+            # were stripped (e.g. Docling exports 'active_ai_users' → 'activeaiusers').
+            term_collapsed = _collapse(term)
+            if term_collapsed and term_collapsed == header_collapsed and len(term_collapsed) >= _MIN_TERM_LEN_FOR_SUBSTRING:
+                return fact
             # Word-boundary substring match, but only when BOTH sides are
             # long enough to be meaningful - "ai" matching as a standalone
             # word inside "monthly ai return" is a false positive, not a
@@ -102,6 +113,9 @@ def classify_document_type_from_columns(columns: list[str], registry) -> Optiona
     return votes.most_common(1)[0][0] if votes else None
 
 
+_GENERIC_JUNK_COLUMNS = {"id", "index", "row", "no", "num", "sr", "sno", "s no", "#"}
+
+
 def _fact_from_direct_lookup(col: str, registry) -> Optional[dict]:
     """
     Fallback for tabular columns that didn't match via alias/pattern search.
@@ -110,6 +124,9 @@ def _fact_from_direct_lookup(col: str, registry) -> Optional[dict]:
     KPI-named columns are stored as fact_observations so the KPI engine's
     calculated_direct path can use them when sub-component facts are missing.
     """
+    # Skip generic row-numbering columns that will never be fact IDs.
+    if _normalize(col).replace(" ", "_") in _GENERIC_JUNK_COLUMNS or col.strip() in _GENERIC_JUNK_COLUMNS:
+        return None
     candidates = [col, _normalize(col).replace(" ", "_")]
     for candidate in candidates:
         ctx = registry.get_fact_context(candidate)
@@ -134,6 +151,34 @@ def _fact_from_direct_lookup(col: str, registry) -> Optional[dict]:
                 "aliases": [],
                 "extraction_patterns": [],
             }
+
+    # Collapsed-form lookup: handles column headers where separators were
+    # stripped by the parser (e.g. 'activeaiusers' → fact 'active_ai_users').
+    real_id = registry.get_id_by_collapsed(col)
+    if real_id:
+        ctx = registry.get_fact_context(real_id)
+        if ctx:
+            return {
+                "fact_id": ctx["fact_id"],
+                "name": ctx.get("name", real_id),
+                "category": ctx.get("category"),
+                "data_type": ctx.get("data_type"),
+                "unit": ctx.get("unit"),
+                "aliases": ctx.get("aliases", []),
+                "extraction_patterns": ctx.get("extraction_patterns", []),
+            }
+        kpi_ctx = registry.get_kpi_context(real_id)
+        if kpi_ctx:
+            return {
+                "fact_id": kpi_ctx["kpi_id"],
+                "name": kpi_ctx.get("name", real_id),
+                "category": kpi_ctx.get("category"),
+                "data_type": "numeric",
+                "unit": kpi_ctx.get("unit"),
+                "aliases": [],
+                "extraction_patterns": [],
+            }
+
     return None
 
 

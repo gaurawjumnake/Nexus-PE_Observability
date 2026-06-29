@@ -150,8 +150,7 @@ class KPICalculationEngine:
     # Internal
     # ------------------------------------------------------------------
     def _all_kpi_ids(self) -> list[str]:
-        hits = self.registry.search_registry("kpi", limit=500)
-        return [h["entity_id"] for h in hits if h["entity_type"] == "kpi"]
+        return self.registry.list_all_kpi_ids()
 
     def _calculate_one(
         self, kpi_id: str, company_id: str, period: str, fact_values: dict

@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.api.deps import init_shared_resources, get_registry, check_db
@@ -12,15 +12,23 @@ from backend.utilites.llm_models import get_llm_client
 
 log = Logger()
 
-_resources_ready = False
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Fast path: only validate env vars — no heavy I/O at cold start.
     log.log_info("Application starting up...")
+
+    # 1. Env vars + DB connection + schema — hard-fail if broken
     init_shared_resources(app)
-    log.log_info("Server ready (resources will lazy-load on first request)")
+
+    # 2. LLM client — fail fast so a missing API key surfaces at startup
+    app.state.llm = get_llm_client()
+    log.log_info("LLM client ready")
+
+    # 3. Registry — loads from YAML if empty; lru_cached after first call
+    app.state.registry = get_registry()
+    log.log_info("Registry ready")
+
+    log.log_info("Application ready")
     yield
     log.log_info("Application shutting down")
 
@@ -35,23 +43,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-@app.middleware("http")
-async def lazy_resource_init(request: Request, call_next):
-    # Runs once per Lambda instance. lru_cache on get_llm_client / get_registry
-    # means the work is only done the first time; subsequent requests are free.
-    global _resources_ready
-    if not _resources_ready:
-        log.log_info("First request — initialising shared resources...")
-        request.app.state.llm = get_llm_client()
-        request.app.state.registry = get_registry()
-        _resources_ready = True
-        log.log_info("Shared resources ready")
-    return await call_next(request)
-
 app.include_router(documents_router)
 app.include_router(kpi_router)
 app.include_router(chat_router)
+
 
 @app.get("/health")
 async def health():
@@ -62,7 +57,6 @@ async def health():
 async def health_db():
     result = check_db()
     if result["status"] != "ok":
-        from fastapi import HTTPException
         raise HTTPException(status_code=503, detail=result.get("detail", "DB unreachable"))
     return result
 

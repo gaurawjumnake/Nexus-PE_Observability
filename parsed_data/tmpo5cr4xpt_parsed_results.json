@@ -1,0 +1,85 @@
+[
+  {
+    "filename": "tmpo5cr4xpt.md",
+    "file_type": ".md",
+    "total_pages": 1,
+    "pages": [
+      {
+        "page_number": 1,
+        "text_content": "# NovaMind AI — Operations &amp; Service Performance Report\n\n**Reporting Period:** Q2 2026  |  **Prepared by:** Operations Team  |  **Distribution:** COO, Portfolio Operations\n\n## 1. Operating Expense Impact\n\n| Metric                                   | Value   |\n|------------------------------------------|---------|\n| Pre-AI opex baseline (opex before AI)    | $42.0M  |\n| Current opex (post-AI operating expense) | $38.8M  |\n\nTotal AI spend this quarter contributing to this opex reduction: $5.2M, yielding an AI-driven cost reduction of $3.2M (baseline operating expense minus post-AI operating expense).\n\n## 2. Service Level Improvement\n\n| Metric                              | Value   |\n|-------------------------------------|---------|\n| SLA pre-AI (baseline service level) | 78.0%   |\n| SLA post-AI (current service level) | 96.0%   |\n\nThis represents an AI-driven SLA improvement of +18 percentage points, driven primarily by automation in the support resolution and finance close workflows.\n\n## 3. Productivity Metrics\n\n| Metric                                                     | Value           |\n|------------------------------------------------------------|-----------------|\n| Output pre-AI per FTE (baseline productivity per employee) | 120.0 units/FTE |\n| Output post-AI per FTE (current productivity per employee) | 169.2 units/FTE |\n\n## 4. Process Automation Coverage\n\nAI-automated processes (processes automated by AI) this quarter: 41 of 100 total automatable processes identified in the operations process inventory, yielding a 41% automation coverage rate — up 8 percentage points quarter-over-quarter.\n\n## 5. Adoption Score Trend\n\n- **Adoption score current year** (this year's AI adoption score): 74.0\n- **Adoption score prior year** (last year's AI adoption score): 66.0\n\n## 6. Portfolio Weighting &amp; Outcomes\n\nPortco revenue weight (revenue weighting factor) for NovaMind within the broader portfolio: 0.28. Portco adoption score (company AI adoption score) this quarter: 74.0/100.\n\nTotal AI successful outcomes (AI outcomes delivered) this quarter: 14,820, supporting an AI ROI (return on AI investment) of 3.1x against total AI spend of $5.2M.\n\n## 7. FTE Redeployment\n\n34 FTEs were redeployed from AI-automated roles to revenue-generating or reskilled positions this quarter, out of approximately 50 FTEs whose roles were materially impacted by AI automation — a 68% redeployment rate, up 8 from the prior quarter.",
+        "images": [],
+        "tables": [
+          {
+            "headers": [
+              "Metric",
+              "Value"
+            ],
+            "row_count": 2,
+            "column_count": 2,
+            "data": [
+              [
+                "Pre-AI opex baseline (opex before AI)",
+                "$42.0M"
+              ],
+              [
+                "Current opex (post-AI operating expense)",
+                "$38.8M"
+              ]
+            ]
+          },
+          {
+            "headers": [
+              "Metric",
+              "Value"
+            ],
+            "row_count": 2,
+            "column_count": 2,
+            "data": [
+              [
+                "SLA pre-AI (baseline service level)",
+                "78.0%"
+              ],
+              [
+                "SLA post-AI (current service level)",
+                "96.0%"
+              ]
+            ]
+          },
+          {
+            "headers": [
+              "Metric",
+              "Value"
+            ],
+            "row_count": 2,
+            "column_count": 2,
+            "data": [
+              [
+                "Output pre-AI per FTE (baseline productivity per employee)",
+                "120.0 units/FTE"
+              ],
+              [
+                "Output post-AI per FTE (current productivity per employee)",
+                "169.2 units/FTE"
+              ]
+            ]
+          }
+        ],
+        "metadata": {
+          "page_number": 1,
+          "content_length": 2449,
+          "file_type": ".md",
+          "has_visual_content": true,
+          "content_type": "mixed_content"
+        }
+      }
+    ],
+    "document_metadata": {
+      "total_documents": 1,
+      "extraction_method": "Docling",
+      "has_images": false,
+      "has_tables": true,
+      "estimated_pages": 1
+    },
+    "processing_time": 0.009460687637329102
+  }
+]

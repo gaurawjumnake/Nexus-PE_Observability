@@ -2,7 +2,6 @@ import argparse
 import json
 import os
 import re
-import sqlite3
 from pathlib import Path
 from typing import Any
 
@@ -86,7 +85,7 @@ def build_schema_context(db_path: Path) -> str:
 
     business_context: dict[str, Any] = {"notes": ["The database is SQLite."]}
     table_names = {row["name"] for row in table_rows}
-    if "financial_data" in table_names:
+    if "nexus_financial_data" in table_names:
         companies = db.get_sqlite_companies_summary(db_path)
         date_range = db.get_sqlite_date_range(db_path)
         business_context.update(
@@ -94,7 +93,7 @@ def build_schema_context(db_path: Path) -> str:
                 "companies": [dict(row) for row in companies],
                 "date_range": dict(date_range),
                 "notes": [
-                    "The main table is financial_data.",
+                    "The main table is nexus_financial_data.",
                     "Use company_name for company filters and financial_year for yearly filters.",
                     "date is a timestamp string; use SQLite date functions when needed.",
                 ],
@@ -134,7 +133,7 @@ def parse_json_object(text: Any) -> dict[str, Any]:
         raise
 
 
-def normalize_sql(sql: str, row_limit: int) -> str:
+def normalize_sql(sql: str) -> str:
     sql = re.sub(r"\s+", " ", sql.strip().rstrip(";")).strip()
     lowered = sql.lower()
 
@@ -144,28 +143,23 @@ def normalize_sql(sql: str, row_limit: int) -> str:
         raise SQLValidationError("Generated SQL contains a blocked keyword.")
     if ";" in sql:
         raise SQLValidationError("Only one SQL statement is allowed.")
-    # Aggregation queries (GROUP BY) already consolidate rows — do not add an
-    # arbitrary LIMIT that would silently drop groups and skew results.
-    is_aggregation = bool(re.search(r"\bgroup\s+by\b", lowered))
-    if not is_aggregation and not re.search(r"\blimit\s+\d+\b", lowered):
-        sql = f"{sql} LIMIT {row_limit}"
     log.log_info(f"Validated read-only SQL: {sql}")
     return sql
 
 
-def execute_sql(db_path: Path, sql: str, row_limit: int) -> dict[str, Any]:
+def execute_sql(db_path: Path, sql: str) -> dict[str, Any]:
     import backend.db.db_client as db
-    safe_sql = normalize_sql(sql, row_limit)
+    safe_sql = normalize_sql(sql)
     log.log_info(f"Executing SQLite query against {db_path}")
-    
+
     db.explain_sqlite_query(db_path, safe_sql)
-    rows = db.execute_sqlite_query(db_path, safe_sql, limit=row_limit)
+    rows = db.execute_sqlite_query(db_path, safe_sql)
 
     log.log_info(f"SQLite query completed: row_count={len(rows)}")
     return {
         "sql": safe_sql,
         "columns": list(rows[0].keys()) if rows else [],
-        "rows": [dict(row) for row in rows],
+        "rows": rows,
         "row_count": len(rows),
     }
 
@@ -175,7 +169,6 @@ class FinancialTextToSQLChatbot:
         self,
         db_path: Path | str | None = None,
         model: str | None = None,
-        row_limit: int = 100,
         verbose: bool = False,
     ) -> None:
         resolved_db_path = resolve_db_path(db_path)
@@ -185,15 +178,11 @@ class FinancialTextToSQLChatbot:
                 "or point FINANCIAL_DATA_DB_PATH to a valid SQLite database."
             )
         self.db_path = resolved_db_path
-        self.row_limit = row_limit
         self.verbose = verbose
         load_environment()
         self.llm = get_crewai_llm(model or DEFAULT_MODEL)
         self.schema_context = build_schema_context(resolved_db_path)
-        log.log_info(
-            f"FinancialTextToSQLChatbot initialized: db_path={self.db_path}, "
-            f"row_limit={self.row_limit}"
-        )
+        log.log_info(f"FinancialTextToSQLChatbot initialized: db_path={self.db_path}")
 
     async def ask(self, question: str) -> dict[str, Any]:
         log.log_info(f"Text-to-SQL ask started: question={question}")
@@ -202,7 +191,7 @@ class FinancialTextToSQLChatbot:
         for attempt in range(3):
             try:
                 import asyncio
-                query_result = await asyncio.to_thread(execute_sql, self.db_path, sql_payload["sql"], self.row_limit)
+                query_result = await asyncio.to_thread(execute_sql, self.db_path, sql_payload["sql"])
                 answer = await self._answer_question(question, query_result)
                 log.log_info(
                     f"Text-to-SQL ask completed: row_count={query_result['row_count']}"
@@ -255,9 +244,9 @@ class FinancialTextToSQLChatbot:
                 "- Prefer clear aliases.\n"
                 "- For comparison, ranking, or summary questions (highest, lowest, total, "
                 "average, by company, by year, etc.) use GROUP BY with the appropriate "
-                "aggregate function (SUM, AVG, MAX, MIN, COUNT). Never add LIMIT to "
-                "aggregation queries — return all groups so results are complete.\n"
-                "- For row-level detail queries that are not aggregated, add LIMIT {row_limit}.\n"
+                "aggregate function (SUM, AVG, MAX, MIN, COUNT).\n"
+                "- Do NOT add LIMIT to any query — always return the full result set "
+                "so statistical and deep-analysis answers are complete.\n"
                 "- Return JSON only with keys: sql, rationale."
             ),
             expected_output='JSON only: {"sql": "...", "rationale": "..."}',
@@ -281,7 +270,6 @@ class FinancialTextToSQLChatbot:
             inputs={
                 "schema_context": self.schema_context,
                 "question": question,
-                "row_limit": self.row_limit,
             }
         )
         payload = parse_json_object(result)
@@ -381,7 +369,6 @@ async def interactive_chat(args: argparse.Namespace) -> None:
     chatbot = FinancialTextToSQLChatbot(
         db_path=args.db,
         model=args.model,
-        row_limit=args.limit,
         verbose=args.verbose,
     )
     print("Financial Text-to-SQL Chatbot")
@@ -413,7 +400,6 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--db", default=None, help="SQLite DB path.")
     parser.add_argument("--model", default=None, help=f"Gemini model, default {DEFAULT_MODEL}.")
-    parser.add_argument("--limit", type=int, default=100, help="Maximum rows to return.")
     parser.add_argument("--show-sql", action="store_true", help="Print generated SQL.")
     parser.add_argument("--verbose", action="store_true", help="Enable CrewAI verbose logs.")
     return parser.parse_args()
@@ -425,7 +411,6 @@ async def async_main() -> None:
         chatbot = FinancialTextToSQLChatbot(
             db_path=args.db,
             model=args.model,
-            row_limit=args.limit,
             verbose=args.verbose,
         )
         result = await chatbot.ask(" ".join(args.question))
