@@ -38,6 +38,7 @@ WORKSPACE_ROOT = PROJECT_ROOT.parent
 # ---------------------------------------------------------------------------
 DB_DIR              = PROJECT_ROOT / "db/schema_template"
 REGISTRY_SCHEMA_PATH = DB_DIR / "registry_schema.sql"  # schema for registry.db
+SQL_AGENT_SCHEMA_CATALOG_PATH = DB_DIR / "sql_agent_schema_catalog.yaml"  # table catalog for text-to-SQL agent
 CHROMA_DIR          = Path(os.getenv("CHROMA_PATH",       str(DB_DIR / "chroma")))
 
 # ---------------------------------------------------------------------------

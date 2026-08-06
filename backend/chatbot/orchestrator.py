@@ -16,7 +16,6 @@ was causing incorrect routing (e.g. choosing RAG for quantitative queries).
 import asyncio
 import json
 import re
-from pathlib import Path
 from typing import Any, Literal, Optional
 
 from fastapi import APIRouter, HTTPException
@@ -24,7 +23,6 @@ from pydantic import BaseModel, Field
 
 from backend.chatbot.chat import ChatQueryRequest, ChatQueryResponse, run_rag_query
 from backend.chatbot.chat_history import ChatHistoryStore, needs_rewrite, rewrite_with_history
-from backend.chatbot.text_to_sql_chatbot import FinancialTextToSQLChatbot
 from backend.utilites.app_logger import Logger
 from backend.utilites.llm_models import get_crewai_llm
 from backend.config import DEFAULT_ORCHESTRATOR_MODEL as DEFAULT_MODEL
@@ -80,70 +78,6 @@ def parse_json_object(text: Any) -> dict[str, Any]:
         if not match:
             raise
         return json.loads(match.group(0))
-
-
-# ---------------------------------------------------------------------------
-# Data-availability helpers
-# ---------------------------------------------------------------------------
-
-
-def _resolve_nexus_db() -> Optional[Path]:
-    """Return the path to the nexus.db / financial_data.db used by the SQL bot."""
-    from backend.chatbot.text_to_sql_chatbot import resolve_db_path
-
-    try:
-        db_path = resolve_db_path(None)
-        return db_path if db_path.exists() else None
-    except Exception:
-        return None
-
-
-def check_sql_data_availability(company_id: str) -> dict[str, Any]:
-    """Quick probe to see whether the SQL database has rows for *company_id*.
-
-    Returns a dict with:
-        available   – bool
-        row_count   – int
-        columns     – list[str]  (of the financial_data table)
-        years       – list[int]  (distinct financial_year values)
-    """
-    db_path = _resolve_nexus_db()
-    if not db_path:
-        return {"available": False, "row_count": 0, "columns": [], "years": []}
-
-    try:
-        import backend.db.db_client as db
-        if not db.check_sqlite_table_exists(db_path, "nexus_financial_data"):
-            return {"available": False, "row_count": 0, "columns": [], "years": []}
-
-        cols = db.get_sqlite_table_info(db_path, "nexus_financial_data")
-        column_names = [c["name"] for c in cols]
-
-        row_count = db.get_sqlite_company_row_count(db_path, company_id)
-        years = db.get_sqlite_company_years(db_path, company_id)
-
-        return {
-            "available": row_count > 0,
-            "row_count": row_count,
-            "columns": column_names,
-            "years": years,
-        }
-    except Exception as exc:
-        log.log_warning(f"SQL availability check failed: {exc}")
-        return {"available": False, "row_count": 0, "columns": [], "years": []}
-
-
-def get_uploaded_document_types(company_id: str) -> dict[str, int]:
-    """Check the documents table to see what document types exist for a company.
-
-    Returns e.g. {"financial": 4, "narrative": 1}
-    """
-    try:
-        import backend.db.db_client as db
-        return db.get_document_type_counts(company_id)
-    except Exception as exc:
-        log.log_warning(f"Document type lookup failed: {exc}")
-        return {}
 
 
 # ---------------------------------------------------------------------------
@@ -247,56 +181,26 @@ async def classify_intent(request: AgenticAskRequest) -> RoutePlan:
 
 
 async def run_sql(request: AgenticAskRequest) -> dict[str, Any]:
-    """Replaced raw text-to-SQL with an agent using DatabaseOperationsTool."""
-    log.log_info("DB Tool Agent execution started")
-    from crewai import Agent, Crew, Process, Task
-    from backend.chatbot.tools.db_tool import DatabaseOperationsTool
+    """Real text-to-SQL against Postgres, scoped to the catalog of
+    application-owned tables (backend/db/schema_template/sql_agent_schema_catalog.yaml)."""
+    log.log_info("Text-to-SQL execution started")
+    from backend.chatbot.text_to_sql_chatbot import get_text_to_sql_chatbot
 
     question = request.message
     if request.contexts:
         question += f" (Context: {', '.join(request.contexts)})"
 
-    db_agent = Agent(
-        role="Database Operations Analyst",
-        goal="Answer the user's question by utilizing the DatabaseOperationsTool to retrieve data.",
-        backstory=(
-            "You are a backend database analyst. You do not write raw SQL. "
-            "Instead, you use the DatabaseOperationsTool to invoke python functions from db_client.py "
-            "to fetch the required data. If the user asks for KPIs, fetch KPIs. If they ask for financial data, "
-            "fetch financial data. Be flexible with column and fact names (e.g. 'ai_revenue' might answer a question about 'AI Revenue'). "
-            "For statistical or deep-analysis questions, always fetch the full dataset — never apply artificial row limits."
-        ),
-        llm=get_crewai_llm(DEFAULT_MODEL),
-        verbose=False,
-        allow_delegation=False,
-        tools=[DatabaseOperationsTool()],
+    chatbot = get_text_to_sql_chatbot()
+    result = await chatbot.ask(question)
+    log.log_info(
+        f"Text-to-SQL execution completed, row_count={result['row_count']}, "
+        f"sql={result['sql']!r}"
     )
-
-    db_task = Task(
-        description=(
-            "Answer the following question using the DatabaseOperationsTool if data is needed.\n\n"
-            f"Question: {question}\n\n"
-            "Rules:\n"
-            "- Use the tool to gather any necessary data.\n"
-            "- If the tool returns JSON with field names close to what the user asked (like 'ai_revenue' for AI Revenue), use that data.\n"
-            "- For statistical or analytical questions, fetch the complete dataset — do not pass limit parameters that would truncate results.\n"
-            "- Provide a clear, concise answer based ONLY on the data returned by the tool.\n"
-            "- If the tool returns an error or absolutely no matching data, state that clearly."
-        ),
-        expected_output="A direct, informative answer to the question based on database results.",
-        agent=db_agent,
-    )
-
-    result = await Crew(
-        agents=[db_agent],
-        tasks=[db_task],
-        process=Process.sequential,
-        verbose=False,
-    ).kickoff_async()
-
-    answer = str(getattr(result, "raw", result)).strip()
-    log.log_info(f"DB Tool Agent execution completed, answer_chars={len(answer)}")
-    return {"answer": answer, "row_count": 1}
+    return {
+        "answer": result["answer"],
+        "row_count": result["row_count"],
+        "sql": result["sql"],
+    }
 
 
 async def run_rag(request: AgenticAskRequest) -> ChatQueryResponse:
@@ -315,6 +219,23 @@ async def run_rag(request: AgenticAskRequest) -> ChatQueryResponse:
     )
 
 
+# Generic meta/instruction words that describe what the user wants to know
+# ABOUT a metric ("what is the formula", "how is X calculated") rather than
+# the metric's own name. websearch_to_tsquery ANDs every remaining word
+# together, and a registry entry's own indexed text never restates words
+# like "kpi" or "formula" about itself — so leaving these in causes a
+# guaranteed zero-hit search for otherwise-perfectly-answerable questions
+# (e.g. "what is the AI ROI KPI formula" against a KPI literally named
+# "AI ROI"). Stripped before FTS; none of the current KPI/fact names
+# contain these words.
+_REGISTRY_QUERY_STOPWORDS = {
+    "kpi", "kpis", "fact", "facts", "metric", "metrics",
+    "formula", "definition", "define", "defined",
+    "calculation", "calculate", "calculated",
+    "mean", "meaning", "measure", "measured",
+}
+
+
 def _clean_search_query(text: str) -> str:
     """Normalize any text before passing to FTS.
 
@@ -324,6 +245,7 @@ def _clean_search_query(text: str) -> str:
     - Underscores as word sep    "ai_attributed_revenue"   → "ai attributed revenue"
     - Brackets/special chars     "[Context: X] why..."     → "why..."
     - Trailing punctuation / extra whitespace
+    - Generic meta words         "AI ROI KPI formula"      → "AI ROI"
     """
     # Drop parenthetical qualifiers like "(Portfolio-wide)", "(Total)", "(Q2 2026)"
     text = re.sub(r"\([^)]*\)", " ", text)
@@ -335,27 +257,36 @@ def _clean_search_query(text: str) -> str:
     text = re.sub(r"[^\w\s]", " ", text)
     # Collapse runs of whitespace
     text = re.sub(r"\s+", " ", text).strip()
-    return text
+    # Drop generic meta/instruction words — but never let this empty out the
+    # query entirely (e.g. a question that's ONLY "what's the formula?").
+    words = [w for w in text.split() if w.lower() not in _REGISTRY_QUERY_STOPWORDS]
+    cleaned = " ".join(words).strip()
+    return cleaned or text
 
 
 async def run_registry(request: AgenticAskRequest, registry: Any) -> dict[str, Any]:
     """Look up KPI/fact definitions directly from registry.db (no LLM, no embedding)."""
     log.log_info("Registry lookup started")
     context_kpi = _extract_context_kpi(request.message)
-    raw_query = context_kpi if context_kpi else request.message
+    stripped_message = _strip_context_prefix(request.message)
+    raw_query = context_kpi if context_kpi else stripped_message
     search_query = _clean_search_query(raw_query)
     log.log_info(f"Registry search query: {search_query!r} (raw={raw_query!r})")
     hits = await asyncio.to_thread(registry.search_registry, search_query, 5)
 
-    # Fallback 1: if context_kpi alone found nothing, try the cleaned stripped question
+    # Fallback 1: if the primary query came from context_kpi and found
+    # nothing, retry against the full (stripped) question instead.
     if not hits and context_kpi:
-        fallback = _clean_search_query(_strip_context_prefix(request.message))
-        log.log_info(f"Registry FTS fallback (stripped message): {fallback!r}")
-        hits = await asyncio.to_thread(registry.search_registry, fallback, 5)
+        fallback = _clean_search_query(stripped_message)
+        if fallback != search_query:
+            log.log_info(f"Registry FTS fallback (stripped message): {fallback!r}")
+            hits = await asyncio.to_thread(registry.search_registry, fallback, 5)
 
-    # Fallback 2: try each meaningful word from the cleaned context_kpi individually
-    if not hits and context_kpi:
-        for term in _clean_search_query(context_kpi).split():
+    # Fallback 2: retry word-by-word on the cleaned query terms. Runs for
+    # ANY zero-hit case (not just when a KPI card was clicked) so free-typed
+    # questions degrade gracefully instead of returning nothing.
+    if not hits:
+        for term in search_query.split():
             if len(term) > 3:
                 hits = await asyncio.to_thread(registry.search_registry, term, 5)
                 if hits:
@@ -668,7 +599,7 @@ async def run_tool_based_agentic_query(
         registry_context=registry_context,
     )
 
-    sql_query_str = None
+    sql_query_str = sql_result.get("sql") if sql_result else None
 
     if request.session_id:
         ChatHistoryStore.add(request.session_id, "assistant", answer)

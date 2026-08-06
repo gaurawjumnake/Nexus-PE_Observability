@@ -1,0 +1,337 @@
+# Schema catalog for the text-to-SQL chat agent.
+#
+# Scope: ONLY the application-owned tables defined in nexus_schema.sql (7) and
+# registry_schema.sql (12). The Postgres database also hosts unrelated tables
+# belonging to a separate dashboard application (analytics_*, dashboards,
+# tile_items, profiles, etc.) — those are intentionally NOT listed here and
+# must never be queried by this agent.
+#
+# Each table entry:
+#   summary      - one/two sentences: what the table holds and when an agent
+#                  should pick it for a given question.
+#   columns      - name, type (as declared in the .sql schema), and a short
+#                  note where the meaning isn't obvious from the name alone.
+#   primary_key  - column(s) forming the PK.
+#   foreign_keys - {column, references} for declared FKs.
+#   related_to   - logical cross-schema links that are NOT enforced as DB
+#                  foreign keys (nexus_* and registry_* are separate schema
+#                  files) but are valid join keys, e.g. nexus_kpis.kpi_id ==
+#                  registry_kpis.kpi_id.
+
+source_schemas:
+  - backend/db/schema_template/nexus_schema.sql
+  - backend/db/schema_template/registry_schema.sql
+
+tables:
+
+  # ---------------------------------------------------------------------
+  # nexus_schema.sql — operational / value data
+  # ---------------------------------------------------------------------
+
+  nexus_documents:
+    summary: >
+      One row per uploaded source document (PDF, report, spreadsheet, etc.).
+      Use to look up which documents exist for a company, or to resolve a
+      document_id to its file name / classified type.
+    columns:
+      - {name: document_id, type: TEXT, note: primary key}
+      - {name: company_id, type: TEXT, note: portfolio company this document belongs to}
+      - {name: file_name, type: TEXT}
+      - {name: document_type, type: TEXT, note: "classified type, e.g. financial, narrative"}
+      - {name: created_at, type: TIMESTAMP}
+    primary_key: [document_id]
+    foreign_keys: []
+
+  nexus_document_chunks:
+    summary: >
+      Chunked text passages extracted from a document (used for RAG retrieval
+      and fact extraction). Rarely relevant to direct business/data questions
+      — prefer nexus_facts or nexus_fact_observations for values.
+    columns:
+      - {name: chunk_id, type: TEXT, note: primary key}
+      - {name: document_id, type: TEXT}
+      - {name: chunk_text, type: TEXT}
+      - {name: chunk_index, type: INTEGER}
+      - {name: page_number, type: INTEGER}
+      - {name: section_title, type: TEXT}
+      - {name: created_at, type: TIMESTAMP}
+    primary_key: [chunk_id]
+    foreign_keys:
+      - {column: document_id, references: nexus_documents.document_id}
+
+  nexus_facts:
+    summary: >
+      Point-in-time fact values, one row per (fact_id, company_id, period).
+      This is the primary source for "what is the value of <fact> for
+      <company> in <period>" questions — e.g. a single quarter's headcount
+      or contract value. For values that change continuously over time, see
+      nexus_fact_observations instead.
+    columns:
+      - {name: fact_id, type: TEXT, note: "identifies the fact type; joins to registry_facts.fact_id for its definition"}
+      - {name: company_id, type: TEXT}
+      - {name: value, type: TEXT, note: stored as text; cast as needed for numeric comparisons}
+      - {name: confidence, type: REAL}
+      - {name: source_document, type: TEXT}
+      - {name: source_chunk, type: TEXT}
+      - {name: source_type, type: TEXT}
+      - {name: period, type: TEXT}
+      - {name: timestamp, type: TIMESTAMP}
+    primary_key: [fact_id, company_id, period]
+    foreign_keys:
+      - {column: source_document, references: nexus_documents.document_id}
+      - {column: source_chunk, references: nexus_document_chunks.chunk_id}
+    related_to:
+      - {column: fact_id, references: registry_facts.fact_id, note: "logical link (not a DB FK) — join for fact name/description/unit"}
+
+  nexus_fact_observations:
+    summary: >
+      Raw dated time-series observations for facts that change over time
+      (never pre-aggregated). Use for trend/history questions — "show X over
+      time", "monthly/daily values of Y", min/max/date-range queries.
+    columns:
+      - {name: fact_id, type: TEXT}
+      - {name: company_id, type: TEXT}
+      - {name: observation_date, type: TEXT}
+      - {name: value, type: TEXT, note: stored as text; cast as needed for numeric comparisons}
+      - {name: confidence, type: REAL}
+      - {name: source_document, type: TEXT}
+      - {name: source_type, type: TEXT}
+      - {name: created_at, type: TIMESTAMP}
+    primary_key: [fact_id, company_id, observation_date]
+    foreign_keys:
+      - {column: source_document, references: nexus_documents.document_id}
+    related_to:
+      - {column: fact_id, references: registry_facts.fact_id, note: "logical link (not a DB FK) — join for fact name/description/unit"}
+
+  nexus_kpis:
+    summary: >
+      Calculated KPI values per company/period (e.g. AI ROI, cost savings %).
+      Use for "what is KPI X for company Y", KPI comparison, and ranking
+      questions. For the KPI's definition/formula/thresholds (not its
+      value), see registry_kpis instead.
+    columns:
+      - {name: kpi_id, type: TEXT, note: "joins to registry_kpis.kpi_id for its definition"}
+      - {name: company_id, type: TEXT}
+      - {name: value, type: REAL}
+      - {name: coverage, type: REAL, note: "data completeness ratio behind this value"}
+      - {name: status, type: TEXT, note: "e.g. ok, insufficient_data"}
+      - {name: period, type: TEXT}
+      - {name: timestamp, type: TIMESTAMP}
+    primary_key: [kpi_id, company_id, period]
+    foreign_keys: []
+    related_to:
+      - {column: kpi_id, references: registry_kpis.kpi_id, note: "logical link (not a DB FK) — join for KPI name/formula/tier/thresholds"}
+
+  nexus_jobs:
+    summary: >
+      Background job tracking for async extract/calculate/insights
+      operations. Internal/operational bookkeeping — only relevant if the
+      user explicitly asks about job or processing status, not business data.
+    columns:
+      - {name: job_id, type: TEXT, note: primary key}
+      - {name: job_type, type: TEXT}
+      - {name: status, type: TEXT, note: "pending | running | done | error"}
+      - {name: params, type: TEXT, note: JSON-encoded}
+      - {name: result, type: TEXT, note: JSON-encoded}
+      - {name: error, type: TEXT}
+      - {name: created_at, type: TIMESTAMP}
+      - {name: updated_at, type: TIMESTAMP}
+    primary_key: [job_id]
+    foreign_keys: []
+
+  nexus_financial_data:
+    summary: >
+      Raw uploaded financial figures per company/year (ai_revenue,
+      total_ai_spend, cost_savings, ebitda_uplift). This is the table with
+      the full list of distinct company_name values — use it for "list
+      portfolio companies", financial comparisons, and year-over-year
+      figures.
+    columns:
+      - {name: id, type: SERIAL, note: primary key}
+      - {name: company_name, type: TEXT}
+      - {name: financial_year, type: INTEGER}
+      - {name: date, type: TEXT}
+      - {name: ai_revenue, type: REAL}
+      - {name: total_ai_spend, type: REAL}
+      - {name: cost_savings, type: REAL}
+      - {name: ebitda_uplift, type: REAL}
+    primary_key: [id]
+    foreign_keys: []
+
+  # ---------------------------------------------------------------------
+  # registry_schema.sql — definitions / metadata (NOT values)
+  # ---------------------------------------------------------------------
+
+  registry_facts:
+    summary: >
+      Definitions/metadata for each fact type (name, category, description,
+      business definition, data type, unit). Use for "what does fact X mean"
+      / "what unit is Y measured in" questions. Does NOT contain values —
+      join to nexus_facts / nexus_fact_observations on fact_id for those.
+    columns:
+      - {name: fact_id, type: TEXT, note: primary key}
+      - {name: name, type: TEXT}
+      - {name: category, type: TEXT}
+      - {name: description, type: TEXT}
+      - {name: business_definition, type: TEXT}
+      - {name: data_type, type: TEXT}
+      - {name: unit, type: TEXT}
+      - {name: fact_type, type: TEXT, note: "raw | derived | composite"}
+      - {name: aggregation_strategy, type: TEXT}
+      - {name: missing_value_strategy, type: TEXT}
+      - {name: status, type: TEXT, note: "default active"}
+      - {name: validation_rules, type: TEXT, note: JSON-encoded}
+      - {name: normalization_rules, type: TEXT, note: JSON-encoded}
+      - {name: confidence_rules, type: TEXT, note: JSON-encoded}
+      - {name: example_values, type: TEXT, note: JSON-encoded}
+    primary_key: [fact_id]
+    foreign_keys: []
+
+  fact_aliases:
+    summary: >
+      Alternate names/synonyms for a fact_id (e.g. "AI Revenue" ->
+      ai_revenue). Useful for resolving a user's loose wording to the exact
+      fact_id before querying value tables.
+    columns:
+      - {name: fact_id, type: TEXT}
+      - {name: alias, type: TEXT}
+    primary_key: [fact_id, alias]
+    foreign_keys:
+      - {column: fact_id, references: registry_facts.fact_id}
+
+  fact_extraction_patterns:
+    summary: >
+      Regex/text patterns used internally to extract a fact from documents.
+      Extraction-pipeline internals — not useful for answering business
+      questions.
+    columns:
+      - {name: fact_id, type: TEXT}
+      - {name: pattern, type: TEXT}
+    primary_key: [fact_id, pattern]
+    foreign_keys:
+      - {column: fact_id, references: registry_facts.fact_id}
+
+  fact_document_sources:
+    summary: >
+      Which document_types are valid/priority sources for extracting a given
+      fact. Extraction-pipeline internals — not useful for answering
+      business questions.
+    columns:
+      - {name: fact_id, type: TEXT}
+      - {name: document_type, type: TEXT}
+      - {name: priority_rank, type: INTEGER}
+    primary_key: [fact_id, document_type]
+    foreign_keys:
+      - {column: fact_id, references: registry_facts.fact_id}
+
+  fact_related:
+    summary: >
+      Fact-to-fact relationship graph (which facts are related to which).
+      Useful only for "what other facts relate to X" meta-questions about
+      the registry itself.
+    columns:
+      - {name: fact_id, type: TEXT}
+      - {name: related_fact_id, type: TEXT}
+    primary_key: [fact_id, related_fact_id]
+    foreign_keys:
+      - {column: fact_id, references: registry_facts.fact_id}
+      - {column: related_fact_id, references: registry_facts.fact_id}
+
+  registry_kpis:
+    summary: >
+      Definitions/metadata for each KPI (name, category, tier, description,
+      business value, formula, unit, thresholds). Use for "what does KPI X
+      mean" / "how is Y calculated" / "what's the threshold for Z"
+      questions. Does NOT contain values — join to nexus_kpis on kpi_id
+      for those.
+    columns:
+      - {name: kpi_id, type: TEXT, note: primary key}
+      - {name: name, type: TEXT}
+      - {name: category, type: TEXT}
+      - {name: tier, type: TEXT, note: "operational | strategic | portfolio"}
+      - {name: description, type: TEXT}
+      - {name: business_value, type: TEXT}
+      - {name: formula, type: TEXT}
+      - {name: unit, type: TEXT}
+      - {name: aggregation, type: TEXT}
+      - {name: frequency, type: TEXT}
+      - {name: missing_data_strategy, type: TEXT}
+      - {name: status, type: TEXT, note: "default active"}
+      - {name: thresholds, type: TEXT, note: JSON-encoded}
+      - {name: data_quality, type: TEXT, note: JSON-encoded}
+      - {name: benchmarking, type: TEXT, note: JSON-encoded}
+      - {name: example_calculation, type: TEXT}
+    primary_key: [kpi_id]
+    foreign_keys: []
+
+  kpi_required_facts:
+    summary: >
+      Which facts a KPI's formula requires as input. Useful for "what data
+      do I need to calculate KPI X" meta-questions about the registry.
+    columns:
+      - {name: kpi_id, type: TEXT}
+      - {name: fact_id, type: TEXT}
+    primary_key: [kpi_id, fact_id]
+    foreign_keys:
+      - {column: kpi_id, references: registry_kpis.kpi_id}
+      - {column: fact_id, references: registry_facts.fact_id}
+
+  kpi_derived_facts:
+    summary: >
+      Which facts a KPI derives/produces as output. Registry-graph
+      internals — rarely needed for direct business questions.
+    columns:
+      - {name: kpi_id, type: TEXT}
+      - {name: fact_id, type: TEXT}
+    primary_key: [kpi_id, fact_id]
+    foreign_keys:
+      - {column: kpi_id, references: registry_kpis.kpi_id}
+      - {column: fact_id, references: registry_facts.fact_id}
+
+  kpi_required_documents:
+    summary: >
+      Which document types are required to compute a given KPI. Useful for
+      "what documents do I need to upload to calculate KPI X" questions.
+    columns:
+      - {name: kpi_id, type: TEXT}
+      - {name: document_type, type: TEXT}
+    primary_key: [kpi_id, document_type]
+    foreign_keys:
+      - {column: kpi_id, references: registry_kpis.kpi_id}
+
+  fact_kpi_related:
+    summary: >
+      Fact-to-KPI relationship graph (which facts feed into which KPIs,
+      distinct from kpi_required_facts's strict input list). Registry-graph
+      internals.
+    columns:
+      - {name: fact_id, type: TEXT}
+      - {name: kpi_id, type: TEXT}
+    primary_key: [fact_id, kpi_id]
+    foreign_keys:
+      - {column: fact_id, references: registry_facts.fact_id}
+      - {column: kpi_id, references: registry_kpis.kpi_id}
+
+  registry_fts:
+    summary: >
+      Full-text search index over fact/KPI names and descriptions, used
+      internally by the registry search route. Not intended for direct
+      SQL querying by the chat agent — use registry_facts/registry_kpis
+      instead for definition lookups.
+    columns:
+      - {name: entity_type, type: TEXT, note: "'fact' or 'kpi'"}
+      - {name: entity_id, type: TEXT}
+      - {name: name, type: TEXT}
+      - {name: text, type: TEXT}
+    primary_key: [entity_type, entity_id]
+    foreign_keys: []
+
+  registry_meta:
+    summary: >
+      Key/value metadata about the registry itself (e.g. schema version).
+      Internal bookkeeping — not useful for business questions.
+    columns:
+      - {name: key, type: TEXT, note: primary key}
+      - {name: value, type: TEXT}
+    primary_key: [key]
+    foreign_keys: []

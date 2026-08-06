@@ -4,6 +4,12 @@ load_dotenv()
 
 from backend.config import DEFAULT_GEMINI_MODEL
 
+# Hard ceiling on any single LLM call. Kept comfortably under API Gateway's
+# fixed 29s integration timeout so a slow/unresponsive provider raises a
+# catchable exception instead of hanging the Lambda invocation to its own
+# (much longer) timeout — see AWS_DEPLOYMENT.md for the 503/hang incident.
+LLM_CALL_TIMEOUT_SECONDS = 20
+
 
 def get_crewai_llm(model: str | None = None, temperature: float = 0):
     # Imported here so crewai's import-time side effects (filesystem writes,
@@ -13,7 +19,12 @@ def get_crewai_llm(model: str | None = None, temperature: float = 0):
     api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if not api_key:
         raise ValueError("Missing GEMINI_API_KEY or GOOGLE_API_KEY")
-    return LLM(model=model or DEFAULT_GEMINI_MODEL, api_key=api_key, temperature=temperature)
+    return LLM(
+        model=model or DEFAULT_GEMINI_MODEL,
+        api_key=api_key,
+        temperature=temperature,
+        timeout=LLM_CALL_TIMEOUT_SECONDS,
+    )
 
 
 from abc import ABC, abstractmethod
@@ -47,7 +58,9 @@ class AzureOpenAIClient(BaseLLMClient):
             ),
             azure_endpoint=os.environ[
                 "AZURE_OPENAI_ENDPOINT"
-            ]
+            ],
+            timeout=LLM_CALL_TIMEOUT_SECONDS,
+            max_retries=1,
         )
 
         self.deployment = os.environ[
@@ -90,9 +103,11 @@ class GeminiClient(BaseLLMClient):
     def __init__(self):
 
         from google import genai
+        from google.genai import types
 
         self.client = genai.Client(
-            api_key=os.environ["GEMINI_API_KEY"]
+            api_key=os.environ["GEMINI_API_KEY"],
+            http_options=types.HttpOptions(timeout=LLM_CALL_TIMEOUT_SECONDS * 1000),
         )
 
         self.model = os.getenv(

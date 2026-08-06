@@ -76,6 +76,28 @@ engine = create_engine(
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+# Dedicated engine for the nexus_jobs poll path (GET /jobs/{job_id} etc).
+# pool_pre_ping is off here: it costs an extra cross-region round-trip on
+# every checkout, which dominates the latency of this table's otherwise
+# trivial single-row reads/writes. The client polls this table every ~1-3s,
+# so a rare stale-connection error self-heals on the next poll instead of
+# needing an application-level retry.
+jobs_engine = create_engine(
+    DATABASE_URL,
+    pool_size=2,
+    max_overflow=1,
+    pool_timeout=30,
+    pool_pre_ping=False,
+    pool_recycle=240,
+    connect_args={
+        "connect_timeout":    10,
+        "keepalives":         1,
+        "keepalives_idle":    30,
+        "keepalives_interval": 5,
+        "keepalives_count":   5,
+    },
+)
+
 
 # ---------------------------------------------------------------------------
 # Session
@@ -303,6 +325,31 @@ def get_kpis_for_company(company_id: str, period: str) -> list[dict]:
         return [_orm_to_dict(r) for r in rows]
 
 
+def get_kpis_for_companies_periods(
+    kpi_ids: list[str], company_ids: list[str], periods: list[str],
+) -> list[dict]:
+    """
+    Batch read of already-persisted nexus_kpis rows for several portfolios,
+    KPIs, and periods at once (one indexed query instead of one request per
+    portfolio) - the cache-read side of a multi-portfolio MoM/QoQ/YoY chart.
+    Callers still need to fill in whatever periods come back missing.
+    """
+    if not kpi_ids or not company_ids or not periods:
+        return []
+    normalized_ids = [c.strip().lower() for c in company_ids]
+    with get_session() as db:
+        rows = (
+            db.query(KPI)
+            .filter(
+                KPI.kpi_id.in_(kpi_ids),
+                KPI.company_id.in_(normalized_ids),
+                KPI.period.in_(periods),
+            )
+            .all()
+        )
+        return [_orm_to_dict(r) for r in rows]
+
+
 def get_kpis() -> list[dict]:
     with get_session() as db:
         rows = db.query(KPI).order_by(KPI.kpi_id).all()
@@ -320,6 +367,73 @@ def get_kpi_history(kpi_id: str, company_id: str, limit: int | None = None) -> l
             q = q.limit(limit)
         rows = q.all()
         return [{"period": r.period, "value": r.value, "status": r.status} for r in rows]  # type: ignore[misc]
+
+
+# ---------------------------------------------------------------------------
+# Jobs
+# ---------------------------------------------------------------------------
+
+def create_job(job_type: str, params: dict) -> str:
+    job_id = str(uuid.uuid4())
+    with jobs_engine.connect() as conn:
+        conn.execute(
+            text(
+                "INSERT INTO nexus_jobs (job_id, job_type, status, params) "
+                "VALUES (:job_id, :job_type, 'pending', :params)"
+            ),
+            {"job_id": job_id, "job_type": job_type, "params": json.dumps(params)},
+        )
+        conn.commit()
+    return job_id
+
+
+def get_job(job_id: str) -> Optional[dict]:
+    with jobs_engine.connect() as conn:
+        row = conn.execute(
+            text("SELECT * FROM nexus_jobs WHERE job_id = :job_id"),
+            {"job_id": job_id},
+        ).fetchone()
+    if row is None:
+        return None
+    d = dict(row._mapping)
+    for field in ("params", "result"):
+        if d.get(field):
+            d[field] = json.loads(d[field])
+    return d
+
+
+def update_job_status(
+    job_id: str,
+    status: str,
+    result: Optional[dict] = None,
+    error: Optional[str] = None,
+) -> None:
+    with jobs_engine.connect() as conn:
+        conn.execute(
+            text(
+                "UPDATE nexus_jobs SET status=:status, result=:result, error=:error, "
+                "updated_at=CURRENT_TIMESTAMP WHERE job_id=:job_id"
+            ),
+            {
+                "job_id": job_id,
+                "status": status,
+                "result": json.dumps(result) if result is not None else None,
+                "error": error,
+            },
+        )
+        conn.commit()
+
+
+def list_jobs(limit: int = 20) -> list[dict]:
+    with jobs_engine.connect() as conn:
+        rows = conn.execute(
+            text(
+                "SELECT job_id, job_type, status, created_at, updated_at "
+                "FROM nexus_jobs ORDER BY created_at DESC LIMIT :limit"
+            ),
+            {"limit": limit},
+        ).fetchall()
+    return [dict(r._mapping) for r in rows]
 
 
 # ---------------------------------------------------------------------------
@@ -717,6 +831,24 @@ class RegistryService:
         finally:
             conn.close()
 
+    def list_kpi_ids_for_document_type(self, document_type: str) -> list[str]:
+        """
+        KPI ids whose required_documents (kpi_required_documents table)
+        include this document_type - i.e. which KPIs a document of this
+        type could plausibly supply facts for. Used to scope the
+        post-extraction sufficiency check to KPIs this document was ever
+        expected to inform, instead of judging it against the full registry.
+        """
+        conn = self._connect()
+        try:
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT DISTINCT kpi_id FROM kpi_required_documents WHERE document_type=%s",
+                (document_type,))
+            return [r["kpi_id"] for r in cur.fetchall()]
+        finally:
+            conn.close()
+
     def list_all_fact_ids(self) -> list[str]:
         """Return every fact_id in the registry."""
         conn = self._connect()
@@ -1063,95 +1195,3 @@ def drop_pg_table(table_name: str):
     meta = MetaData()
     tbl = Table(table_name, meta, autoload_with=engine)
     tbl.drop(engine)
-
-
-# ---------------------------------------------------------------------------
-# Text-to-SQL Chatbot Helpers (SQLite) — second pass
-# ---------------------------------------------------------------------------
-import sqlite3
-from pathlib import Path
-
-
-def get_sqlite_table_names(db_path: Path) -> list[dict]:
-    with sqlite3.connect(db_path) as conn:
-        conn.row_factory = sqlite3.Row
-        return conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' "
-            "AND name IN ('nexus_financial_data', 'nexus_kpis', 'nexus_fact_observations', 'nexus_facts') ORDER BY name"
-        ).fetchall()
-
-
-def get_sqlite_table_info(db_path: Path, table: str) -> list[dict]:
-    with sqlite3.connect(db_path) as conn:
-        conn.row_factory = sqlite3.Row
-        return conn.execute(f'PRAGMA table_info("{table}")').fetchall()
-
-
-def get_sqlite_table_count(db_path: Path, table: str) -> int:
-    with sqlite3.connect(db_path) as conn:
-        conn.row_factory = sqlite3.Row
-        return conn.execute(f'SELECT COUNT(*) AS count FROM "{table}"').fetchone()["count"]
-
-
-def get_sqlite_table_sample(db_path: Path, table: str, limit: int = 3) -> list[dict]:
-    with sqlite3.connect(db_path) as conn:
-        conn.row_factory = sqlite3.Row
-        return conn.execute(f'SELECT * FROM "{table}" LIMIT {limit}').fetchall()
-
-
-def get_sqlite_companies_summary(db_path: Path) -> list[dict]:
-    with sqlite3.connect(db_path) as conn:
-        conn.row_factory = sqlite3.Row
-        return conn.execute(
-            "SELECT company_name, MIN(financial_year) AS min_year, "
-            "MAX(financial_year) AS max_year, COUNT(*) AS rows "
-            "FROM nexus_financial_data GROUP BY company_name ORDER BY company_name"
-        ).fetchall()
-
-
-def get_sqlite_date_range(db_path: Path) -> dict:
-    with sqlite3.connect(db_path) as conn:
-        conn.row_factory = sqlite3.Row
-        return dict(conn.execute(
-            "SELECT MIN(date) AS min_date, MAX(date) AS max_date FROM nexus_financial_data"
-        ).fetchone())
-
-
-def check_sqlite_table_exists(db_path: Path, table: str) -> bool:
-    with sqlite3.connect(db_path) as conn:
-        conn.row_factory = sqlite3.Row
-        return len(conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table,)
-        ).fetchall()) > 0
-
-
-def get_sqlite_company_row_count(db_path: Path, company_id: str) -> int:
-    with sqlite3.connect(db_path) as conn:
-        conn.row_factory = sqlite3.Row
-        return conn.execute(
-            "SELECT COUNT(*) AS cnt FROM nexus_financial_data WHERE LOWER(company_name) LIKE ?",
-            (f"%{company_id.lower()}%",),
-        ).fetchone()["cnt"]
-
-
-def get_sqlite_company_years(db_path: Path, company_id: str) -> list[int]:
-    with sqlite3.connect(db_path) as conn:
-        conn.row_factory = sqlite3.Row
-        rows = conn.execute(
-            "SELECT DISTINCT financial_year FROM nexus_financial_data "
-            "WHERE LOWER(company_name) LIKE ? AND financial_year IS NOT NULL ORDER BY financial_year",
-            (f"%{company_id.lower()}%",),
-        ).fetchall()
-        return [r["financial_year"] for r in rows]
-
-
-def explain_sqlite_query(db_path: Path, sql: str) -> list[dict]:
-    with sqlite3.connect(db_path) as conn:
-        conn.row_factory = sqlite3.Row
-        return [dict(r) for r in conn.execute(f"EXPLAIN QUERY PLAN {sql}").fetchall()]
-
-
-def execute_sqlite_query(db_path: Path, sql: str) -> list[dict]:
-    with sqlite3.connect(db_path) as conn:
-        conn.row_factory = sqlite3.Row
-        return [dict(r) for r in conn.execute(sql).fetchall()]

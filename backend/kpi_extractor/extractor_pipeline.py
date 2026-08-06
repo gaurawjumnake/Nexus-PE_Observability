@@ -326,6 +326,34 @@ def calculate_kpis_for_periods(
     return {p: calculate_kpis(company_id=company_id, period=p, registry=registry, kpi_ids=kpi_ids) for p in periods}
 
 
+def is_kpi_extraction_sufficient(
+    kpi_results_by_period: dict[str, list[dict]],
+    document_type: str,
+    registry: RegistryService,
+) -> bool:
+    """
+    True if every KPI relevant to this document_type (per the registry's
+    kpi_required_documents) calculated successfully in every period - i.e.
+    the deterministic tabular extraction pass already got everything this
+    document could plausibly supply, and the narrative/LLM extraction
+    fallback isn't worth running.
+
+    Strict rule: a single insufficient_data result among the relevant KPIs,
+    in any period, is enough to call it insufficient. KPIs not relevant to
+    this document_type (not in its required_documents anywhere in the
+    registry) don't count against it either way.
+    """
+    relevant_kpi_ids = set(registry.list_kpi_ids_for_document_type(document_type))
+    if not relevant_kpi_ids:
+        return True
+
+    for period_results in kpi_results_by_period.values():
+        for result in period_results:
+            if result["kpi_id"] in relevant_kpi_ids and result["status"] == "insufficient_data":
+                return False
+    return True
+
+
 def calculate_kpi_trend(
     kpi_id: str,
     company_id: str,
@@ -401,6 +429,68 @@ def calculate_kpi_trends(
         )
         for kpi_id in kpi_ids
     }
+
+
+def calculate_kpi_trends_for_portfolios(
+    kpi_ids: list[str],
+    company_ids: list[str],
+    period_type: str,
+    start_period: str,
+    end_period: str,
+    registry: RegistryService,
+) -> dict[str, dict[str, list[dict]]]:
+    """
+    Like calculate_kpi_trends, but across many portfolios at once - the
+    all-portfolios MoM/QoQ/YoY chart. Reads already-persisted nexus_kpis
+    rows in a single batch query first (one call per period is what
+    calculate_trend/save_kpi already keeps up to date), and only falls
+    back to live fact aggregation for a (company_id, kpi_id) pair that
+    isn't fully cached yet - warming the cache for next time via
+    save_results=True on that fallback.
+
+    Returns {company_id: {kpi_id: [period_result, ...]}}.
+    """
+    periods = fact_aggregation.enumerate_periods(period_type, start_period, end_period)
+
+    cached_rows = db.get_kpis_for_companies_periods(kpi_ids, company_ids, periods)
+    cached_lookup: dict[tuple[str, str, str], dict] = {
+        (row["company_id"], row["kpi_id"], row["period"]): row for row in cached_rows
+    }
+
+    results: dict[str, dict[str, list[dict]]] = {}
+    for company_id in company_ids:
+        normalized_id = company_id.strip().lower()
+        results[company_id] = {}
+        missing_kpi_ids = []
+
+        for kpi_id in kpi_ids:
+            period_results = [
+                cached_lookup.get((normalized_id, kpi_id, period)) for period in periods
+            ]
+            if all(period_results):
+                results[company_id][kpi_id] = [
+                    {
+                        "kpi_id": row["kpi_id"], "kpi": row["kpi_id"], "value": row["value"], #type:ignore
+                        "coverage": row["coverage"], "status": row["status"], "period": row["period"], #type:ignore
+                    }
+                    for row in period_results
+                ]
+            else:
+                missing_kpi_ids.append(kpi_id)
+
+        if missing_kpi_ids:
+            live_results = calculate_kpi_trends(
+                kpi_ids=missing_kpi_ids,
+                company_id=company_id,
+                period_type=period_type,
+                start_period=start_period,
+                end_period=end_period,
+                registry=registry,
+                save_results=True,
+            )
+            results[company_id].update(live_results)
+
+    return results
 
 
 # ------------------------------------------------------------------

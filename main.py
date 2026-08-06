@@ -7,6 +7,7 @@ from backend.api.deps import init_shared_resources, get_registry, check_db
 from backend.api.documents_router import router as documents_router
 from backend.api.kpi_router import router as kpi_router
 from backend.api.chatbot_router import router as chat_router
+from backend.api.jobs_router import router as jobs_router
 from backend.utilites.app_logger import Logger
 from backend.utilites.llm_models import get_llm_client
 
@@ -46,6 +47,7 @@ app.add_middleware(
 app.include_router(documents_router)
 app.include_router(kpi_router)
 app.include_router(chat_router)
+app.include_router(jobs_router)
 
 
 @app.get("/health")
@@ -60,8 +62,62 @@ async def health_db():
         raise HTTPException(status_code=503, detail=result.get("detail", "DB unreachable"))
     return result
 
+
+@app.get("/warmup")
+async def warmup():
+    """
+    Lightweight endpoint for EventBridge keepalive pings via API Gateway.
+    Returns immediately — no DB or LLM calls.
+    """
+    return {"status": "warm"}
+
+
+# ---------------------------------------------------------------------------
+# Lambda entrypoint
+# ---------------------------------------------------------------------------
+# _mangum handles normal API Gateway HTTP events.
+# handler() wraps it to intercept two additional event shapes before they
+# reach Mangum (which would fail to parse them):
+#
+#   1. EventBridge scheduled ping  {"source": "aws.events", ...}
+#      → returns immediately so the container stays warm without a real request.
+#
+#   2. Async job invocation        {"nexus_job_id": "<uuid>"}
+#      → runs the job worker inline (Lambda was invoked with InvocationType=Event
+#        by POST /kpis/extract/async, so the original caller already got 202).
+# ---------------------------------------------------------------------------
 from mangum import Mangum
-handler = Mangum(app, lifespan="auto")
+
+_mangum = Mangum(app, lifespan="off")
+
+
+def handler(event, context):
+    # EventBridge warmup ping
+    if event.get("source") == "aws.events":
+        log.log_info("Warmup ping received from EventBridge")
+        return {"statusCode": 200, "body": "warm"}
+
+    # Async job worker invocation (self-invoked with InvocationType=Event)
+    if "nexus_job_id" in event:
+        job_id = event["nexus_job_id"]
+        log.log_info(f"Processing background job: {job_id}")
+        from backend.api.job_worker import process_job
+        import threading
+        # Run in a dedicated thread: job handlers may call asyncio.run(),
+        # which nulls out the calling thread's event loop when it finishes.
+        # This container's MainThread is reused by Mangum for unrelated HTTP
+        # requests on the next warm invocation — if asyncio.run() ran there
+        # directly, it would leave every subsequent request in this container
+        # broken with "no current event loop in thread 'MainThread'".
+        # asyncio's loop state is thread-local, so isolating to a child
+        # thread keeps MainThread's loop state untouched.
+        t = threading.Thread(target=process_job, args=(job_id,))
+        t.start()
+        t.join()
+        return {"statusCode": 200, "body": "done"}
+
+    # Normal API Gateway request
+    return _mangum(event, context)
 
 
 if __name__ == "__main__":

@@ -169,7 +169,7 @@ def main(company_name, year, seed=None, outdir='.'):
 
 
 if __name__ == "__main__":
-    company_name = "Provation"
+    company_name = "demo_account_1"
     year = 2026
     # seed = 42 
     df = main(company_name, year, outdir='.')

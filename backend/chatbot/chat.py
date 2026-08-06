@@ -63,13 +63,18 @@ class ChatQueryResponse(BaseModel):
 class GeminiEmbeddingFunction(EmbeddingFunction):
     def __init__(self) -> None:
         from google import genai
+        from google.genai import types
+        from backend.utilites.llm_models import LLM_CALL_TIMEOUT_SECONDS
 
         api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
         if not api_key:
             raise ValueError("Missing GEMINI_API_KEY or GOOGLE_API_KEY for Gemini embeddings")
 
         log.log_info("Initializing Gemini embedding function")
-        self.client = genai.Client(api_key=api_key)
+        self.client = genai.Client(
+            api_key=api_key,
+            http_options=types.HttpOptions(timeout=LLM_CALL_TIMEOUT_SECONDS * 1000),
+        )
         self.model = os.getenv("NEXUS_GEMINI_EMBEDDING_MODEL", "gemini-embedding-001")
         log.log_info(f"Gemini embedding model selected: {self.model}")
 
@@ -87,12 +92,15 @@ class GeminiEmbeddingFunction(EmbeddingFunction):
 class AzureOpenAIEmbeddingFunction(EmbeddingFunction):
     def __init__(self) -> None:
         from openai import AzureOpenAI
+        from backend.utilites.llm_models import LLM_CALL_TIMEOUT_SECONDS
 
         log.log_info("Initializing Azure OpenAI embedding function")
         self.client = AzureOpenAI(
             api_key=os.environ["AZURE_OPENAI_API_KEY"],
             api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview"),
             azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
+            timeout=LLM_CALL_TIMEOUT_SECONDS,
+            max_retries=1,
         )
         self.deployment = os.environ["AZURE_OPENAI_EMBEDDING_DEPLOYMENT"]
         log.log_info(f"Azure embedding deployment selected: {self.deployment}")

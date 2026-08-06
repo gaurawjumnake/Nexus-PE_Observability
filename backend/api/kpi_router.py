@@ -1,16 +1,22 @@
+import json
+import os
+import threading
 from typing import Any, Optional
 
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from backend.kpi_extractor.extractor_pipeline import (
     ingest_document_from_chunks,
     calculate_kpis,
     calculate_kpi_trends,
+    calculate_kpi_trends_for_portfolios,
     get_insights,
 )
 from backend.kpi_extractor.app.core.registry_writer import add_fact, add_kpi
 from backend.utilites.app_logger import Logger
+from backend.utilites.llm_models import get_llm_client
+from backend.api.deps import get_registry
 import backend.db.db_client as db
 
 log = Logger()
@@ -45,8 +51,16 @@ class TrendRequest(BaseModel):
     save_results: bool = False  # persist each period's result via /calculate's storage path
 
 
+class PortfolioTrendRequest(BaseModel):
+    company_ids: list[str]
+    kpi_ids: list[str]
+    period_type: str          # 'month' | 'quarter' | 'year'
+    start_period: str         # e.g. '2025-Q1' for period_type='quarter'
+    end_period: str           # e.g. '2025-Q4'
+
+
 @router.post("/extract")
-async def extract_facts(request: Request, body: ExtractRequest):
+async def extract_facts(body: ExtractRequest):
     """
     Stages 3-7: classify document, extract + validate facts from
     chunks already persisted by the document router, save to fact store.
@@ -57,8 +71,8 @@ async def extract_facts(request: Request, body: ExtractRequest):
         log.log_warning(f"Fact extraction: no chunks found for document_id={body.document_id}")
         raise HTTPException(status_code=404, detail="Document not found or has no chunks")
 
-    llm = request.app.state.llm
-    registry = request.app.state.registry
+    llm = get_llm_client()
+    registry = get_registry()
 
     try:
         result = ingest_document_from_chunks(
@@ -75,11 +89,49 @@ async def extract_facts(request: Request, body: ExtractRequest):
     return result
 
 
+@router.post("/extract/async")
+async def extract_facts_async(body: ExtractRequest):
+    """
+    Submit fact extraction as a background job and return immediately (202).
+    Poll GET /jobs/{job_id} for status and result.
+
+    On Lambda: invokes the same function asynchronously (InvocationType=Event).
+    Locally: runs in a background thread.
+    """
+    chunks = db.get_chunks(body.document_id)
+    if not chunks:
+        raise HTTPException(status_code=404, detail="Document not found or has no chunks")
+
+    params = {
+        "document_id": body.document_id,
+        "company_id": body.company_id,
+        "period": body.period,
+    }
+    job_id = db.create_job("extract", params)
+    log.log_info(f"Async extract job created: job_id={job_id} document_id={body.document_id}")
+
+    fn_name = os.getenv("AWS_LAMBDA_FUNCTION_NAME")
+    if fn_name:
+        import boto3
+        boto3.client("lambda", region_name=os.getenv("AWS_REGION", "ap-southeast-2")).invoke(
+            FunctionName=fn_name,
+            InvocationType="Event",
+            Payload=json.dumps({"nexus_job_id": job_id}),
+        )
+        log.log_info(f"Job {job_id} dispatched via Lambda async invocation")
+    else:
+        from backend.api.job_worker import process_job
+        threading.Thread(target=process_job, args=(job_id,), daemon=True).start()
+        log.log_info(f"Job {job_id} dispatched via background thread (local)")
+
+    return {"job_id": job_id, "status": "pending", "poll_url": f"/jobs/{job_id}"}
+
+
 @router.post("/calculate")
-async def calculate(request: Request, body: CalculateKPIRequest):
+async def calculate(body: CalculateKPIRequest):
     """Stages 8-10: read facts, compute KPIs, persist results."""
     log.log_info(f"KPI calculation started: company_id={body.company_id} period={body.period} kpi_ids={body.kpi_ids}")
-    registry = request.app.state.registry
+    registry = get_registry()
     try:
         results = calculate_kpis(
             company_id=body.company_id,
@@ -107,7 +159,7 @@ async def list_all_kpis():
 
 
 @router.post("/trend")
-async def trend(request: Request, body: TrendRequest):
+async def trend(body: TrendRequest):
     """
     MoM / QoQ / YoY for one or more KPIs: the same formula evaluated once
     per period between start_period and end_period, each period pulling
@@ -123,7 +175,7 @@ async def trend(request: Request, body: TrendRequest):
     pass save_results=true to also write each period's value via the
     same storage path /calculate uses.
     """
-    registry = request.app.state.registry
+    registry = get_registry()
     try:
         results = calculate_kpi_trends(
             kpi_ids=body.kpi_ids,
@@ -146,12 +198,53 @@ async def trend(request: Request, body: TrendRequest):
     }
 
 
+@router.post("/trend/portfolios")
+async def trend_portfolios(body: PortfolioTrendRequest):
+    """
+    MoM / QoQ / YoY for one or more KPIs across MULTIPLE portfolios in a
+    single request - what an "all portfolios" trend chart should call
+    instead of firing one /trend request per portfolio and aggregating
+    client-side.
+
+    Serves already-persisted nexus_kpis rows via one batch query where
+    available, and only recomputes (and caches for next time) whatever
+    (portfolio, KPI) pairs aren't fully covered yet for the requested
+    period range. Read-only from the caller's perspective - any fallback
+    computation is persisted via the same storage path /calculate uses,
+    same as /trend's save_results=true.
+
+    period_type='month'   -> start_period/end_period like '2025-01'
+    period_type='quarter' -> start_period/end_period like '2025-Q1'
+    period_type='year'    -> start_period/end_period like '2025'
+    """
+    registry = get_registry()
+    try:
+        results = calculate_kpi_trends_for_portfolios(
+            kpi_ids=body.kpi_ids,
+            company_ids=body.company_ids,
+            period_type=body.period_type,
+            start_period=body.start_period,
+            end_period=body.end_period,
+            registry=registry,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    return {
+        "company_ids": body.company_ids,
+        "period_type": body.period_type,
+        "start_period": body.start_period,
+        "end_period": body.end_period,
+        "results": results,
+    }
+
+
 @router.post("/insights")
-async def insights(request: Request, body: InsightRequest):
+async def insights(body: InsightRequest):
     """Stage 11: KPIs + facts -> executive analysis."""
     log.log_info(f"Insights requested: company_id={body.company_id} period={body.period} kpi_ids={body.kpi_ids}")
-    llm = request.app.state.llm
-    registry = request.app.state.registry
+    llm = get_llm_client()
+    registry = get_registry()
     try:
         report = get_insights(
             question=body.question,
@@ -248,12 +341,12 @@ class AddKPIRequest(BaseModel):
 
 
 @router.post("/registry/facts")
-async def create_fact(request: Request, body: AddFactRequest):
+async def create_fact(body: AddFactRequest):
     """
     Create a new fact: writes registry/facts/<fact_id>.yaml and syncs SQLite.
     Pass overwrite=true to replace an existing fact with the same fact_id.
     """
-    registry = request.app.state.registry
+    registry = get_registry()
     fact_data = body.model_dump(exclude={"overwrite"})
     fact_data["confidence_rules"] = body.confidence_rules.model_dump()
     try:
@@ -264,13 +357,13 @@ async def create_fact(request: Request, body: AddFactRequest):
 
 
 @router.post("/registry/kpis")
-async def create_kpi(request: Request, body: AddKPIRequest):
+async def create_kpi(body: AddKPIRequest):
     """
     Create a new KPI: writes registry/kpis/<kpi_id>.yaml and syncs SQLite.
     All facts listed in required_facts must already exist in the registry.
     Pass overwrite=true to replace an existing KPI with the same kpi_id.
     """
-    registry = request.app.state.registry
+    registry = get_registry()
     kpi_data = body.model_dump(exclude={"overwrite"})
     kpi_data["benchmarking"] = body.benchmarking.model_dump()
     kpi_data["data_quality"] = body.data_quality.model_dump()

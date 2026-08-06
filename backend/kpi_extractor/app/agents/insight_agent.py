@@ -149,10 +149,12 @@ class InsightAgent(BaseAgent):
             return "No fact data available."
         lines = []
         for r in records:
+            confidence = r.get("confidence")
+            conf_str = f"{confidence:.2f}" if confidence is not None else "?"
             lines.append(
                 f"- {r['fact_id']} = {r['value']} "
-                f"(confidence={r.get('confidence', '?'):.2f}, "
-                f"source={r.get('source_type', '?')})"
+                f"(confidence={conf_str}, "
+                f"source={r.get('source_type') or '?'})"
             )
         return "\n".join(lines)
 

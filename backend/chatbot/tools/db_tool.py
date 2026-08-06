@@ -27,17 +27,6 @@ _READ_ONLY_FUNCTIONS: Dict[str, Any] = {
     "get_observation_date_range": db.get_observation_date_range,
     "get_distinct_observed_facts": db.get_distinct_observed_facts,
     "get_financial_data": db.get_financial_data,
-    # SQLite reads (financial_data.db used by text-to-SQL)
-    "get_sqlite_table_names": db.get_sqlite_table_names,
-    "get_sqlite_table_info": db.get_sqlite_table_info,
-    "get_sqlite_table_count": db.get_sqlite_table_count,
-    "get_sqlite_table_sample": db.get_sqlite_table_sample,
-    "get_sqlite_companies_summary": db.get_sqlite_companies_summary,
-    "get_sqlite_date_range": db.get_sqlite_date_range,
-    "check_sqlite_table_exists": db.check_sqlite_table_exists,
-    "get_sqlite_company_row_count": db.get_sqlite_company_row_count,
-    "get_sqlite_company_years": db.get_sqlite_company_years,
-    "execute_sqlite_query": db.execute_sqlite_query,
 }
 
 

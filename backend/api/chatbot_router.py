@@ -1,3 +1,7 @@
+import json
+import os
+import threading
+
 from backend.chatbot.chat import (
     IndexDocumentRequest,
     ChatQueryResponse,
@@ -13,7 +17,9 @@ from backend.chatbot.orchestrator import (
 )
 
 from backend.utilites.app_logger import Logger
-from fastapi import APIRouter, HTTPException, Request
+from backend.api.deps import get_registry
+import backend.db.db_client as db
+from fastapi import APIRouter, HTTPException
 
 log = Logger()
 
@@ -54,7 +60,7 @@ async def query_chat(request: ChatQueryRequest):
 
 
 @router.post("/ask", response_model=AgenticToolAskResponse)
-async def ask_agentic(request: Request, body: AgenticAskRequest):
+async def ask_agentic(body: AgenticAskRequest):
     """Orchestrated ask.
 
     1. classify_intent() scores the question for SQL vs RAG vs registry-lookup signals.
@@ -63,7 +69,7 @@ async def ask_agentic(request: Request, body: AgenticAskRequest):
     """
     try:
         log.log_info(f"Agentic ask started: {body.model_dump()}")
-        return await run_tool_based_agentic_query(body, request.app.state.registry)
+        return await run_tool_based_agentic_query(body, get_registry())
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
     except Exception as exc:
@@ -78,6 +84,40 @@ async def ask_agentic(request: Request, body: AgenticAskRequest):
             sql_query_executed=None,
             iterations_hint=f"error: {type(exc).__name__}",
         )
+
+
+@router.post("/ask/async")
+async def ask_agentic_async(body: AgenticAskRequest):
+    """
+    Submit an agentic ask as a background job and return immediately (202).
+    Poll GET /jobs/{job_id} for status and result.
+
+    Use this instead of POST /ask for anything that might run long — API
+    Gateway's HTTP API integration has a fixed 29s timeout it will 503 the
+    caller at regardless of what the Lambda is still doing, and tool chains
+    involving SQL + RAG + synthesis routinely exceed that.
+
+    On Lambda: invokes the same function asynchronously (InvocationType=Event).
+    Locally: runs in a background thread.
+    """
+    job_id = db.create_job("chat_ask", body.model_dump())
+    log.log_info(f"Async chat ask job created: job_id={job_id}")
+
+    fn_name = os.getenv("AWS_LAMBDA_FUNCTION_NAME")
+    if fn_name:
+        import boto3
+        boto3.client("lambda", region_name=os.getenv("AWS_REGION", "ap-southeast-2")).invoke(
+            FunctionName=fn_name,
+            InvocationType="Event",
+            Payload=json.dumps({"nexus_job_id": job_id}),
+        )
+        log.log_info(f"Job {job_id} dispatched via Lambda async invocation")
+    else:
+        from backend.api.job_worker import process_job
+        threading.Thread(target=process_job, args=(job_id,), daemon=True).start()
+        log.log_info(f"Job {job_id} dispatched via background thread (local)")
+
+    return {"job_id": job_id, "status": "pending", "poll_url": f"/jobs/{job_id}"}
 
 
 @router.delete("/history/{session_id}")

@@ -109,6 +109,24 @@ CREATE INDEX IF NOT EXISTS idx_nexus_kpis_company
 ON nexus_kpis(company_id);
 
 
+-- nexus_jobs
+-- Background job tracking for async operations (extract, calculate, insights).
+
+CREATE TABLE IF NOT EXISTS nexus_jobs (
+    job_id      TEXT PRIMARY KEY,
+    job_type    TEXT NOT NULL,
+    status      TEXT NOT NULL DEFAULT 'pending',
+    params      TEXT NOT NULL,
+    result      TEXT,
+    error       TEXT,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_nexus_jobs_status
+ON nexus_jobs(status, created_at DESC);
+
+
 -- nexus_financial_data
 
 CREATE TABLE IF NOT EXISTS nexus_financial_data (
